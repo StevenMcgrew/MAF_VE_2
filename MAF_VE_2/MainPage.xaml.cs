@@ -26,5 +26,34 @@ namespace MAF_VE_2
         {
             this.InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            splitView_Main.IsPaneOpen = !(splitView_Main.IsPaneOpen);
+        }
+
+        private void btnOpen_Click(object sender, RoutedEventArgs e)
+        {
+            pivot_Main.SelectedItem = pivotItem_Search;
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if ((page_Main.ActualWidth < 687) && (grid_ForMainPivotItem.Children.Contains(sPanel_Search)))
+            {
+                grid_ForMainPivotItem.Children.Remove(sPanel_Search);
+                grid_ForSearchPivotItem.Children.Add(sPanel_Search);
+            }
+            else if ((page_Main.ActualWidth >= 687) && !(grid_ForMainPivotItem.Children.Contains(sPanel_Search)))
+            {
+                grid_ForSearchPivotItem.Children.Remove(sPanel_Search);
+                grid_ForMainPivotItem.Children.Add(sPanel_Search);
+            }
+        }
+
+        private void btnCloseRecordsView2_Click(object sender, RoutedEventArgs e)
+        {
+            pivot_Main.SelectedItem = pivotItem_Calculator;
+        }
     }
 }
