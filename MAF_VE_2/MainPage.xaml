@@ -5,108 +5,105 @@
     xmlns:local="using:MAF_VE_2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Name="page_Main" SizeChanged="Page_SizeChanged">
+    mc:Ignorable="d" Name="mainPage" Loaded="mainPage_Loaded" SizeChanged="mainPage_SizeChanged">
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
     <Grid Background="Gray">
 
-        <Pivot Name="pivot_Main">
-            <PivotItem Name="pivotItem_Calculator">
-                <Grid Name="grid_ForMainPivotItem">
-                    
+        <Pivot Name="mainPivot">
+            <PivotItem Name="frontPivotItem">
+                <Grid Name="mainGrid">
+
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="0"/>
-                        <ColumnDefinition/>
+                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                        
+                        <StackPanel Name="leftSlimPanel" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                    <Border Grid.Column="0" Background="#FF191818" CornerRadius="20" Margin="0,0,0,15" Padding="0" VerticalAlignment="Center">
-                        <StackPanel Margin="10,10,10,20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <Border Name="calculatorPanel" Background="#FF191818" CornerRadius="20" Margin="0,0,15,15" Padding="0" VerticalAlignment="Top">
+                                <StackPanel Margin="10,10,10,20" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,0,0,15">
+                                    <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,0,0,15">
                                     <Underline>
                                         <Run Text="Inputs"/>
                                     </Underline>
                                     <Run Text=":"/>
-                            </TextBlock>
+                                    </TextBlock>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEC48;" Foreground="White" VerticalAlignment="Center" Margin="0,2,0,0" Width="20"/>
-                                <TextBlock Name="tblkEngineSpeed" Text="Engine speed" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" Width="160"/>
-                                <TextBox Name="tboxEngineRPM" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                <TextBlock Name="tblkRPM" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
-                                <TextBlock Name="tblkMAF" Text="MAF" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0" />
-                                <TextBox Name="tboxMAF" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                <ComboBox Name="cboxMAF" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content">
-                                    <ComboBoxItem Content="g/s"/>
-                                    <ComboBoxItem Content="kg/h"/>
-                                </ComboBox>
-
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEA8B;" Foreground="White" VerticalAlignment="Center" Margin="0,0,0,2" Width="20"/>
-                                <TextBlock Name="tblkEngineSize" Text="Engine size" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                <TextBox Name="tboxEngineSize" TextAlignment="Right" MaxLength="3" InputScope="Number"/>
-                                <TextBlock Name="tblkLiters" Text="L" Margin="2,0,0,0" Foreground="White" VerticalAlignment="Center"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
-                                <TextBlock Name="tblkAirTemp" Text="Air temperature" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                <TextBox Name="tboxTemperature" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                <ComboBox Name="cboxTemp" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
-                                    <ComboBoxItem Content="&#186;F"/>
-                                    <ComboBoxItem Content="&#186;C"/>
-                                </ComboBox>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
-                                <TextBlock Name="tblkAltitude" Text="Elevation" Foreground="White" Width="160" Margin="3,0,0,0" VerticalAlignment="Center"/>
-                                <TextBox Name="tboxAltitude" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                <ComboBox Name="cboxAltitude" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
-                                    <ComboBoxItem Content="ft"/>
-                                    <ComboBoxItem Content="m"/>
-                                </ComboBox>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                <Button Name="btnCalculate" Background="#FF3399FF" Margin="134,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Calculate"/>
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE8EF;" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEC48;" Foreground="White" VerticalAlignment="Center" Margin="0,2,0,0" Width="20"/>
+                                        <TextBlock Text="Engine speed" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" Width="160"/>
+                                        <TextBox Name="rpm" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
+                                        <TextBlock Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
                                     </StackPanel>
-                                </Button>
-                                <Button Name="btnClear" Background="#FF3399FF" Margin="4,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="Clear"/>
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="  &#xE894;" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                </Button>
-                            </StackPanel>
 
-                            <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,30,0,15">
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
+                                        <TextBlock Text="MAF" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                        <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
+                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content">
+                                            <ComboBoxItem Content="g/s"/>
+                                            <ComboBoxItem Content="kg/h"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEA8B;" Foreground="White" VerticalAlignment="Center" Margin="0,0,0,2" Width="20"/>
+                                        <TextBlock Text="Engine size" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                        <TextBox Name="engineSize" TextAlignment="Right" MaxLength="3" InputScope="Number"/>
+                                        <TextBlock Text="L" Margin="2,0,0,0" Foreground="White" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                                        <TextBlock Text="Air temperature" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                        <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
+                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
+                                            <ComboBoxItem Content="&#186;F"/>
+                                            <ComboBoxItem Content="&#186;C"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Elevation" Foreground="White" Width="160" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
+                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
+                                            <ComboBoxItem Content="ft"/>
+                                            <ComboBoxItem Content="m"/>
+                                        </ComboBox>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                        <Button Name="calculateButton" Background="#FF3399FF" Margin="134,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Calculate"/>
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE8EF;" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Name="clearButton" Background="#FF3399FF" Margin="4,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Clear"/>
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="  &#xE894;" VerticalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,30,0,15">
                                     <Underline>
                                         <Run Text="Outputs"/>
                                     </Underline>
                                     <Run Text=":"/>
-                            </TextBlock>
+                                    </TextBlock>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                <StackPanel Orientation="Horizontal" Width="225">
-                                    <TextBlock Name="tblkExpectedMAF" Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <Button Content="*" Foreground="White"/>
-                                    <!--<ComboBox SelectedValuePath="Content" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" Margin="0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                        <StackPanel Orientation="Horizontal" Width="225">
+                                            <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                            <Button Name="asteriskButton" Content="*" Foreground="White"/>
+                                            <!--<ComboBox SelectedValuePath="Content" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" Margin="0">
                                         <ComboBoxItem Content="77"/>
                                         <ComboBoxItem Content="78"/>
                                         <ComboBoxItem Content="79"/>
@@ -212,108 +209,116 @@
                                         <ComboBoxItem Content="179"/>
                                         <ComboBoxItem Content="180"/>
                                     </ComboBox>-->
+                                        </StackPanel>
+                                        <TextBox Name="expectedMAF" TextAlignment="Right" IsReadOnly="True"/>
+                                        <TextBlock Name="expectedMAFUnits" Text="g/s" Margin="3,0,0,0" Foreground="White" VerticalAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Text="MAF Difference" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox Name="mafDifference" TextAlignment="Right" IsReadOnly="True"/>
+                                        <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,2">
+                                        <TextBlock Text="Volumetric Efficiency" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBox Name="VE" TextAlignment="Right" IsReadOnly="True"/>
+                                        <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
+                                    </StackPanel>
+
                                 </StackPanel>
-                                <TextBox Name="tboxExpectedMAF" TextAlignment="Right" IsReadOnly="True"/>
-                                <TextBlock Text="g/s" Margin="3,0,0,0" Foreground="White" VerticalAlignment="Center"/>
+                            </Border>
+
+                            <StackPanel Name="searchPanel" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal">
+                                    <StackPanel>
+                                        <Button Name="searchBackButton" Visibility="Collapsed" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select">
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <ComboBox Name="make" Margin="5,0,5,5" PlaceholderText="Select">
+                                            </ComboBox>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <TextBox Name="model" Margin="5,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select">
+                                            </ComboBox>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" />
+                                        <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" />
+                                        <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" />
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Name="searchButton" Background="#FF3399FF" Margin="12,10,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Search"/>
+                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE11A;" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Name="resetButton" Content="Reset" Background="#FF3399FF" Margin="12,10,0,0"/>
+                                    <!--<Button Name="btnDeleteAll" Content="Delete All" Background="#FF3399FF" Margin="12,10,0,0" Click="btnDeleteAll_Click" />-->
+                                </StackPanel>
+
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Name="tblkMAFDifference" Text="MAF Difference" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBox Name="tboxDifference" TextAlignment="Right" IsReadOnly="True"/>
-                                <TextBlock Name="tblkDiffPercentSign" Text="%" Margin="3,0,0,0" Foreground="White"/>
-                            </StackPanel>
-
-                            <StackPanel Orientation="Horizontal" Margin="0,2">
-                                <TextBlock Name="tblkVE" Text="Volumetric Efficiency" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                <TextBox Name="tboxVE" TextAlignment="Right" IsReadOnly="True"/>
-                                <TextBlock Name="tblkVePercentSign" Text="%" Margin="3,0,0,0" Foreground="White"/>
-                            </StackPanel>
-
-                        </StackPanel>
-                    </Border>
-
-                    <StackPanel Name="sPanel_Search" Grid.Column="0" Grid.Row="1" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel>
-                                <Button Name="btnCloseRecordsView2" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" Click="btnCloseRecordsView2_Click"/>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                    <ComboBox Name="cboxYear2" Margin="5" PlaceholderText="Select">
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                    <ComboBox Name="cboxMake2" Margin="5,0,5,5" PlaceholderText="Select">
-                                    </ComboBox>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                    <TextBox Name="tboxModel2" Margin="5,0,0,0"/>
-                                </StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                    <ComboBox Name="cboxEngine2" Margin="5" PlaceholderText="Select">
-                                    </ComboBox>
-                                </StackPanel>
-                            </StackPanel>
-                            <StackPanel>
-                                <RadioButton GroupName="rbGroup2" Name="rbGood2" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" />
-                                <RadioButton GroupName="rbGroup2" Name="rbBad2" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" />
-                                <RadioButton GroupName="rbGroup2" Name="rbUnsure2" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <StackPanel Orientation="Horizontal">
-                            <Button Name="btnSearch" Background="#FF3399FF" Margin="12,10,0,0">
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Search"/>
-                                    <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE11A;" VerticalAlignment="Center"/>
-                                </StackPanel>
-                            </Button>
-                            <Button Name="btnReset" Content="Reset" Background="#FF3399FF" Margin="12,10,0,0"/>
-                            <!--<Button Name="btnDeleteAll" Content="Delete All" Background="#FF3399FF" Margin="12,10,0,0" Click="btnDeleteAll_Click" />-->
                         </StackPanel>
                         
-                    </StackPanel>
+                    </ScrollViewer>
 
-                    <Grid Grid.Column="2" Grid.RowSpan="2">
-                        <Grid.RowDefinitions>
-                            <RowDefinition/>
-                            <RowDefinition/>
-                        </Grid.RowDefinitions>
-                        <Grid Grid.Row="0">
-                            <ListView Background="White" Margin="20,20,0,20"/>
+                    <ScrollViewer Name="recordsPanel" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <ListView Background="White" Margin="20,20,0,20" Width="1500"/>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <ListView Background="White" Margin="20,20,0,20" Width="1500"/>
+                            </Grid>
                         </Grid>
-                        <Grid Grid.Row="1">
-                            <ListView Background="White" Margin="20,20,0,20"/>
-                        </Grid>
-                    </Grid>
+                        
+                    </ScrollViewer>
                     
                 </Grid>
             </PivotItem>
 
-            <PivotItem Name="pivotItem_Search">
-                <Grid Name="grid_ForSearchPivotItem" Background="#FFBF5050"/>
+            <PivotItem Name="searchPivotItem" Background="#FF812020">
+                <Grid Name="searchGrid"/>
             </PivotItem>
-            <PivotItem Name="pivotItem_Results">
-                <Grid Name="grid_ForResultsPivotItem"/>
+            <PivotItem Name="recordsPivotItem" Background="#FF244F8D">
+                <Grid Name="recordsGrid"/>
             </PivotItem>
         </Pivot>
 
         <StackPanel VerticalAlignment="Top" Background="#FF191818">
-            <Button Name="btn_Menu" HorizontalContentAlignment="Left" Width="100" Foreground="White" VerticalAlignment="Top">
+            <Button Name="menuButton" HorizontalContentAlignment="Left" Width="100" Foreground="White" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
                     <TextBlock Text="Menu" Margin="2,0,0,0"/>
                 </StackPanel>
                 <Button.Flyout>
                     <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}">
-                        <MenuFlyoutItem Name="menuOpen" Text="Open                        Ctrl+ O" />
-                        <MenuFlyoutItem Name="menuSave" Text="Save                          Ctrl+ S" />
-                        <MenuFlyoutItem Name="menuInstructions" Text="Help and How to..." />
+                        <MenuFlyoutItem Name="openButton" Text="Open                        Ctrl+ O" />
+                        <MenuFlyoutItem Name="saveButton" Text="Save                          Ctrl+ S" />
+                        <MenuFlyoutItem Name="helpButton" Text="Help and How to..." />
                         <MenuFlyoutSeparator/>
-                        <MenuFlyoutItem Name="menuPrint" Text="Print                          Ctrl+ P" />
-                        <MenuFlyoutItem Name="menuShare" Text="Share" />
+                        <MenuFlyoutItem Name="printButton" Text="Print                          Ctrl+ P" />
+                        <MenuFlyoutItem Name="shareButton" Text="Share" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>

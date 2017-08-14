@@ -13,48 +13,59 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
-
 namespace MAF_VE_2
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
-        private void btnOpen_Click(object sender, RoutedEventArgs e)
+        private void mainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            pivot_Main.SelectedItem = pivotItem_Search;
+            //mainPage.SizeChanged += mainPage_SizeChanged;
         }
 
-        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if ((page_Main.ActualWidth < 700) && (grid_ForMainPivotItem.Children.Contains(sPanel_Search)))
+            if (mainPage.ActualWidth < 640)
             {
-                grid_ForMainPivotItem.Children.Remove(sPanel_Search);
-                grid_ForSearchPivotItem.Children.Add(sPanel_Search);
-
-                grid_ForMainPivotItem.RowDefinitions[1].Height = new GridLength(0, GridUnitType.Pixel);
-                grid_ForMainPivotItem.RowDefinitions[0].Height = new GridLength(1, GridUnitType.Star);
+                if (mainGrid.Children.Contains(recordsPanel))
+                {
+                    mainGrid.Children.Remove(recordsPanel);
+                    recordsGrid.Children.Add(recordsPanel);
+                    mainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                    mainGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
+                }
             }
-            else if ((page_Main.ActualWidth >= 687) && !(grid_ForMainPivotItem.Children.Contains(sPanel_Search)))
+            else
             {
-                grid_ForSearchPivotItem.Children.Remove(sPanel_Search);
-                grid_ForMainPivotItem.Children.Add(sPanel_Search);
-
-                grid_ForMainPivotItem.RowDefinitions[0].Height = GridLength.Auto;
-                grid_ForMainPivotItem.RowDefinitions[1].Height = new GridLength(1, GridUnitType.Star);
+                if (recordsGrid.Children.Contains(recordsPanel))
+                {
+                    recordsGrid.Children.Remove(recordsPanel);
+                    mainGrid.Children.Add(recordsPanel);
+                    mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
+                    mainGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+                }
             }
-        }
 
-        private void btnCloseRecordsView2_Click(object sender, RoutedEventArgs e)
-        {
-            pivot_Main.SelectedItem = pivotItem_Calculator;
+            if ((mainPage.ActualHeight < 700) && (mainPage.ActualWidth < 640))
+            {
+                if (leftSlimPanel.Children.Contains(searchPanel))
+                {
+                    leftSlimPanel.Children.Remove(searchPanel);
+                    searchGrid.Children.Add(searchPanel);
+                }
+            }
+            else
+            {
+                if (searchGrid.Children.Contains(searchPanel))
+                {
+                    searchGrid.Children.Remove(searchPanel);
+                    leftSlimPanel.Children.Add(searchPanel);
+                }
+            }
         }
     }
 }
