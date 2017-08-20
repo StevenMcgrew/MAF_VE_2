@@ -5,12 +5,12 @@
     xmlns:local="using:MAF_VE_2"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" Name="mainPage" Loaded="mainPage_Loaded" SizeChanged="mainPage_SizeChanged">
+    mc:Ignorable="d" Name="mainPage" SizeChanged="mainPage_SizeChanged">
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
     <Grid Background="Gray">
 
-        <Pivot Name="mainPivot">
+        <Pivot Name="mainPivot" SelectionChanged="mainPivot_SelectionChanged">
             <PivotItem Name="frontPivotItem">
                 <Grid Name="mainGrid">
 
@@ -297,11 +297,11 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem Name="searchPivotItem" Background="#FF812020">
-                <Grid Name="searchGrid"/>
+            <PivotItem Name="saveOrSearchPivotItem" Background="#FF812020">
+                <Grid Name="saveOrSearchGrid"/>
             </PivotItem>
-            <PivotItem Name="recordsPivotItem" Background="#FF244F8D">
-                <Grid Name="recordsGrid"/>
+            <PivotItem Name="databasePivotItem" Background="#FF244F8D">
+                <Grid Name="databaseGrid"/>
             </PivotItem>
         </Pivot>
 
@@ -313,12 +313,14 @@
                 </StackPanel>
                 <Button.Flyout>
                     <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}">
-                        <MenuFlyoutItem Name="openButton" Text="Open                        Ctrl+ O" />
-                        <MenuFlyoutItem Name="saveButton" Text="Save                          Ctrl+ S" />
-                        <MenuFlyoutItem Name="helpButton" Text="Help and How to..." />
+                        <MenuFlyoutItem Name="calculatorMenuItem" Visibility="Collapsed" Text="Calculator" Click="calculatorMenuItem_Click"/>
+                        <MenuFlyoutItem Name="saveOrSearchMenuItem" Visibility="Collapsed" Text="Save or Search" Click="saveOrSearchMenuItem_Click" />
+                        <MenuFlyoutItem Name="databaseMenuItem" Visibility="Collapsed" Text="Database" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
-                        <MenuFlyoutItem Name="printButton" Text="Print                          Ctrl+ P" />
-                        <MenuFlyoutItem Name="shareButton" Text="Share" />
+                        <MenuFlyoutItem Name="printMenuItem" Text="Print" Click="printMenuItem_Click" />
+                        <MenuFlyoutItem Name="shareMenuItem" Text="Share" Click="shareMenuItem_Click" />
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
