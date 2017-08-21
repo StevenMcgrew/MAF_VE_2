@@ -312,10 +312,10 @@
                     <TextBlock Text="Menu" Margin="2,0,0,0"/>
                 </StackPanel>
                 <Button.Flyout>
-                    <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}">
-                        <MenuFlyoutItem Name="calculatorMenuItem" Visibility="Collapsed" Text="Calculator" Click="calculatorMenuItem_Click"/>
-                        <MenuFlyoutItem Name="saveOrSearchMenuItem" Visibility="Collapsed" Text="Save or Search" Click="saveOrSearchMenuItem_Click" />
-                        <MenuFlyoutItem Name="databaseMenuItem" Visibility="Collapsed" Text="Database" Click="databaseMenuItem_Click" />
+                    <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}" Placement="Bottom">
+                        <MenuFlyoutItem Name="calculatorMenuItem" Text="Calculator" Click="calculatorMenuItem_Click"/>
+                        <MenuFlyoutItem Name="saveOrSearchMenuItem" Text="Save or Search" Click="saveOrSearchMenuItem_Click" />
+                        <MenuFlyoutItem Name="databaseMenuItem" Text="Database" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="printMenuItem" Text="Print" Click="printMenuItem_Click" />
                         <MenuFlyoutItem Name="shareMenuItem" Text="Share" Click="shareMenuItem_Click" />

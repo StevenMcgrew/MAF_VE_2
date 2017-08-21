@@ -17,12 +17,7 @@ namespace MAF_VE_2
 {
     public sealed partial class MainPage : Page
     {
-        public MainPage()
-        {
-            InitializeComponent();
-        }
-
-        enum BasicViewState
+        enum ViewState
         {
             Wide,
             NarrowCalculator,
@@ -32,197 +27,226 @@ namespace MAF_VE_2
             ShortDatabase
         };
 
-        private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
+        enum PageSize
         {
-            var basicViewState = GetBasicViewState();
-            RearrangePanels(basicViewState);
-            ManageMenuItems(basicViewState);
-
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            //if (mainPage.ActualWidth < 640)
-            //{
-
-
-            //    if (mainGrid.Children.Contains(recordsPanel))
-            //    {
-            //        mainGrid.Children.Remove(recordsPanel);
-            //        databaseGrid.Children.Add(recordsPanel);
-            //        mainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-            //        mainGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
-            //    }
-            //}
-            //else
-            //{
-            //    if (databaseGrid.Children.Contains(recordsPanel))
-            //    {
-            //        databaseGrid.Children.Remove(recordsPanel);
-            //        mainGrid.Children.Add(recordsPanel);
-            //        mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
-            //        mainGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-            //        mainPivot.SelectedItem = frontPivotItem;
-            //    }
-            //}
-
-            //if ((mainPage.ActualHeight < 700) && (mainPage.ActualWidth < 640))
-            //{
-            //    if (leftSlimPanel.Children.Contains(searchPanel))
-            //    {
-            //        leftSlimPanel.Children.Remove(searchPanel);
-            //        saveOrSearchGrid.Children.Add(searchPanel);
-            //    }
-            //}
-            //else
-            //{
-            //    if (saveOrSearchGrid.Children.Contains(searchPanel))
-            //    {
-            //        saveOrSearchGrid.Children.Remove(searchPanel);
-            //        leftSlimPanel.Children.Add(searchPanel);
-            //        mainPivot.SelectedItem = frontPivotItem;
-            //    }
-            //}
+            Wide,
+            Narrow,
+            Short
         }
 
-        BasicViewState GetBasicViewState()
+        public MainPage()
         {
-            if ((mainPage.ActualHeight < 700) && (mainPage.ActualWidth < 640))
+            InitializeComponent();
+        }
+
+        private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var pageSize = GetPageSize(mainPage);
+            RearrangePanels(pageSize);
+
+            var viewState = GetViewState();
+            ManageMenuItems(viewState);
+        }
+
+        PageSize GetPageSize(Page page)
+        {
+            if ((page.ActualHeight < 700) && (page.ActualWidth < 640))
+            {
+                return PageSize.Short;
+            }
+            else if ((page.ActualWidth < 640) && (page.ActualHeight >=700))
+            {
+                return PageSize.Narrow;
+            }
+            else
+            {
+                return PageSize.Wide;
+            }
+        }
+
+        void RearrangePanels(PageSize pageSize)
+        {
+            switch (pageSize)
+            {
+                case PageSize.Wide:
+                    if (mainPivot.SelectedItem == frontPivotItem)
+                    {
+                        MoveRecordsToFront();
+                    }
+                    else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
+                    {
+                        MoveSearchToFront();
+                        MoveRecordsToFront();
+                        mainPivot.SelectedItem = frontPivotItem;
+                    }
+                    else if (mainPivot.SelectedItem == databasePivotItem)
+                    {
+                        MoveRecordsToFront();
+                        mainPivot.SelectedItem = frontPivotItem;
+                    }
+                    break;
+
+                case PageSize.Narrow:
+                    if (mainPivot.SelectedItem == frontPivotItem)
+                    {
+                        MoveRecordsToPivotItem();
+                        MoveSearchToFront();
+                    }
+                    else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
+                    {
+                        MoveSearchToFront();
+                        mainPivot.SelectedItem = frontPivotItem;
+                    }
+                    else if (mainPivot.SelectedItem == databasePivotItem)
+                    {
+                        MoveSearchToFront();
+                    }
+                    break;
+
+                case PageSize.Short:
+                    if (mainPivot.SelectedItem == frontPivotItem)
+                    {
+                        MoveRecordsToPivotItem();
+                        MoveSearchToPivotItem();
+                    }
+                    //else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
+                    //{
+
+                    //}
+                    //else if (mainPivot.SelectedItem == databasePivotItem)
+                    //{
+
+                    //}
+                    break;
+
+                default:
+                    MoveSearchToFront();
+                    MoveRecordsToFront();
+                    mainPivot.SelectedItem = frontPivotItem;
+                    break;
+            }
+        }
+
+        void MoveSearchToPivotItem()
+        {
+            if (leftSlimPanel.Children.Contains(searchPanel))
+            {
+                leftSlimPanel.Children.Remove(searchPanel);
+                saveOrSearchGrid.Children.Add(searchPanel);
+            }
+        }
+
+        void MoveSearchToFront()
+        {
+            if (saveOrSearchGrid.Children.Contains(searchPanel))
+            {
+                saveOrSearchGrid.Children.Remove(searchPanel);
+                leftSlimPanel.Children.Add(searchPanel);
+            }
+        }
+
+        void MoveRecordsToPivotItem()
+        {
+            if (mainGrid.Children.Contains(recordsPanel))
+            {
+                mainGrid.Children.Remove(recordsPanel);
+                databaseGrid.Children.Add(recordsPanel);
+                mainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
+                mainGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
+            }
+        }
+
+        void MoveRecordsToFront()
+        {
+            if (databaseGrid.Children.Contains(recordsPanel))
+            {
+                databaseGrid.Children.Remove(recordsPanel);
+                mainGrid.Children.Add(recordsPanel);
+                mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
+                mainGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            }
+        }
+
+        ViewState GetViewState()
+        {
+            var pageSize = GetPageSize(mainPage);
+
+            if (pageSize == PageSize.Short)
             {
                 if (mainPivot.SelectedItem == frontPivotItem)
                 {
-                    return BasicViewState.ShortCalculator;
+                    return ViewState.ShortCalculator;
                 }
                 else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
                 {
-                    return BasicViewState.ShortSaveOrSearch;
+                    return ViewState.ShortSaveOrSearch;
                 }
                 else
                 {
-                    return BasicViewState.ShortDatabase;
+                    return ViewState.ShortDatabase;
                 }
             }
-            else if (mainPage.ActualWidth < 640)
+            else if (pageSize == PageSize.Narrow)
             {
                 if (mainPivot.SelectedItem == frontPivotItem)
                 {
-                    return BasicViewState.NarrowCalculator;
+                    return ViewState.NarrowCalculator;
                 }
                 else
                 {
-                    return BasicViewState.NarrowDatabase;
+                    return ViewState.NarrowDatabase;
                 }
             }
             else
             {
-                return BasicViewState.Wide;
+                return ViewState.Wide;
             }
         }
 
-        void ManageMenuItems(BasicViewState view)
+        void ManageMenuItems(ViewState view)
         {
             switch (view)
             {
-                case BasicViewState.Wide:
-                    calculatorMenuItem.Visibility = Visibility.Collapsed;
-                    saveOrSearchMenuItem.Visibility = Visibility.Collapsed;
-                    databaseMenuItem.Visibility = Visibility.Collapsed;
+                case ViewState.Wide:
+                    calculatorMenuItem.IsEnabled = false;
+                    saveOrSearchMenuItem.IsEnabled = false;
+                    databaseMenuItem.IsEnabled = false;
                     break;
 
-                case BasicViewState.NarrowCalculator:
-                    calculatorMenuItem.Visibility = Visibility.Collapsed;
-                    saveOrSearchMenuItem.Visibility = Visibility.Collapsed;
-                    databaseMenuItem.Visibility = Visibility.Visible;
+                case ViewState.NarrowCalculator:
+                    calculatorMenuItem.IsEnabled = false;
+                    saveOrSearchMenuItem.IsEnabled = false;
+                    databaseMenuItem.IsEnabled = true;
                     break;
 
-                case BasicViewState.NarrowDatabase:
-                    calculatorMenuItem.Visibility = Visibility.Visible;
-                    saveOrSearchMenuItem.Visibility = Visibility.Visible;
-                    databaseMenuItem.Visibility = Visibility.Collapsed;
+                case ViewState.NarrowDatabase:
+                    calculatorMenuItem.IsEnabled = true;
+                    saveOrSearchMenuItem.IsEnabled = true;
+                    databaseMenuItem.IsEnabled = false;
                     break;
 
-                case BasicViewState.ShortCalculator:
-                    calculatorMenuItem.Visibility = Visibility.Collapsed;
-                    saveOrSearchMenuItem.Visibility = Visibility.Visible;
-                    databaseMenuItem.Visibility = Visibility.Visible;
+                case ViewState.ShortCalculator:
+                    calculatorMenuItem.IsEnabled = false;
+                    saveOrSearchMenuItem.IsEnabled = true;
+                    databaseMenuItem.IsEnabled = true;
                     break;
 
-                case BasicViewState.ShortSaveOrSearch:
-                    calculatorMenuItem.Visibility = Visibility.Visible;
-                    saveOrSearchMenuItem.Visibility = Visibility.Collapsed;
-                    databaseMenuItem.Visibility = Visibility.Visible;
+                case ViewState.ShortSaveOrSearch:
+                    calculatorMenuItem.IsEnabled = true;
+                    saveOrSearchMenuItem.IsEnabled = false;
+                    databaseMenuItem.IsEnabled = true;
                     break;
 
-                case BasicViewState.ShortDatabase:
-                    calculatorMenuItem.Visibility = Visibility.Visible;
-                    saveOrSearchMenuItem.Visibility = Visibility.Visible;
-                    databaseMenuItem.Visibility = Visibility.Collapsed;
+                case ViewState.ShortDatabase:
+                    calculatorMenuItem.IsEnabled = true;
+                    saveOrSearchMenuItem.IsEnabled = true;
+                    databaseMenuItem.IsEnabled = false;
                     break;
 
                 default:
-                    calculatorMenuItem.Visibility = Visibility.Visible;
-                    saveOrSearchMenuItem.Visibility = Visibility.Visible;
-                    databaseMenuItem.Visibility = Visibility.Visible;
-                    break;
-            }
-        }
-
-        void RearrangePanels(BasicViewState view)
-        {
-            switch (view)
-            {
-                case BasicViewState.Wide:
-                    if (databaseGrid.Children.Contains(recordsPanel))
-                    {
-                        databaseGrid.Children.Remove(recordsPanel);
-                        mainGrid.Children.Add(recordsPanel);
-                        mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
-                        mainGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    if (saveOrSearchGrid.Children.Contains(searchPanel))
-                    {
-                        saveOrSearchGrid.Children.Remove(searchPanel);
-                        leftSlimPanel.Children.Add(searchPanel);
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    break;
-
-                case BasicViewState.NarrowCalculator:
-                    if (mainGrid.Children.Contains(recordsPanel))
-                    {
-                        mainGrid.Children.Remove(recordsPanel);
-                        databaseGrid.Children.Add(recordsPanel);
-                        mainGrid.ColumnDefinitions[0].Width = new GridLength(1, GridUnitType.Star);
-                        mainGrid.ColumnDefinitions[1].Width = new GridLength(0, GridUnitType.Pixel);
-                    }
-                    if (saveOrSearchGrid.Children.Contains(searchPanel))
-                    {
-                        saveOrSearchGrid.Children.Remove(searchPanel);
-                        leftSlimPanel.Children.Add(searchPanel);
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    break;
-
-                case BasicViewState.NarrowDatabase:
-                    if (saveOrSearchGrid.Children.Contains(searchPanel))
-                    {
-                        saveOrSearchGrid.Children.Remove(searchPanel);
-                        leftSlimPanel.Children.Add(searchPanel);
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    break;
-
-                case BasicViewState.ShortCalculator:
-                    if (leftSlimPanel.Children.Contains(searchPanel))
-                    {
-                        leftSlimPanel.Children.Remove(searchPanel);
-                        saveOrSearchGrid.Children.Add(searchPanel);
-                    }
-                    break;
-                case BasicViewState.ShortSaveOrSearch:
-                    break;
-                case BasicViewState.ShortDatabase:
-                    break;
-                default:
+                    calculatorMenuItem.IsEnabled = true;
+                    saveOrSearchMenuItem.IsEnabled = true;
+                    databaseMenuItem.IsEnabled = true;
                     break;
             }
         }
@@ -234,7 +258,16 @@ namespace MAF_VE_2
 
         private void saveOrSearchMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            mainPivot.SelectedItem = saveOrSearchPivotItem;
+            var viewState = GetViewState();
+
+            if (viewState == ViewState.NarrowDatabase)
+            {
+                mainPivot.SelectedItem = frontPivotItem;
+            }
+            else
+            {
+                mainPivot.SelectedItem = saveOrSearchPivotItem;
+            }
         }
 
         private void databaseMenuItem_Click(object sender, RoutedEventArgs e)
@@ -259,8 +292,8 @@ namespace MAF_VE_2
 
         private void mainPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var basicViewState = GetBasicViewState();
-            ManageMenuItems(basicViewState);
+            var viewState = GetViewState();
+            ManageMenuItems(viewState);
         }
     }
 }
