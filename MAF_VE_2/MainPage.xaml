@@ -36,15 +36,15 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEC48;" Foreground="White" VerticalAlignment="Center" Margin="0,2,0,0" Width="20"/>
                                         <TextBlock Text="Engine speed" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" Width="160"/>
-                                        <TextBox Name="rpm" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
+                                        <TextBox Name="rpm" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
                                         <TextBlock Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
                                         <TextBlock Text="MAF" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0" />
-                                        <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content">
+                                        <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="64">
                                             <ComboBoxItem Content="g/s"/>
                                             <ComboBoxItem Content="kg/h"/>
                                         </ComboBox>
@@ -53,15 +53,15 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEA8B;" Foreground="White" VerticalAlignment="Center" Margin="0,0,0,2" Width="20"/>
                                         <TextBlock Text="Engine size" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                        <TextBox Name="engineSize" TextAlignment="Right" MaxLength="3" InputScope="Number"/>
+                                        <TextBox Name="engineSize" TextAlignment="Right" MaxLength="3" InputScope="Number" TextChanged="TextBox_TextChanged"/>
                                         <TextBlock Text="L" Margin="2,0,0,0" Foreground="White" VerticalAlignment="Center"/>
                                     </StackPanel>
 
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
                                         <TextBlock Text="Air temperature" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                        <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
+                                        <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
                                             <ComboBoxItem Content="&#186;F"/>
                                             <ComboBoxItem Content="&#186;C"/>
                                         </ComboBox>
@@ -70,8 +70,8 @@
                                     <StackPanel Orientation="Horizontal" Margin="0,2">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
                                         <TextBlock Text="Elevation" Foreground="White" Width="160" Margin="3,0,0,0" VerticalAlignment="Center"/>
-                                        <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number"/>
-                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0">
+                                        <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
                                             <ComboBoxItem Content="ft"/>
                                             <ComboBoxItem Content="m"/>
                                         </ComboBox>
@@ -84,7 +84,7 @@
                                                 <TextBlock Text="Calculate" Margin="4,0,0,0"/>
                                             </StackPanel>
                                         </Button>
-                                        <Button Name="clearButton" Background="#FF3399FF" Margin="4,0,0,0">
+                                        <Button Name="clearButton" Background="#FF3399FF" Margin="4,0,0,0" Click="clearButton_Click">
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" VerticalAlignment="Center"/>
                                                 <TextBlock Text="Clear" Margin="5,0,0,0"/>
