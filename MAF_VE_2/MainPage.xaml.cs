@@ -7,6 +7,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
 using Windows.UI.Popups;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -20,7 +21,7 @@ namespace MAF_VE_2
     public sealed partial class MainPage : Page
     {
 
-#region Enums
+        #region Enums
 
         enum ViewState
         {
@@ -41,26 +42,55 @@ namespace MAF_VE_2
 
 #endregion
 
+        List<string> makesList = new List<string> { "Acura", "Alfa Romeo","Aston Martin", "Audi", "Bentley",
+                                                "BMW", "Bugatti", "Buick", "Cadillac", "Chevrolet", "Chrysler",
+                                                "Citroen", "Daewoo", "Daihatsu", "Dodge", "Eagle", "Ferrari",
+                                                "Fiat", "Ford", "Freightliner", "Geo", "GMC", "Honda", "Hummer",
+                                                "Hyundai", "Infiniti", "Isuzu", "Jaguar", "Jeep", "Kia", "Lamborghini",
+                                                "Land Rover", "Lexus", "Lincoln", "Lotus", "Maserati", "Maybach",
+                                                "Mazda", "Mercedes-Benz", "Mercury", "Mini", "Mitsubishi", "Nissan",
+                                                "Oldsmobile", "Opel", "Plymouth", "Pontiac", "Porsche", "Ram",
+                                                "Renault", "Rolls-Royce", "Rover", "Saab", "Saturn", "Scion", "Seat",
+                                                "Skoda", "Smart", "Subaru", "Suzuki", "Toyota", "Volkswagen", "Volvo" };
+
         public MainPage()
         {
             InitializeComponent();
+
+            //Create SQLite database table
+            //SQLpath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
+            //SQLconn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), SQLpath);
+            //SQLconn.CreateTable<MAFcalculation>();
         }
 
         private void mainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            string[] engines = new string[] { "0.5L", "0.6L", "0.7L", "0.8L", "0.9L",
-                                              "1.0L", "1.1L", "1.2L", "1.3L", "1.4L", "1.5L", "1.6L", "1.7L", "1.8L", "1.9L",
-                                              "2.0L", "2.1L", "2.2L", "2.3L", "2.4L", "2.5L", "2.6L", "2.7L", "2.8L", "2.9L",
-                                              "3.0L", "3.1L", "3.2L", "3.3L", "3.4L", "3.5L", "3.6L", "3.7L", "3.8L", "3.9L",
-                                              "4.0L", "4.1L", "4.2L", "4.3L", "4.4L", "4.5L", "4.6L", "4.7L", "4.8L", "4.9L",
-                                              "5.0L", "5.1L", "5.2L", "5.3L", "5.4L", "5.5L", "5.6L", "5.7L", "5.8L", "5.9L",
-                                              "6.0L", "6.1L", "6.2L", "6.3L", "6.4L", "6.5L", "6.6L", "6.7L", "6.8L", "6.9L",
-                                              "7.0L", "7.1L", "7.2L", "7.3L", "7.4L", "7.5L", "7.6L", "7.7L", "7.8L", "7.9L",
-                                              "8.0L", "8.1L", "8.2L", "8.3L", "8.4L" };
-            engine.ItemsSource = engines;
+            // Insert engine combobox items
+            double maxEngineSize = 9.0;
+            double minEngineSize = 0.1;
+            for (double i = minEngineSize; i <= maxEngineSize; i = i + 0.1)
+            {
+                string itemToAdd = i.ToString("0.0");
+                engine.Items.Add(itemToAdd);
+            }
+
+            // Insert year combobox items
+            int maxYear = (DateTime.Today.Year) + 2;
+            int minYear = 1900;
+            for (int i = maxYear; i >= minYear; i--)
+            {
+                year.Items.Add(i);
+            }
+
+            // Insert make combobox items
+            var indexOfLastMake = makesList.Count - 1;
+            for (int k = indexOfLastMake; k >= 0; k--)
+            {
+                make.Items.Insert(0, makesList[k]);
+            }
         }
 
-#region SizeChanged handling
+        #region SizeChanged handling
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -521,6 +551,55 @@ namespace MAF_VE_2
             airTemp.ClearValue(TextBox.TextProperty);
             VE.Background = new SolidColorBrush(Colors.White);
             mafDifference.Background = new SolidColorBrush(Colors.White);
+        }
+
+        private void cancelAddMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            addMakeTextBox.Text = "";
+            addMakeButton.Flyout.Hide();
+        }
+
+        private async void okAddMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(addMakeTextBox.Text))
+            {
+                return;
+            }
+            else
+            {
+                string makeToAdd = addMakeTextBox.Text;
+
+                // Check if item is already in the combobox
+                bool itemAlreadyExists = false;
+                foreach (var boxItem in make.Items)
+                {
+                    string itemWeAreCurrentlyChecking = boxItem.ToString().ToLower();
+                    string itemWeWantToAdd = makeToAdd.ToLower();
+
+                    if (itemWeAreCurrentlyChecking == itemWeWantToAdd)
+                    {
+                        itemAlreadyExists = true;
+                        break;
+                    }
+                }
+
+                if (itemAlreadyExists)
+                {
+                    await new MessageDialog("That car make already exists in the list.").ShowAsync();
+                }
+                else
+                {
+                    make.Items.Add(makeToAdd);
+
+                    ItemCollection listOfItems = make.Items;
+                    List<string> listOfStrings = listOfItems.Cast<string>().ToList();
+                    listOfStrings.Sort();
+                    make.ItemsSource = listOfStrings;
+
+                    addMakeTextBox.Text = "";
+                    addMakeButton.Flyout.Hide();
+                }
+            }
         }
     }
 }

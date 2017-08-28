@@ -44,7 +44,7 @@
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
                                         <TextBlock Text="MAF" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0" />
                                         <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="64">
+                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                             <ComboBoxItem Content="g/s"/>
                                             <ComboBoxItem Content="kg/h"/>
                                         </ComboBox>
@@ -61,7 +61,7 @@
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
                                         <TextBlock Text="Air temperature" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
                                         <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                             <ComboBoxItem Content="&#186;F"/>
                                             <ComboBoxItem Content="&#186;C"/>
                                         </ComboBox>
@@ -71,7 +71,7 @@
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
                                         <TextBlock Text="Elevation" Foreground="White" Width="160" Margin="3,0,0,0" VerticalAlignment="Center"/>
                                         <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged">
+                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74" Height="30">
                                             <ComboBoxItem Content="ft"/>
                                             <ComboBoxItem Content="m"/>
                                         </ComboBox>
@@ -242,6 +242,17 @@
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
                                             <ComboBox Name="make" Margin="5,0,5,5" PlaceholderText="Select">
                                             </ComboBox>
+                                            <Button Name="addMakeButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;">
+                                                <Button.Flyout>
+                                                    <Flyout>
+                                                        <RelativePanel>
+                                                            <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
+                                                            <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
+                                                            <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
+                                                        </RelativePanel>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>

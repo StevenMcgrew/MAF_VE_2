@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+//using Microsoft.Data.Sqlite;
+//using Microsoft.Data.Sqlite.Internal;
 
 namespace MAF_VE_2
 {
