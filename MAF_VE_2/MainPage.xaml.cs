@@ -22,7 +22,7 @@ namespace MAF_VE_2
     public sealed partial class MainPage : Page
     {
         SQLite.Net.SQLiteConnection localDatabaseConnection;
-
+        List<string> allCarMakes;
 
 #region Enums
 
@@ -49,6 +49,8 @@ namespace MAF_VE_2
         {
             InitializeComponent();
             InitializeLocalDatabase();
+
+            allCarMakes = new List<string>();
         }
 
         void InitializeLocalDatabase()
@@ -80,13 +82,73 @@ namespace MAF_VE_2
             }
 
             // Insert make combobox items
-            //var indexOfLastMake = makesList.Count - 1;
-            //for (int k = indexOfLastMake; k >= 0; k--)
-            //{
-            //    make.Items.Insert(0, makesList[k]);
-            //}
-            
+            RefreshMakesComboBox();
         }
+
+#region Adding a new make
+
+        private async void okAddMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (String.IsNullOrWhiteSpace(addMakeTextBox.Text))
+            {
+                return;
+            }
+            else
+            {
+                string makeToAdd = addMakeTextBox.Text;
+
+                // Check if item is already in the combobox
+                var listOfItems = make.Items.Cast<string>().ToList();
+                if (listOfItems.Contains(makeToAdd))
+                {
+                    await new MessageDialog("That car make already exists in the list.").ShowAsync();
+                }
+                else
+                {
+                    // Add new make to local database
+                    localDatabaseConnection.Insert(new LocalCarMake()
+                    {
+                        Make = makeToAdd,
+                    });
+
+                    RefreshMakesComboBox();
+                    addMakeTextBox.Text = "";
+                    addMakeButton.Flyout.Hide();
+                }
+            }
+        }
+
+        private void cancelAddMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            addMakeTextBox.Text = "";
+            addMakeButton.Flyout.Hide();
+        }
+
+        // Functions/Methods /////////////////////////////////////////////////
+
+        void RefreshMakesComboBox()
+        {
+            allCarMakes = null;
+
+            // Get standard car makes and add to allCarMakes
+            CarMakes carMakes = new CarMakes();
+            allCarMakes = carMakes.StandardMakes;
+
+            // Get makes from local database and add to allCarMakes and set ComboBox source
+            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT Make from LocalCarMake");
+            if (localCarMakes != null)
+            {
+                foreach (var car in localCarMakes)
+                {
+                    var c = car.Make.ToString();
+                    allCarMakes.Add(c);
+                }
+            }
+            allCarMakes.Sort();
+            make.ItemsSource = allCarMakes;
+        }
+
+#endregion
 
 #region SizeChanged handling
 
@@ -551,70 +613,6 @@ namespace MAF_VE_2
             mafDifference.Background = new SolidColorBrush(Colors.White);
         }
 
-        private void cancelAddMakeButton_Click(object sender, RoutedEventArgs e)
-        {
-            addMakeTextBox.Text = "";
-            addMakeButton.Flyout.Hide();
-        }
-
-        private async void okAddMakeButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (String.IsNullOrWhiteSpace(addMakeTextBox.Text))
-            {
-                return;
-            }
-            else
-            {
-                string makeToAdd = addMakeTextBox.Text;
-
-                // Check if item is already in the combobox
-                bool itemAlreadyExists = false;
-                foreach (var boxItem in make.Items)
-                {
-                    string itemWeAreCurrentlyChecking = boxItem.ToString().ToLower();
-                    string itemWeWantToAdd = makeToAdd.ToLower();
-
-                    if (itemWeAreCurrentlyChecking == itemWeWantToAdd)
-                    {
-                        itemAlreadyExists = true;
-                        break;
-                    }
-                }
-
-                if (itemAlreadyExists)
-                {
-                    await new MessageDialog("That car make already exists in the list.").ShowAsync();
-                }
-                else
-                {
-                    LocalCarMake localMake = (from p in localDatabaseConnection.Table<LocalCarMake>()
-                                     where p.Make == makeToAdd
-                                     select p).FirstOrDefault();
-                    if (localMake != null)
-                    {
-                        //already exists
-                        await new MessageDialog("That car make already exists in the list.").ShowAsync();
-                    }
-                    else
-                    {
-                        // Add new make to local database
-                        localDatabaseConnection.Insert(new LocalCarMake()
-                        {
-                            Make = makeToAdd,
-                        });
-                    }
-
-                    //make.Items.Add(makeToAdd);
-
-                    //ItemCollection listOfItems = make.Items;
-                    //List<string> listOfStrings = listOfItems.Cast<string>().ToList();
-                    //listOfStrings.Sort();
-                    //make.ItemsSource = listOfStrings;
-
-                    //addMakeTextBox.Text = "";
-                    //addMakeButton.Flyout.Hide();
-                }
-            }
-        }
+        
     }
 }
