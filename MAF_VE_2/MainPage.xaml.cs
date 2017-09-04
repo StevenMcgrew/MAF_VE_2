@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MAF_VE_2.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,8 +21,10 @@ namespace MAF_VE_2
 {
     public sealed partial class MainPage : Page
     {
+        SQLite.Net.SQLiteConnection localDatabaseConnection;
 
-        #region Enums
+
+#region Enums
 
         enum ViewState
         {
@@ -42,25 +45,19 @@ namespace MAF_VE_2
 
 #endregion
 
-        List<string> makesList = new List<string> { "Acura", "Alfa Romeo","Aston Martin", "Audi", "Bentley",
-                                                "BMW", "Bugatti", "Buick", "Cadillac", "Chevrolet", "Chrysler",
-                                                "Citroen", "Daewoo", "Daihatsu", "Dodge", "Eagle", "Ferrari",
-                                                "Fiat", "Ford", "Freightliner", "Geo", "GMC", "Honda", "Hummer",
-                                                "Hyundai", "Infiniti", "Isuzu", "Jaguar", "Jeep", "Kia", "Lamborghini",
-                                                "Land Rover", "Lexus", "Lincoln", "Lotus", "Maserati", "Maybach",
-                                                "Mazda", "Mercedes-Benz", "Mercury", "Mini", "Mitsubishi", "Nissan",
-                                                "Oldsmobile", "Opel", "Plymouth", "Pontiac", "Porsche", "Ram",
-                                                "Renault", "Rolls-Royce", "Rover", "Saab", "Saturn", "Scion", "Seat",
-                                                "Skoda", "Smart", "Subaru", "Suzuki", "Toyota", "Volkswagen", "Volvo" };
-
         public MainPage()
         {
             InitializeComponent();
+            InitializeLocalDatabase();
+        }
 
-            //Create SQLite database table
-            //SQLpath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
-            //SQLconn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), SQLpath);
-            //SQLconn.CreateTable<MAFcalculation>();
+        void InitializeLocalDatabase()
+        {
+            // Connect to local database and create tables if they don't exist
+            string localDatabasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
+            localDatabaseConnection = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), localDatabasePath);
+            localDatabaseConnection.CreateTable<MAFcalculation>();
+            localDatabaseConnection.CreateTable<LocalCarMake>();
         }
 
         private void mainPage_Loaded(object sender, RoutedEventArgs e)
@@ -83,14 +80,15 @@ namespace MAF_VE_2
             }
 
             // Insert make combobox items
-            var indexOfLastMake = makesList.Count - 1;
-            for (int k = indexOfLastMake; k >= 0; k--)
-            {
-                make.Items.Insert(0, makesList[k]);
-            }
+            //var indexOfLastMake = makesList.Count - 1;
+            //for (int k = indexOfLastMake; k >= 0; k--)
+            //{
+            //    make.Items.Insert(0, makesList[k]);
+            //}
+            
         }
 
-        #region SizeChanged handling
+#region SizeChanged handling
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -589,15 +587,32 @@ namespace MAF_VE_2
                 }
                 else
                 {
-                    make.Items.Add(makeToAdd);
+                    LocalCarMake localMake = (from p in localDatabaseConnection.Table<LocalCarMake>()
+                                     where p.Make == makeToAdd
+                                     select p).FirstOrDefault();
+                    if (localMake != null)
+                    {
+                        //already exists
+                        await new MessageDialog("That car make already exists in the list.").ShowAsync();
+                    }
+                    else
+                    {
+                        // Add new make to local database
+                        localDatabaseConnection.Insert(new LocalCarMake()
+                        {
+                            Make = makeToAdd,
+                        });
+                    }
 
-                    ItemCollection listOfItems = make.Items;
-                    List<string> listOfStrings = listOfItems.Cast<string>().ToList();
-                    listOfStrings.Sort();
-                    make.ItemsSource = listOfStrings;
+                    //make.Items.Add(makeToAdd);
 
-                    addMakeTextBox.Text = "";
-                    addMakeButton.Flyout.Hide();
+                    //ItemCollection listOfItems = make.Items;
+                    //List<string> listOfStrings = listOfItems.Cast<string>().ToList();
+                    //listOfStrings.Sort();
+                    //make.ItemsSource = listOfStrings;
+
+                    //addMakeTextBox.Text = "";
+                    //addMakeButton.Flyout.Hide();
                 }
             }
         }
