@@ -85,7 +85,7 @@ namespace MAF_VE_2
             RefreshMakesComboBox();
         }
 
-#region Adding a new make
+#region Add or Delete a make
 
         private async void okAddMakeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -113,7 +113,7 @@ namespace MAF_VE_2
 
                     RefreshMakesComboBox();
                     addMakeTextBox.Text = "";
-                    addMakeButton.Flyout.Hide();
+                    makeOptionsButton.Flyout.Hide();
                 }
             }
         }
@@ -121,7 +121,54 @@ namespace MAF_VE_2
         private void cancelAddMakeButton_Click(object sender, RoutedEventArgs e)
         {
             addMakeTextBox.Text = "";
-            addMakeButton.Flyout.Hide();
+            makeOptionsButton.Flyout.Hide();
+        }
+
+        private void makeOptionsButton_Click(object sender, RoutedEventArgs e)
+        {
+            addMakeButton.IsEnabled = true;
+
+            var count = localDatabaseConnection.GetTableInfo("LocalCarMake").Count;
+            if (count > 0)
+            {
+                deleteMakeButton.IsEnabled = true;
+            }
+            else
+            {
+                deleteMakeButton.IsEnabled = false;
+            }
+        }
+
+        private void deleteMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            addMakeButton.IsEnabled = false;
+            deleteMakeButton.IsEnabled = false;
+
+            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
+            MakesToDelete.ItemsSource = localCarMakes;
+        }
+
+        private void cancelDeleteMake_Click(object sender, RoutedEventArgs e)
+        {
+            makeOptionsButton.Flyout.Hide();
+        }
+
+        private void deleteMake_Click(object sender, RoutedEventArgs e)
+        {
+            var selectedMake = MakesToDelete.SelectedItem;
+            var LocalMake = selectedMake as LocalCarMake;
+            localDatabaseConnection.Delete<LocalCarMake>(LocalMake.ID);
+
+            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
+            MakesToDelete.ItemsSource = localCarMakes;
+
+            RefreshMakesComboBox();
+        }
+
+        private void addMakeButton_Click(object sender, RoutedEventArgs e)
+        {
+            addMakeButton.IsEnabled = false;
+            deleteMakeButton.IsEnabled = false;
         }
 
         // Functions/Methods /////////////////////////////////////////////////
@@ -135,7 +182,7 @@ namespace MAF_VE_2
             allCarMakes = carMakes.StandardMakes;
 
             // Get makes from local database and add to allCarMakes and set ComboBox source
-            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT Make from LocalCarMake");
+            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
             if (localCarMakes != null)
             {
                 foreach (var car in localCarMakes)
@@ -589,7 +636,7 @@ namespace MAF_VE_2
 
         private void printMenuItem_Click(object sender, RoutedEventArgs e)
         {
-
+            
         }
 
         private void shareMenuItem_Click(object sender, RoutedEventArgs e)
@@ -612,7 +659,5 @@ namespace MAF_VE_2
             VE.Background = new SolidColorBrush(Colors.White);
             mafDifference.Background = new SolidColorBrush(Colors.White);
         }
-
-        
     }
 }

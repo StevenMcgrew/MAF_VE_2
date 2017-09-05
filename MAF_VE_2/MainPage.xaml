@@ -242,15 +242,51 @@
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
                                             <ComboBox Name="make" Margin="5,0,5,5" PlaceholderText="Select">
                                             </ComboBox>
-                                            <Button Name="addMakeButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;">
+                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Click="makeOptionsButton_Click">
                                                 <Button.Flyout>
                                                     <Flyout>
+                                                        <StackPanel>
+                                                            <Button Name="addMakeButton" Content="Add Make" Margin="0,0,0,10" Click="addMakeButton_Click">
+                                                                <Button.Flyout>
+                                                                    <Flyout>
+                                                                        <RelativePanel>
+                                                                            <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
+                                                                            <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
+                                                                            <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
+                                                                        </RelativePanel>
+                                                                    </Flyout>
+                                                                </Button.Flyout>
+                                                            </Button>
+                                                            <Button Name="deleteMakeButton" Content="Delete Make" IsEnabled="False" Click="deleteMakeButton_Click">
+                                                                <Button.Flyout>
+                                                                    <Flyout>
+                                                                        <StackPanel>
+                                                                            <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
+                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="300">
+                                                                                <ListBox.ItemTemplate>
+                                                                                    <DataTemplate>
+                                                                                        <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
+                                                                                    </DataTemplate>
+                                                                                </ListBox.ItemTemplate>
+                                                                                <ListBoxItem Content="No custom Makes found"/>
+                                                                            </ListBox>
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click"/>
+                                                                                <Button Name="cancelDeleteMake" Content="Done" Click="cancelDeleteMake_Click"/>
+                                                                            </StackPanel>
+                                                                        </StackPanel>
+                                                                    </Flyout>
+                                                                </Button.Flyout>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Flyout>
+                                                    <!--<Flyout>
                                                         <RelativePanel>
                                                             <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
                                                             <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
                                                             <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
                                                         </RelativePanel>
-                                                    </Flyout>
+                                                    </Flyout>-->
                                                 </Button.Flyout>
                                             </Button>
                                         </StackPanel>
