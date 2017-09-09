@@ -659,5 +659,16 @@ namespace MAF_VE_2
             VE.Background = new SolidColorBrush(Colors.White);
             mafDifference.Background = new SolidColorBrush(Colors.White);
         }
+
+        private void resetButton_Click(object sender, RoutedEventArgs e)
+        {
+            year.SelectedIndex = -1;
+            make.SelectedIndex = -1;
+            model.Text = "";
+            engine.SelectedIndex = -1;
+            good.IsChecked = false;
+            bad.IsChecked = false;
+            unsure.IsChecked = false;
+        }
     }
 }
