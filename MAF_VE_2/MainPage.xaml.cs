@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Popups;
 using Windows.UI.Text;
@@ -74,9 +75,29 @@ namespace MAF_VE_2
             }
 
             // Insert year combobox items
-            int maxYear = (DateTime.Today.Year) + 2;
+              // First, declare some variables
+            var localSettings = ApplicationData.Current.LocalSettings;
+            int currentMaxYear = DateTime.Today.Year + 2;
+            int storedMaxYear;
             int minYear = 1900;
-            for (int i = maxYear; i >= minYear; i--)
+              // Second, set storedMaxYear based on whether or not a value has been saved in LocalSettings
+            if (localSettings.Values["maxYear"] != null)
+            {
+                storedMaxYear = (int)localSettings.Values["maxYear"];
+            }
+            else
+            {
+                localSettings.Values["maxYear"] = currentMaxYear;
+                storedMaxYear = currentMaxYear;
+            }
+              // Third, update LocalSettings and storedMaxYear if less than currentMaxYear
+            if (storedMaxYear < currentMaxYear)
+            {
+                localSettings.Values["maxYear"] = currentMaxYear;
+                storedMaxYear = currentMaxYear;
+            }
+              // Finally, use a loop to add all the years to the "year" combobox
+            for (int i = storedMaxYear; i >= minYear; i--)
             {
                 year.Items.Add(i);
             }
