@@ -24,7 +24,7 @@ namespace MAF_VE_2
     {
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
-
+        bool rbCheckFired = false;
 #region Enums
 
         enum ViewState
@@ -105,6 +105,29 @@ namespace MAF_VE_2
             // Insert make combobox items
             RefreshMakesComboBox();
         }
+
+#region Uncheck radiobuttons if already checked
+
+        private void ConditionRadioButtons_Click(object sender, RoutedEventArgs e)
+        {
+            var radioButton = sender as RadioButton;
+
+            if (rbCheckFired) // The radiobutton was just checked, so do nothing except set rbCheckFired back to false for the next time we need to evaluate this scenario.
+            {
+                rbCheckFired = false;
+            }
+            else // The radiobutton checked event was NOT fired, which means the radiobutton was already checked, so we want to uncheck it.
+            {
+                radioButton.IsChecked = false;
+            }
+        }
+
+        private void ConditionRadioButtons_Checked(object sender, RoutedEventArgs e)
+        {
+            rbCheckFired = true;
+        }
+
+#endregion
 
 #region Add or Delete a make
 
@@ -691,5 +714,6 @@ namespace MAF_VE_2
             bad.IsChecked = false;
             unsure.IsChecked = false;
         }
+
     }
 }

@@ -301,9 +301,9 @@
                                         </StackPanel>
                                     </StackPanel>
                                     <StackPanel>
-                                        <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" />
-                                        <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" />
-                                        <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" />
+                                        <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
+                                        <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
+                                        <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
                                     </StackPanel>
                                 </StackPanel>
 
