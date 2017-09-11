@@ -25,6 +25,7 @@ namespace MAF_VE_2
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         bool rbCheckFired = false;
+        string condition = "";
 #region Enums
 
         enum ViewState
@@ -104,6 +105,22 @@ namespace MAF_VE_2
 
             // Insert make combobox items
             RefreshMakesComboBox();
+
+            ShowAllLocalRecords();
+        }
+
+        void ShowAllLocalRecords()
+        {
+            var mafRecords = localDatabaseConnection.Query<MAFcalculation>("SELECT * from MAFcalculation ORDER BY vehicleID DESC");
+            localRecords.ItemsSource = mafRecords;
+            if (mafRecords.Count == 0)
+            {
+                noResults.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                noResults.Visibility = Visibility.Collapsed;
+            }
         }
 
 #region Uncheck radiobuttons if already checked
@@ -119,11 +136,15 @@ namespace MAF_VE_2
             else // The radiobutton checked event was NOT fired, which means the radiobutton was already checked, so we want to uncheck it.
             {
                 radioButton.IsChecked = false;
+                condition = "";
             }
         }
 
         private void ConditionRadioButtons_Checked(object sender, RoutedEventArgs e)
         {
+            var radioButton = sender as RadioButton;
+            condition = radioButton.Content.ToString();
+
             rbCheckFired = true;
         }
 
@@ -715,5 +736,85 @@ namespace MAF_VE_2
             unsure.IsChecked = false;
         }
 
+        private async void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog1 = new MessageDialog("Must enter Year, Make, Model, Engine, and select Good/Bad/Unsure. Only the comments section is optional.");
+
+            string _year;
+            string _make;
+            string _model;
+            string _engine;
+            string _condition;
+            string _comments;
+
+            try
+            {
+                _year = year.SelectedItem.ToString();
+                _make = make.SelectedItem.ToString();
+                _model = model.Text;
+                _engine = engine.SelectedItem.ToString();
+                _condition = condition;
+                _comments = comments.Text;
+            }
+            catch
+            {
+                await dialog1.ShowAsync();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_model))
+            {
+                await dialog1.ShowAsync();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_condition))
+            {
+                await dialog1.ShowAsync();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(_comments))
+            {
+                _comments = "No comments";
+            }
+
+            try
+            {
+                localDatabaseConnection.Insert(new MAFcalculation()
+                {
+                    Year = _year,
+                    Make = _make,
+                    Model = _model,
+                    Engine = _engine,
+                    Condition = _condition,
+                    Comments = _comments,
+                    Engine_speed = Convert.ToDouble(rpm.Text),
+                    MAF = Convert.ToDouble(maf.Text),
+                    Engine_size = Convert.ToDouble(engineSize.Text),
+                    Air_temperature = Convert.ToDouble(airTemp.Text),
+                    Altitude = Convert.ToDouble(altitude.Text),
+                    Expected_MAF = Convert.ToDouble(expectedMAF.Text),
+                    MAF_Difference = Convert.ToDouble(mafDifference.Text),
+                    Volumetric_Efficiency = Convert.ToDouble(VE.Text),
+                    MAF_units = mafUnits.SelectedValue.ToString(),
+                    Temp_units = airTempUnits.SelectedValue.ToString(),
+                    Altitude_units = altitudeUnits.SelectedValue.ToString()
+                });
+
+                await new MessageDialog("Saved successfully").ShowAsync();
+                ShowAllLocalRecords();
+
+                good.ClearValue(RadioButton.IsCheckedProperty);
+                bad.ClearValue(RadioButton.IsCheckedProperty);
+                unsure.ClearValue(RadioButton.IsCheckedProperty);
+                condition = "";
+                comments.ClearValue(TextBox.TextProperty);
+            }
+            catch
+            {
+                await new MessageDialog("Failed to save. Make sure your inputs in the calculator are correct. Input requirements: Numbers only; Only one decimal (or no decimals) per input box; No blank input boxes.").ShowAsync();
+            }
+        }
     }
 }
