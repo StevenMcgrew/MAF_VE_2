@@ -302,54 +302,23 @@ namespace MAF_VE_2
             switch (pageSize)
             {
                 case PageSize.Wide:
-                    if (mainPivot.SelectedItem == frontPivotItem)
-                    {
-                        MoveRecordsToFront();
-                    }
-                    else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
-                    {
-                        MoveSearchToFront();
-                        MoveRecordsToFront();
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    else if (mainPivot.SelectedItem == databasePivotItem)
-                    {
-                        MoveRecordsToFront();
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
+                    MoveSearchToFront();
+                    MoveRecordsToFront();
+                    mainPivot.SelectedItem = frontPivotItem;
                     break;
 
                 case PageSize.Narrow:
-                    if (mainPivot.SelectedItem == frontPivotItem)
+                    MoveRecordsToPivotItem();
+                    MoveSearchToFront();
+                    if (mainPivot.SelectedItem != databasePivotItem)
                     {
-                        MoveRecordsToPivotItem();
-                        MoveSearchToFront();
-                    }
-                    else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
-                    {
-                        MoveSearchToFront();
                         mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    else if (mainPivot.SelectedItem == databasePivotItem)
-                    {
-                        MoveSearchToFront();
                     }
                     break;
 
                 case PageSize.Short:
-                    if (mainPivot.SelectedItem == frontPivotItem)
-                    {
-                        MoveRecordsToPivotItem();
-                        MoveSearchToPivotItem();
-                    }
-                    //else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
-                    //{
-
-                    //}
-                    //else if (mainPivot.SelectedItem == databasePivotItem)
-                    //{
-
-                    //}
+                    MoveRecordsToPivotItem();
+                    MoveSearchToPivotItem();
                     break;
 
                 default:
