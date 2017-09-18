@@ -333,9 +333,77 @@
                         
                     </ScrollViewer>
 
-                    <ScrollViewer Name="recordsPanel" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                    <Grid Name="recordsPanel" Grid.Column="1" >
                         
                         <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Orientation="Horizontal">
+                                <Grid Background="CadetBlue" Width="200" Height="200"/>
+                                <TextBox Header="You searched for:" Text="2000 Ford Ranger 3.0L VIN U Good" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
+                                <PivotItem Header="Local" Style="{StaticResource stylePivotItem}">
+                                    <StackPanel Background="White" Margin="10">
+                                        
+                                        <ListBox Margin="2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                            <Grid Width="320">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="42" />
+                                                    <ColumnDefinition Width="80" />
+                                                    <ColumnDefinition Width="90" />
+                                                    <ColumnDefinition Width="40" />
+                                                    <ColumnDefinition Width="50" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="Year" HorizontalAlignment="Left" FontWeight="Bold" />
+                                                <TextBlock Grid.Column="1" Text="Make" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="2" Text="Model" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="3" Text="Eng." HorizontalAlignment="Left" FontWeight="Bold" />
+                                                <TextBlock Grid.Column="4" Text="Cond." HorizontalAlignment="Left" FontWeight="Bold" />
+                                            </Grid>
+                                        </ListBox>
+
+                                        <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+
+                                        <ListView Name="localRecords" Margin="2,0,2,2" Background="White" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemClickEnabled="True" SelectionMode="None" >
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Name="gridForData" Width="300">
+
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="42" />
+                                                            <ColumnDefinition Width="80" />
+                                                            <ColumnDefinition Width="90" />
+                                                            <ColumnDefinition Width="40" />
+                                                            <ColumnDefinition Width="50" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock Grid.Column="0" Text="{Binding Path=Year}" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Column="1" Text="{Binding Path=Make}" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="2" Text="{Binding Path=Model}" HorizontalAlignment="Left" Width="85" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Grid.Column="3" Text="{Binding Path=Engine}" HorizontalAlignment="Left" />
+                                                        <TextBlock Grid.Column="4" Text="{Binding Path=Condition}" HorizontalAlignment="Left" Name="tblkListCondition" />
+
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+
+                                    </StackPanel>
+                                </PivotItem>
+                                
+                                <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
+                                    
+                                </PivotItem>
+                                
+                            </Pivot>
+
+                        </Grid>
+                        <!--<Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
@@ -388,9 +456,9 @@
                                 <TextBlock Name="noResults" Text="No results found..." Foreground="White" Margin="10,5,5,5" Visibility="Collapsed"/>
                                 
                             </Grid>
-                        </Grid>
+                        </Grid>-->
                         
-                    </ScrollViewer>
+                    </Grid>
                     
                 </Grid>
             </PivotItem>
