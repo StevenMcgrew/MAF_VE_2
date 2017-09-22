@@ -771,7 +771,7 @@ namespace MAF_VE_2
                     Altitude_units = altitudeUnits.SelectedValue.ToString()
                 });
 
-                await new MessageDialog("Saved successfully").ShowAsync();
+                //await new MessageDialog("Saved successfully").ShowAsync();
                 ShowAllLocalRecords();
 
                 good.ClearValue(RadioButton.IsCheckedProperty);
