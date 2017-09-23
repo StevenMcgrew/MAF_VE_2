@@ -350,7 +350,47 @@
                                 <PivotItem Header="Local" Style="{StaticResource stylePivotItem}">
                                     <StackPanel Background="White" Margin="10">
 
-                                        <ListBox Margin="2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                        <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="50" />
+                                                <ColumnDefinition Width="80" />
+                                                <ColumnDefinition Width="90" />
+                                                <ColumnDefinition Width="40" />
+                                                <ColumnDefinition Width="50" />
+                                                <ColumnDefinition Width="78"/>
+                                                <ColumnDefinition Width="67"/>
+                                                <ColumnDefinition Width="67"/>
+                                                <ColumnDefinition Width="47"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"  VerticalAlignment="Center" Text="Year" Margin="14,0,0,0" />
+                                            <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
+                                            <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
+                                            <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
+                                            <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="RPM" />
+                                            <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Air Temp." />
+                                            <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Altitude" />
+                                            <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
+                                            <TextBlock Grid.Column="8"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE" />
+                                            <TextBlock Grid.Column="9"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
+                                            <TextBlock Grid.Column="10" VerticalAlignment="Center" Margin="5,0,0,0" Text="Comments/Keywords"/>
+
+                                            <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="7"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="8"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="9"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+
+                                        </Grid>
+
+                                        <!--<ListBox Margin="2,0" Background="white" >
                                             <Grid>
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="42" />
@@ -360,42 +400,33 @@
                                                     <ColumnDefinition Width="50" />
                                                     <ColumnDefinition Width="78"/>
                                                     <ColumnDefinition Width="67"/>
+                                                    <ColumnDefinition Width="67"/>
+                                                    <ColumnDefinition Width="47"/>
+                                                    <ColumnDefinition Width="80"/>
+                                                    <ColumnDefinition Width="Auto"/>
                                                 </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Year" HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="1" Text="Make" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2" Text="Model" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="3" Text="Eng." HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="4" Text="RPM" HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="5" Text="Air Temp." FontWeight="Bold"/>
-                                                <TextBlock Grid.Column="6" Text="Altitude" FontWeight="Bold"/>
+                                                
+                                                <TextBlock Grid.Column="0" Text="2005" />
+                                                <TextBlock Grid.Column="1" Text="Chevrolet" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="2" Text="Silverado 1500 4wd" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="3" Text="6.0L" HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Column="4" Text="5980" HorizontalAlignment="Left"/>
+                                                <TextBlock Grid.Column="5" Text="78dF" TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Grid.Column="6" Text="68745ft" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="7" Text="240.5g/s" TextTrimming="CharacterEllipsis" />
+                                                <TextBlock Grid.Column="8" Text="198%" HorizontalAlignment="Left" />
+                                                <TextBlock Grid.Column="9" Text="Unsure" HorizontalAlignment="Left"/>
+                                                <TextBlock Grid.Column="10" Text="VIN 7 engine, Idle 5.9g/s @ 700rpm, 17.3g/s @ 2500rpm, Fuel trims all within +/-5%" TextTrimming="CharacterEllipsis"/>
+                                                
                                             </Grid>
-                                        </ListBox>
-                                        
-                                        <ListBox Margin="2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="42" />
-                                                    <ColumnDefinition Width="80" />
-                                                    <ColumnDefinition Width="90" />
-                                                    <ColumnDefinition Width="40" />
-                                                    <ColumnDefinition Width="50" />
-                                                    <ColumnDefinition Width="68"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="8888" />
-                                                <TextBlock Grid.Column="1" Text="Forddfdfeedfdfdf" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2" Text="Explorernunuun" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="3" Text="8.8L" HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="4" Text="8888" HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="5" Text="888F" TextTrimming="CharacterEllipsis"/>
-                                            </Grid>
-                                        </ListBox>
+                                        </ListBox>-->
 
                                         <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
 
-                                        <ListView Name="localRecords" Margin="2,0,2,2" Background="White" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemClickEnabled="True" SelectionMode="None" >
+                                        <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" >
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
-                                                    <Grid Name="gridForData" Width="300">
+                                                    <Grid Name="gridForData">
 
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="42" />
@@ -403,13 +434,25 @@
                                                             <ColumnDefinition Width="90" />
                                                             <ColumnDefinition Width="40" />
                                                             <ColumnDefinition Width="50" />
+                                                            <ColumnDefinition Width="78"/>
+                                                            <ColumnDefinition Width="67"/>
+                                                            <ColumnDefinition Width="67"/>
+                                                            <ColumnDefinition Width="47"/>
+                                                            <ColumnDefinition Width="80"/>
+                                                            <ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
 
-                                                        <TextBlock Grid.Column="0" Text="{Binding Path=Year}" HorizontalAlignment="Left" />
-                                                        <TextBlock Grid.Column="1" Text="{Binding Path=Make}" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Grid.Column="2" Text="{Binding Path=Model}" HorizontalAlignment="Left" Width="85" TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Grid.Column="3" Text="{Binding Path=Engine}" HorizontalAlignment="Left" />
-                                                        <TextBlock Grid.Column="4" Text="{Binding Path=Condition}" HorizontalAlignment="Left" Name="tblkListCondition" />
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="3"  Text="{Binding Path=Engine}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="4"  Text="{Binding Path=Engine_speed}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="5"  Text="{Binding Path=Air_temperature}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=Altitude}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7"  Text="{Binding Path=MAF}"  />
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="8"  Text="{Binding Path=Volumetric_Efficiency}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="9"  Text="{Binding Path=Condition}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="10" Text="{Binding Path=Comments}"/>
 
                                                     </Grid>
                                                 </DataTemplate>
