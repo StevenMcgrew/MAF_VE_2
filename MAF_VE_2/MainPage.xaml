@@ -11,6 +11,7 @@
     <Grid Background="Gray">
 
         <Pivot Name="mainPivot" SelectionChanged="mainPivot_SelectionChanged">
+            
             <PivotItem Name="frontPivotItem">
                 <Grid Name="mainGrid">
 
@@ -101,7 +102,7 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                         <StackPanel Orientation="Horizontal" Width="225">
-                                            <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                            <TextBlock Text="Average MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
                                             <Button Name="asteriskButton" Content="*" Foreground="White"/>
                                             <!--<ComboBox SelectedValuePath="Content" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" Margin="0">
                                         <ComboBoxItem Content="77"/>
@@ -333,7 +334,7 @@
                         
                     </ScrollViewer>
 
-                    <Grid Name="recordsPanel" Grid.Column="1" >
+                    <Grid Name="recordsPanel" Grid.Column="1" CornerRadius="20" Background="#FF191818">
                         
                         <Grid>
                             <Grid.RowDefinitions>
@@ -341,27 +342,40 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <TextBox Header="You searched for:" Text="2000 Ford Ranger 3.0L VIN U Good" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                            <StackPanel Padding="20,10,10,15">
+                                <TextBlock Foreground="White">
+                                    <Span><Underline>You searched for</Underline>:</Span>
+                                </TextBlock>
+                                <TextBlock TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Gray" Margin="15,0,0,0">
+                                    <Span><Italic>No search critieria. Showing all records.</Italic></Span>
+                                </TextBlock>
+                            </StackPanel>
 
                             <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
                                 <PivotItem Header="Local" Style="{StaticResource stylePivotItem}">
                                     <StackPanel Background="White" Margin="10">
 
-                                        <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1" Margin="12,0,0,0">
+                                        <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="52" />  <!--Year-->
-                                                <ColumnDefinition Width="90" />  <!--Make-->
-                                                <ColumnDefinition Width="100" /> <!--Model-->
-                                                <ColumnDefinition Width="50" />  <!--Engine-->
-                                                <ColumnDefinition Width="90"/>   <!--Condition-->
-                                                <ColumnDefinition Width="57"/>   <!--VE-->
-                                                <ColumnDefinition Width="78"/>   <!--MAF-->
-                                                <ColumnDefinition Width="Auto"/> <!--Comments-->
+                                                <ColumnDefinition Width="64" />
+                                                <!--Year-->
+                                                <ColumnDefinition Width="90" />
+                                                <!--Make-->
+                                                <ColumnDefinition Width="100" />
+                                                <!--Model-->
+                                                <ColumnDefinition Width="50" />
+                                                <!--Engine-->
+                                                <ColumnDefinition Width="90"/>
+                                                <!--Condition-->
+                                                <ColumnDefinition Width="57"/>
+                                                <!--VE-->
+                                                <ColumnDefinition Width="78"/>
+                                                <!--MAF-->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!--Comments-->
                                             </Grid.ColumnDefinitions>
 
-                                            <Border Grid.Column="0" Background="LightGray" BorderThickness="0,0,0,1" BorderBrush="Black" Margin="-12,0,0,-1"/>
-
-                                            <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Year"/>
+                                            <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
                                             <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
                                             <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
                                             <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
@@ -377,14 +391,12 @@
                                             <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
                                             <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
                                             <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                            <Rectangle Grid.Column="7"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                            <Rectangle Grid.Column="8"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
 
                                         </Grid>
 
                                         <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
 
-                                        <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" >
+                                        <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
                                             <ListView.ItemTemplate>
                                                 <DataTemplate>
                                                     <Grid Name="gridForData">
@@ -421,7 +433,11 @@
                                 <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
                                     
                                 </PivotItem>
-                                
+
+                                <PivotItem Header="Graph" Style="{StaticResource stylePivotItem}">
+
+                                </PivotItem>
+
                             </Pivot>
 
                         </Grid>
@@ -485,12 +501,14 @@
                 </Grid>
             </PivotItem>
 
-            <PivotItem Name="saveOrSearchPivotItem" Background="#FF812020">
+            <PivotItem Name="saveOrSearchPivotItem">
                 <Grid Name="saveOrSearchGrid"/>
             </PivotItem>
-            <PivotItem Name="databasePivotItem" Background="#FF244F8D">
+            
+            <PivotItem Name="databasePivotItem">
                 <Grid Name="databaseGrid"/>
             </PivotItem>
+            
         </Pivot>
 
         <StackPanel VerticalAlignment="Top" Background="#FF191818">
@@ -514,6 +532,61 @@
                 </Button.Flyout>
             </Button>
         </StackPanel>
+
+        <Border Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
+
+            <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20">
+
+                <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                <Grid HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="85"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Left">
+                        <TextBlock HorizontalAlignment="Left" Text="RPM"/>
+                        <TextBlock HorizontalAlignment="Left" Text="MAF"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Air Temp"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Elevation"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Avg MAF"/>
+                        <TextBlock HorizontalAlignment="Left" Text="MAF Diff"/>
+                        <TextBlock HorizontalAlignment="Left" Text="VE"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Condition"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Left">
+                        <TextBlock HorizontalAlignment="Right" Name="RPM"/>
+                        <TextBlock HorizontalAlignment="Right" Name="MAF"/>
+                        <TextBlock HorizontalAlignment="Right" Name="AIR"/>
+                        <TextBlock HorizontalAlignment="Right" Name="ELEVATION"/>
+                        <TextBlock HorizontalAlignment="Right" Name="EXPECTED"/>
+                        <TextBlock HorizontalAlignment="Right" Name="DIFF"/>
+                        <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC"/>
+                        <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="2,0,0,0">
+                        <TextBlock HorizontalAlignment="Left"/>
+                        <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Text="g/s"/>
+                        <TextBlock HorizontalAlignment="Left" Text="%"/>
+                        <TextBlock HorizontalAlignment="Left" Text="%"/>
+                        <TextBlock HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <TextBox Name="COMMENTS" Header="Comments/Keywords:" IsReadOnly="True" HorizontalAlignment="Center" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextWrapping="Wrap" MaxWidth="345" Margin="0,20,0,0"/>
+                <Button Name="closeRecordPopUpButton" Content="Close" Margin="0,20,0,0" Click="closeRecordPopUpButton_Click" HorizontalAlignment="Center"/>
+
+            </StackPanel>
+            
+        </Border>
         
     </Grid>
 </Page>

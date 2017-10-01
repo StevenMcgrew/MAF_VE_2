@@ -785,5 +785,37 @@ namespace MAF_VE_2
                 await new MessageDialog("Failed to save. Make sure your inputs in the calculator are correct. Input requirements: Numbers only; Only one decimal (or no decimals) per input box; No blank input boxes.").ShowAsync();
             }
         }
+
+        private void localRecords_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = e.ClickedItem as MAFcalculation;
+            
+            YMME.Text = item.Year + " " +
+                        item.Make + " " +
+                        item.Model + " " +
+                        item.Engine;
+
+            RPM.Text = item.Engine_speed.ToString();
+            MAF.Text = item.MAF.ToString();
+            MAF_UNITS.Text = item.MAF_units;
+            AIR.Text = item.Air_temperature.ToString();
+            AIR_UNITS.Text = item.Temp_units;
+            ELEVATION.Text = item.Altitude.ToString();
+            ELEVATION_UNITS.Text = item.Altitude_units;
+            EXPECTED.Text = item.Expected_MAF.ToString();
+            DIFF.Text = item.MAF_Difference.ToString();
+            VOLUMETRIC.Text = item.Volumetric_Efficiency.ToString();
+            CONDITION.Text = item.Condition;
+            COMMENTS.Text = item.Comments;
+
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            recordPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void closeRecordPopUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+            recordPopUp.Visibility = Visibility.Collapsed;
+        }
     }
 }
