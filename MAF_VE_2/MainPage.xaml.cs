@@ -817,5 +817,30 @@ namespace MAF_VE_2
             popUpPanelBackground.Visibility = Visibility.Collapsed;
             recordPopUp.Visibility = Visibility.Collapsed;
         }
+
+        private void Charts_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double newWidth = e.NewSize.Width;
+            double newHeight = e.NewSize.Height;
+            double orientationCheck = 1;
+
+            if (newHeight != 0)
+            {
+                orientationCheck = newWidth / newHeight;
+            }
+
+            if (orientationCheck == 1) // Perfect square
+            {
+                return;
+            }
+            else if (orientationCheck > 1) // Landscape
+            {
+                ChartsStackPanel.Orientation = Orientation.Horizontal;
+            }
+            else if (orientationCheck < 1) // Portrait
+            {
+                ChartsStackPanel.Orientation = Orientation.Vertical;
+            }
+        }
     }
 }
