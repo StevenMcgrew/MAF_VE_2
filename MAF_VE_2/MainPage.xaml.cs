@@ -26,6 +26,7 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
+
 #region Enums
 
         enum ViewState
@@ -193,10 +194,11 @@ namespace MAF_VE_2
         {
             addMakeButton.IsEnabled = true;
 
-            var count = localDatabaseConnection.GetTableInfo("LocalCarMake").Count;
-            if (count > 0)
+            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
+            if (localCarMakes.Count > 0)
             {
                 deleteMakeButton.IsEnabled = true;
+                MakesToDelete.ItemsSource = localCarMakes;
             }
             else
             {
@@ -208,9 +210,6 @@ namespace MAF_VE_2
         {
             addMakeButton.IsEnabled = false;
             deleteMakeButton.IsEnabled = false;
-
-            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
-            MakesToDelete.ItemsSource = localCarMakes;
         }
 
         private void cancelDeleteMake_Click(object sender, RoutedEventArgs e)
@@ -221,19 +220,35 @@ namespace MAF_VE_2
         private void deleteMake_Click(object sender, RoutedEventArgs e)
         {
             var selectedMake = MakesToDelete.SelectedItem;
-            var LocalMake = selectedMake as LocalCarMake;
-            localDatabaseConnection.Delete<LocalCarMake>(LocalMake.ID);
 
-            List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
-            MakesToDelete.ItemsSource = localCarMakes;
+            if (selectedMake != null)
+            {
+                var LocalMake = selectedMake as LocalCarMake;
+                localDatabaseConnection.Delete<LocalCarMake>(LocalMake.ID);
 
-            RefreshMakesComboBox();
+                List<LocalCarMake> localCarMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * from LocalCarMake");
+                MakesToDelete.ItemsSource = localCarMakes;
+
+                RefreshMakesComboBox();
+                deleteMake.IsEnabled = false;
+            }
         }
 
         private void addMakeButton_Click(object sender, RoutedEventArgs e)
         {
             addMakeButton.IsEnabled = false;
             deleteMakeButton.IsEnabled = false;
+        }
+
+        private void MakesToDelete_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            deleteMake.IsEnabled = true;
+        }
+
+        private void deleteMakeFlyout_Closed(object sender, object e)
+        {
+            deleteMake.IsEnabled = false;
+            makeOptionsButton.Flyout.Hide();
         }
 
         // Functions/Methods /////////////////////////////////////////////////
@@ -842,5 +857,7 @@ namespace MAF_VE_2
                 ChartsStackPanel.Orientation = Orientation.Vertical;
             }
         }
+
+        
     }
 }

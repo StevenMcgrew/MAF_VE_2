@@ -260,10 +260,10 @@
                                                             </Button>
                                                             <Button Name="deleteMakeButton" Content="Delete Make" IsEnabled="False" Click="deleteMakeButton_Click">
                                                                 <Button.Flyout>
-                                                                    <Flyout>
+                                                                    <Flyout x:Name="deleteMakeFlyout" Closed="deleteMakeFlyout_Closed">
                                                                         <StackPanel>
                                                                             <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
-                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="300">
+                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="300" SelectionChanged="MakesToDelete_SelectionChanged">
                                                                                 <ListBox.ItemTemplate>
                                                                                     <DataTemplate>
                                                                                         <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
@@ -272,7 +272,7 @@
                                                                                 <ListBoxItem Content="No custom Makes found"/>
                                                                             </ListBox>
                                                                             <StackPanel Orientation="Horizontal">
-                                                                                <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click"/>
+                                                                                <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click" IsEnabled="False"/>
                                                                                 <Button Name="cancelDeleteMake" Content="Done" Click="cancelDeleteMake_Click"/>
                                                                             </StackPanel>
                                                                         </StackPanel>
