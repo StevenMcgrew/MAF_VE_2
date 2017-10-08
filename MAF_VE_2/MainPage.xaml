@@ -312,7 +312,7 @@
                                 <TextBox Name="comments" TextWrapping="Wrap" Height="53" MaxLength="200" Margin="5,0,0,0" />
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Name="searchButton" Background="#FF3399FF" Margin="5,10,0,0">
+                                    <Button Name="searchButton" Background="#FF3399FF" Margin="5,10,0,0" Click="searchButton_Click">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11A;" VerticalAlignment="Center"/>
                                             <TextBlock Text="Search" Margin="5,0,0,0"/>
@@ -346,9 +346,7 @@
                                 <TextBlock Foreground="White">
                                     <Span><Underline>You searched for</Underline>:</Span>
                                 </TextBlock>
-                                <TextBlock TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Gray" Margin="15,0,0,0">
-                                    <Span><Italic>No search critieria. Showing all records.</Italic></Span>
-                                </TextBlock>
+                                <TextBlock Name="searchedForText" TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Gray" Margin="15,0,0,0"/>
                             </StackPanel>
 
                             <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">

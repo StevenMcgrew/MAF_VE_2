@@ -122,6 +122,23 @@ namespace MAF_VE_2
             {
                 noResults.Visibility = Visibility.Collapsed;
             }
+
+            searchedForText.Text = "Showing all records.";
+        }
+
+        private void printMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void shareMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
         }
 
 #region Uncheck radiobuttons if already checked
@@ -275,9 +292,34 @@ namespace MAF_VE_2
             make.ItemsSource = allCarMakes;
         }
 
-#endregion
+        #endregion
 
 #region SizeChanged handling
+
+        private void Charts_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            double newWidth = e.NewSize.Width;
+            double newHeight = e.NewSize.Height;
+            double orientationCheck = 1;
+
+            if (newHeight != 0)
+            {
+                orientationCheck = newWidth / newHeight;
+            }
+
+            if (orientationCheck == 1) // Perfect square
+            {
+                return;
+            }
+            else if (orientationCheck > 1) // Landscape
+            {
+                ChartsStackPanel.Orientation = Orientation.Horizontal;
+            }
+            else if (orientationCheck < 1) // Portrait
+            {
+                ChartsStackPanel.Orientation = Orientation.Vertical;
+            }
+        }
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -681,22 +723,9 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
-        private void printMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void shareMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
+#region Clear and Reset buttons
 
         private void clearButton_Click(object sender, RoutedEventArgs e)
         {
@@ -718,7 +747,14 @@ namespace MAF_VE_2
             good.IsChecked = false;
             bad.IsChecked = false;
             unsure.IsChecked = false;
+            condition = "";
+
+            ShowAllLocalRecords();
         }
+
+        #endregion
+
+#region Save
 
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -801,6 +837,10 @@ namespace MAF_VE_2
             }
         }
 
+#endregion
+
+#region Record click
+
         private void localRecords_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = e.ClickedItem as MAFcalculation;
@@ -833,31 +873,147 @@ namespace MAF_VE_2
             recordPopUp.Visibility = Visibility.Collapsed;
         }
 
-        private void Charts_SizeChanged(object sender, SizeChangedEventArgs e)
+
+        #endregion
+
+#region Search
+
+        private async void searchButton_Click(object sender, RoutedEventArgs e)
         {
-            double newWidth = e.NewSize.Width;
-            double newHeight = e.NewSize.Height;
-            double orientationCheck = 1;
+            {
+                noResults.Visibility = Visibility.Collapsed;
 
-            if (newHeight != 0)
-            {
-                orientationCheck = newWidth / newHeight;
-            }
+                string YEAR = "";
+                string MAKE = "";
+                string MODEL = "";
+                string ENGINE = "";
+                string CONDITION = "";
+                string COMMENTS = "";
+                List<string> queryStringList = new List<string>();
+                List<string> searchedForList = new List<string>();
+                string queryString;
 
-            if (orientationCheck == 1) // Perfect square
-            {
-                return;
-            }
-            else if (orientationCheck > 1) // Landscape
-            {
-                ChartsStackPanel.Orientation = Orientation.Horizontal;
-            }
-            else if (orientationCheck < 1) // Portrait
-            {
-                ChartsStackPanel.Orientation = Orientation.Vertical;
+                try
+                {
+                    if (year.SelectedItem != null)
+                    {
+                        YEAR = year.SelectedItem.ToString();
+                        searchedForList.Add(YEAR);
+
+                        if (YEAR != "")
+                        {
+                            YEAR = " Year = '" + YEAR + "'";
+                            queryStringList.Add(YEAR);
+                        }
+                    }
+
+                    if (make.SelectedItem != null)
+                    {
+                        MAKE = make.SelectedItem.ToString();
+                        searchedForList.Add(MAKE);
+
+                        if (MAKE != "")
+                        {
+                            MAKE = " Make = '" + MAKE + "'";
+                            queryStringList.Add(MAKE);
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(model.Text))
+                    {
+                        MODEL = model.Text.Trim();
+                        searchedForList.Add(MODEL);
+
+                        if (MODEL.Length < 3)
+                        {
+                            MODEL = " Model = '" + MODEL + "'";
+                            queryStringList.Add(MODEL);
+                        }
+                        else
+                        {
+                            MODEL = MODEL.Substring(0, 3);
+                            MODEL = " Model LIKE '" + MODEL + "%'";
+                            queryStringList.Add(MODEL);
+                        }
+                    }
+
+                    if (engine.SelectedItem != null)
+                    {
+                        ENGINE = engine.SelectedItem.ToString();
+                        searchedForList.Add(ENGINE);
+
+                        if (ENGINE != "")
+                        {
+                            ENGINE = " Engine = '" + ENGINE + "'";
+                            queryStringList.Add(ENGINE);
+                        }
+                    }
+
+                    if (condition != null)
+                    {
+                        CONDITION = condition;
+                        searchedForList.Add(CONDITION);
+
+                        if (CONDITION != "")
+                        {
+                            CONDITION = " Condition = '" + CONDITION + "'";
+                            queryStringList.Add(CONDITION);
+                        }
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(comments.Text))
+                    {
+                        COMMENTS = comments.Text.Trim();
+
+                        // Split comments into individual words and remove separators like commas and white space
+                        string[] separators = { ",", ".", "!", "?", ";", ":", " " };
+                        string[] words = COMMENTS.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                        
+                        foreach (var word in words)
+                        {
+                            // Add each word as a keyword search of the Comments in the database
+                            string KEYWORD = " Comments LIKE '%" + word + "%'";
+                            queryStringList.Add(KEYWORD);
+
+                            // Add each word to searchedForList
+                            searchedForList.Add(word);
+                        }
+                    }
+
+                    if (queryStringList.Count > 0)
+                    {
+                        if (queryStringList.Count == 1)
+                        {
+                            queryString = queryStringList.First().ToString();
+                            var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
+                            localRecords.ItemsSource = query;
+                        }
+                        else
+                        {
+                            queryString = string.Join(" AND", queryStringList);
+                            var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
+                            localRecords.ItemsSource = query;
+                        }
+
+                        searchedForText.Text = string.Join(" ", searchedForList);
+
+                        if (localRecords.Items.Count == 0)
+                        {
+                            noResults.Visibility = Visibility.Visible;
+                        }
+                    }
+                    else
+                    {
+                        var dialog = await new MessageDialog("Please select at least one option before searching.").ShowAsync();
+                    }
+                }
+                catch
+                {
+                    var dialog = await new MessageDialog("Nothing found. Please try a different search.").ShowAsync();
+                }
             }
         }
 
-        
+#endregion
     }
 }
