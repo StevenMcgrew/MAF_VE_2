@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Shapes;
 
 namespace MAF_VE_2
 {
@@ -59,7 +60,7 @@ namespace MAF_VE_2
         void InitializeLocalDatabase()
         {
             // Connect to local database and create tables if they don't exist
-            string localDatabasePath = Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
+            string localDatabasePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
             localDatabaseConnection = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), localDatabasePath);
             localDatabaseConnection.CreateTable<MAFcalculation>();
             localDatabaseConnection.CreateTable<LocalCarMake>();
@@ -688,6 +689,11 @@ namespace MAF_VE_2
             }
         }
 
+        private void closeExpectedNoteButton_Click(object sender, RoutedEventArgs e)
+        {
+            expectedMafNoteButton.Flyout.Hide();
+        }
+
         #endregion
 
 #region Calculator TextChanged and SelectionChanged
@@ -982,24 +988,37 @@ namespace MAF_VE_2
 
                     if (queryStringList.Count > 0)
                     {
+                        // Set queryString based on items in queryStringList
                         if (queryStringList.Count == 1)
                         {
                             queryString = queryStringList.First().ToString();
-                            var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
-                            localRecords.ItemsSource = query;
                         }
                         else
                         {
                             queryString = string.Join(" AND", queryStringList);
-                            var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
-                            localRecords.ItemsSource = query;
                         }
 
+                        // Query the database and update localRecords
+                        var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
+                        localRecords.ItemsSource = query;
+
+                        // Set searchedForText
                         searchedForText.Text = string.Join(" ", searchedForList);
 
+                        // Manage noResults visibility, plot data if there are results
                         if (localRecords.Items.Count == 0)
                         {
                             noResults.Visibility = Visibility.Visible;
+                        }
+                        else
+                        {
+                            PlotDataOnCharts(query);
+                        }
+
+                        // Navigate to databasePivotItem if needed
+                        if (databaseGrid.Children.Contains(recordsPanel))
+                        {
+                            mainPivot.SelectedItem = databasePivotItem;
                         }
                     }
                     else
@@ -1014,6 +1033,116 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
+
+        void PlotDataOnCharts(List<MAFcalculation> records)
+        {
+            double lowRPM;
+            double highRPM;
+            double lowMAF;
+            double highMAF;
+            double lowVE;
+            double highVE;
+
+            if (records.Count < 1)
+            {
+                return;
+            }
+            else if (records.Count == 1)
+            {
+                var first = records.First();
+
+                // Set rpm scale on both charts
+                var recordRPM = first.Engine_speed;
+                if (recordRPM < 1000)
+                {
+                    lowRPM = 0;
+                }
+                else
+                {
+                    lowRPM = recordRPM - 1000;
+                }
+                highRPM = recordRPM + 1000;
+
+                lowRPM = Math.Round(lowRPM);
+                highRPM = Math.Round(highRPM);
+                highMafRpm.Text = highRPM.ToString();
+                highVeRpm.Text = highMafRpm.Text;
+                lowMafRpm.Text = lowRPM.ToString();
+                lowVeRpm.Text = lowMafRpm.Text;
+
+                // Set MAF scale on chart
+                var recordMAF = first.MAF;
+                if (first.MAF_units == "kg/h")
+                {
+                    recordMAF = recordMAF / 3.6;
+                }
+                if (recordMAF < 50)
+                {
+                    lowMAF = 0;
+                }
+                else
+                {
+                    lowMAF = recordMAF - 50;
+                }
+                highMAF = recordMAF + 50;
+
+                lowMAF = Math.Round(lowMAF);
+                highMAF = Math.Round(highMAF);
+                lowMafFlow.Text = lowMAF.ToString();
+                highMafFlow.Text = highMAF.ToString();
+
+                // Set VE scale on chart
+                var recordVE = first.Volumetric_Efficiency;
+                if (recordVE < 25)
+                {
+                    lowVE = 0;
+                }
+                else
+                {
+                    lowVE = recordVE - 25;
+                }
+                highVE = recordVE + 25;
+
+                lowVE = Math.Round(lowVE);
+                highVE = Math.Round(highVE);
+                lowVePercent.Text = lowVE.ToString();
+                highVePercent.Text = highVE.ToString();
+
+                // Add ellipse at proper position
+                var rpmPerPixel = 380 / (highRPM - lowRPM);
+                var mafPerPixel = 380 / (highMAF - lowMAF);
+                var vePerPixel = 380 / (highVE - lowVE);
+
+                var leftMafMargin = (recordMAF - lowMAF) * mafPerPixel;
+                var bottomRpmMargin = (recordRPM - lowRPM) * rpmPerPixel;
+                var leftVeMargin = (recordVE - lowVE) * vePerPixel;
+
+                Ellipse mafEll = new Ellipse();
+                mafEll.Width = 10;
+                mafEll.Height = 10;
+                mafEll.Fill = new SolidColorBrush(Colors.White);
+                mafEll.HorizontalAlignment = HorizontalAlignment.Left;
+                mafEll.VerticalAlignment = VerticalAlignment.Bottom;
+                mafEll.Margin = new Thickness(leftMafMargin, 0, 0, bottomRpmMargin);
+
+                mafPlot.Children.Add(mafEll);
+
+                Ellipse veEll = new Ellipse();
+                veEll.Width = 10;
+                veEll.Height = 10;
+                veEll.Fill = new SolidColorBrush(Colors.White);
+                veEll.HorizontalAlignment = HorizontalAlignment.Left;
+                veEll.VerticalAlignment = VerticalAlignment.Bottom;
+                veEll.Margin = new Thickness(leftVeMargin, 0, 0, bottomRpmMargin);
+
+                vePlot.Children.Add(veEll);
+            }
+            else if (records.Count > 1)
+            {
+
+            }
+        }
+        
     }
 }

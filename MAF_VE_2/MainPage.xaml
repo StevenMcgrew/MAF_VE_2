@@ -102,8 +102,17 @@
 
                                     <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                         <StackPanel Orientation="Horizontal" Width="225">
-                                            <TextBlock Text="Average MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                            <Button Name="asteriskButton" Content="*" Foreground="White"/>
+                                            <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                            <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA21;" Foreground="Red" Margin="0" Padding="10,4,0,0" FontSize="24" Width="32" Height="32">
+                                                <Button.Flyout>
+                                                    <Flyout>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="Based on a naturally aspirated engine&#10;with average airflow ability&#10;and a VE around 77-84%."/>
+                                                            <Button Name="closeExpectedNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Background="Red" Foreground="White" VerticalAlignment="Top" Margin="20,0,0,0" Click="closeExpectedNoteButton_Click"/>
+                                                        </StackPanel>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
                                             <!--<ComboBox SelectedValuePath="Content" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" Margin="0">
                                         <ComboBoxItem Content="77"/>
                                         <ComboBoxItem Content="78"/>
@@ -241,9 +250,9 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                            <ComboBox Name="make" Margin="5,0,5,5" PlaceholderText="Select">
+                                            <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select">
                                             </ComboBox>
-                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Click="makeOptionsButton_Click">
+                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Foreground="Black" Height="32" Margin="0,0,0,5" Padding="0" Width="32" Click="makeOptionsButton_Click">
                                                 <Button.Flyout>
                                                     <Flyout>
                                                         <StackPanel>
@@ -263,13 +272,12 @@
                                                                     <Flyout x:Name="deleteMakeFlyout" Closed="deleteMakeFlyout_Closed">
                                                                         <StackPanel>
                                                                             <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
-                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="300" SelectionChanged="MakesToDelete_SelectionChanged">
+                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="250  " SelectionChanged="MakesToDelete_SelectionChanged">
                                                                                 <ListBox.ItemTemplate>
                                                                                     <DataTemplate>
                                                                                         <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
                                                                                     </DataTemplate>
                                                                                 </ListBox.ItemTemplate>
-                                                                                <ListBoxItem Content="No custom Makes found"/>
                                                                             </ListBox>
                                                                             <StackPanel Orientation="Horizontal">
                                                                                 <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click" IsEnabled="False"/>
@@ -429,7 +437,92 @@
                                 </PivotItem>
                                 
                                 <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
-                                    
+                                    <StackPanel Background="White" Margin="10">
+
+                                        <TextBlock Text="Not yet available. Planned for a future update." FontSize="36" Margin="10"/>
+
+                                        <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="64" />
+                                                <!--Year-->
+                                                <ColumnDefinition Width="90" />
+                                                <!--Make-->
+                                                <ColumnDefinition Width="100" />
+                                                <!--Model-->
+                                                <ColumnDefinition Width="50" />
+                                                <!--Engine-->
+                                                <ColumnDefinition Width="90"/>
+                                                <!--Condition-->
+                                                <ColumnDefinition Width="57"/>
+                                                <!--VE-->
+                                                <ColumnDefinition Width="78"/>
+                                                <!--MAF-->
+                                                <ColumnDefinition Width="Auto"/>
+                                                <!--Comments-->
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
+                                            <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
+                                            <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
+                                            <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
+                                            <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
+                                            <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE%" />
+                                            <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
+                                            <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0" Text="Comments/Keywords" />
+
+                                            <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+
+                                        </Grid>
+
+                                        <TextBlock Name="globalNoResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+
+                                        <ListView Name="globalRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
+                                            <ListView.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Grid Name="gridForGlobalData">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="52"/>
+                                                            <!--Year-->
+                                                            <ColumnDefinition Width="90"/>
+                                                            <!--Make-->
+                                                            <ColumnDefinition Width="100"/>
+                                                            <!--Model-->
+                                                            <ColumnDefinition Width="50"/>
+                                                            <!--Engine-->
+                                                            <ColumnDefinition Width="90"/>
+                                                            <!--Condition-->
+                                                            <ColumnDefinition Width="57"/>
+                                                            <!--VE-->
+                                                            <ColumnDefinition Width="44"/>
+                                                            <!--MAF-->
+                                                            <ColumnDefinition Width="34"/>
+                                                            <!--MAF units-->
+                                                            <ColumnDefinition Width="Auto"/>
+                                                            <!--Comments-->
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
+                                                        <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
+
+                                                    </Grid>
+                                                </DataTemplate>
+                                            </ListView.ItemTemplate>
+                                        </ListView>
+
+                                    </StackPanel>
                                 </PivotItem>
 
                                 <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged">
@@ -450,10 +543,10 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                 <Span><Underline>MAF chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="6000" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="4000" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="240" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="200" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
+                                                <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>
@@ -462,6 +555,7 @@
                                                 </TextBlock>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
+                                                <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1"/>
 
                                             </Grid>
 
@@ -480,10 +574,10 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                 <Span><Underline>VE chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="6000" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="4000" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="100" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="70" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
+                                                <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="VE (%)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>
@@ -492,7 +586,8 @@
                                                 </TextBlock>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-
+                                                <Grid Name="vePlot" Grid.Row="1" Grid.Column="1"/>
+                                                
                                             </Grid>
                                         </StackPanel>
                                     </Viewbox>
