@@ -1034,7 +1034,8 @@ namespace MAF_VE_2
                         }
                         else
                         {
-                            PlotDataOnCharts(query);
+                            List<MAFcalculation> copyOfQuery = query.Select(item => new MAFcalculation(item)).ToList();
+                            PlotDataOnCharts(copyOfQuery);
                         }
 
                         // Navigate to databasePivotItem if needed
@@ -1069,6 +1070,7 @@ namespace MAF_VE_2
             }
             else if (records.Count > 0)
             {
+                records = AddCurrentCalculationToList(records);
                 ConvertToGramsPerSecond(records);
                 SetRpmScaleOnCharts(records);
                 SetMafScaleOnChart(records);
@@ -1076,7 +1078,6 @@ namespace MAF_VE_2
                 SetAmountsPerPixel();
                 AddMafDataPlots(records);
                 AddVeDataPlots(records);
-                AddCurrentCalculationToCharts();
             }
         }
 
@@ -1251,6 +1252,9 @@ namespace MAF_VE_2
                 case ("Unsure"):
                     plotColor = new SolidColorBrush(Colors.Yellow);
                     break;
+                case ("CurrentCalculation"):
+                    plotColor = new SolidColorBrush(Colors.White);
+                    break;
                 default:
                     plotColor = new SolidColorBrush(Colors.Gray);
                     break;
@@ -1274,15 +1278,24 @@ namespace MAF_VE_2
             return el;
         }
 
-        void AddCurrentCalculationToCharts()
+        List<MAFcalculation> AddCurrentCalculationToList(List<MAFcalculation> records)
         {
-            if (string.IsNullOrWhiteSpace(maf.Text) || string.IsNullOrWhiteSpace(VE.Text))
+            if (string.IsNullOrWhiteSpace(maf.Text) || string.IsNullOrWhiteSpace(VE.Text) || string.IsNullOrWhiteSpace(rpm.Text))
             {
-                return;
+                return records;
             }
             else
             {
+                MAFcalculation c = new MAFcalculation();
+                c.Condition = "CurrentCalculation";
+                c.MAF_units = mafUnits.SelectedValue.ToString();
+                c.Engine_speed = Convert.ToDouble(rpm.Text);
+                c.MAF = Convert.ToDouble(maf.Text);
+                c.Volumetric_Efficiency = Convert.ToDouble(VE.Text);
 
+                records.Add(c);
+
+                return records;
             }
         }
 
