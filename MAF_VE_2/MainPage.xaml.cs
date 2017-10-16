@@ -23,10 +23,29 @@ namespace MAF_VE_2
 {
     public sealed partial class MainPage : Page
     {
+
+#region General variables and fields
+
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
+
+#endregion
+
+#region Variables for charts
+
+        double lowRPM;
+        double highRPM;
+        double lowMAF;
+        double highMAF;
+        double lowVE;
+        double highVE;
+        double rpmPerPixel;
+        double mafPerPixel;
+        double vePerPixel;
+
+#endregion
 
 #region Enums
 
@@ -125,6 +144,7 @@ namespace MAF_VE_2
             }
 
             searchedForText.Text = "Showing all records.";
+            ClearChartData();
         }
 
         private void printMenuItem_Click(object sender, RoutedEventArgs e)
@@ -988,6 +1008,8 @@ namespace MAF_VE_2
 
                     if (queryStringList.Count > 0)
                     {
+                        ClearChartData();
+
                         // Set queryString based on items in queryStringList
                         if (queryStringList.Count == 1)
                         {
@@ -1028,121 +1050,243 @@ namespace MAF_VE_2
                 }
                 catch
                 {
-                    var dialog = await new MessageDialog("Nothing found. Please try a different search.").ShowAsync();
+                    var dialog = await new MessageDialog("A problem occurred when trying to search. Showing all records now.").ShowAsync();
+                    ClearChartData();
+                    ShowAllLocalRecords();
                 }
+            }
+        }
+
+#endregion
+
+#region Plot data
+
+        void PlotDataOnCharts(List<MAFcalculation> records)
+        {
+            if (records.Count < 1)
+            {
+                return;
+            }
+            else if (records.Count > 0)
+            {
+                ConvertToGramsPerSecond(records);
+                SetRpmScaleOnCharts(records);
+                SetMafScaleOnChart(records);
+                SetVeScaleOnChart(records);
+                SetAmountsPerPixel();
+                AddMafDataPlots(records);
+                AddVeDataPlots(records);
+                AddCurrentCalculationToCharts();
+            }
+        }
+
+        // Functions/Methods for data plotting //////////////////////////////////////////////
+
+        void ClearChartData()
+        {
+            lowRPM = double.NaN;
+            highRPM = double.NaN;
+            lowMAF = double.NaN;
+            highMAF = double.NaN;
+            lowVE = double.NaN;
+            highVE = double.NaN;
+            rpmPerPixel = double.NaN;
+            mafPerPixel = double.NaN;
+            vePerPixel = double.NaN;
+
+            highMafRpm.Text = "----";
+            highVeRpm.Text = "----";
+            lowMafRpm.Text = "----";
+            lowVeRpm.Text = "----";
+            lowMafFlow.Text = "----";
+            highMafFlow.Text = "----";
+            lowVePercent.Text = "----";
+            highVePercent.Text = "----";
+
+            vePlot.Children.Clear();
+            mafPlot.Children.Clear();
+        }
+
+        List<MAFcalculation> ConvertToGramsPerSecond(List<MAFcalculation> records)
+        {
+            foreach (var record in records)
+            {
+                if (record.MAF_units == "kg/h")
+                {
+                    record.MAF = record.MAF / 3.6;
+                    record.MAF_units = "g/s";
+                }
+            }
+
+            return records;
+        }
+
+        List<MAFcalculation> ConvertToKilogramsPerHour(List<MAFcalculation> records)
+        {
+            foreach (var record in records)
+            {
+                if (record.MAF_units == "g/s")
+                {
+                    record.MAF = record.MAF * 3.6;
+                    record.MAF_units = "kg/h";
+                }
+            }
+
+            return records;
+        }
+
+        void SetRpmScaleOnCharts(List<MAFcalculation> records)
+        {
+            double minRecordRpm = records.Min(p => p.Engine_speed);
+            double maxRecordRpm = records.Max(p => p.Engine_speed);
+
+            if (minRecordRpm < 1000)
+            {
+                lowRPM = 0;
+            }
+            else
+            {
+                lowRPM = minRecordRpm - 1000;
+            }
+            highRPM = maxRecordRpm + 1000;
+
+            lowRPM = Math.Round(lowRPM);
+            highRPM = Math.Round(highRPM);
+
+            lowMafRpm.Text = lowRPM.ToString();
+            lowVeRpm.Text = lowMafRpm.Text;
+            highMafRpm.Text = highRPM.ToString();
+            highVeRpm.Text = highMafRpm.Text;
+        }
+
+        void SetMafScaleOnChart(List<MAFcalculation> records)
+        {
+            double minRecordMaf = records.Min(p => p.MAF);
+            double maxRecordMaf = records.Max(p => p.MAF);
+
+            if (minRecordMaf < 50)
+            {
+                lowMAF = 0;
+            }
+            else
+            {
+                lowMAF = minRecordMaf - 50;
+            }
+            highMAF = maxRecordMaf + 50;
+
+            lowMAF = Math.Round(lowMAF);
+            highMAF = Math.Round(highMAF);
+
+            lowMafFlow.Text = lowMAF.ToString();
+            highMafFlow.Text = highMAF.ToString();
+        }
+
+        void SetVeScaleOnChart(List<MAFcalculation> records)
+        {
+            double minRecordVe = records.Min(p => p.Volumetric_Efficiency);
+            double maxRecordVe = records.Max(p => p.Volumetric_Efficiency);
+
+            if (minRecordVe < 25)
+            {
+                lowVE = 0;
+            }
+            else
+            {
+                lowVE = minRecordVe - 25;
+            }
+            highVE = maxRecordVe + 25;
+
+            lowVE = Math.Round(lowVE);
+            highVE = Math.Round(highVE);
+
+            lowVePercent.Text = lowVE.ToString();
+            highVePercent.Text = highVE.ToString();
+        }
+
+        void SetAmountsPerPixel()
+        {
+            rpmPerPixel = 380 / (highRPM - lowRPM);
+            mafPerPixel = 380 / (highMAF - lowMAF);
+            vePerPixel = 380 / (highVE - lowVE);
+        }
+
+        void AddMafDataPlots(List<MAFcalculation> records)
+        {
+            foreach (var record in records)
+            {
+                var leftMafMargin = (record.MAF - lowMAF) * mafPerPixel;
+                var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
+                var plotColor = GetPlotColorBasedOnCondition(record);
+
+                Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftMafMargin, bottomRpmMargin);
+                mafPlot.Children.Add(ellipse);
+            }
+        }
+
+        void AddVeDataPlots(List<MAFcalculation> records)
+        {
+            foreach (var record in records)
+            {
+                var leftVeMargin = (record.Volumetric_Efficiency - lowVE) * vePerPixel;
+                var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
+                var plotColor = GetPlotColorBasedOnCondition(record);
+
+                Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftVeMargin, bottomRpmMargin);
+                vePlot.Children.Add(ellipse);
+            }
+        }
+
+        SolidColorBrush GetPlotColorBasedOnCondition(MAFcalculation record)
+        {
+            SolidColorBrush plotColor;
+
+            switch (record.Condition)
+            {
+                case ("Good"):
+                    plotColor = new SolidColorBrush(Colors.Lime);
+                    break;
+                case ("Bad"):
+                    plotColor = new SolidColorBrush(Colors.Red);
+                    break;
+                case ("Unsure"):
+                    plotColor = new SolidColorBrush(Colors.Yellow);
+                    break;
+                default:
+                    plotColor = new SolidColorBrush(Colors.Gray);
+                    break;
+            }
+
+            return plotColor;
+        }
+
+        Ellipse CreateEllipseForPlotChart(SolidColorBrush color, double left, double bottom)
+        {
+            Ellipse el = new Ellipse();
+            el.Width = 10;
+            el.Height = 10;
+            el.Fill = color;
+            el.Stroke = new SolidColorBrush(Colors.Black);
+            el.StrokeThickness = 1;
+            el.HorizontalAlignment = HorizontalAlignment.Left;
+            el.VerticalAlignment = VerticalAlignment.Bottom;
+            el.Margin = new Thickness(left, 0, 0, bottom);
+
+            return el;
+        }
+
+        void AddCurrentCalculationToCharts()
+        {
+            if (string.IsNullOrWhiteSpace(maf.Text) || string.IsNullOrWhiteSpace(VE.Text))
+            {
+                return;
+            }
+            else
+            {
+
             }
         }
 
         #endregion
 
-        void PlotDataOnCharts(List<MAFcalculation> records)
-        {
-            double lowRPM;
-            double highRPM;
-            double lowMAF;
-            double highMAF;
-            double lowVE;
-            double highVE;
-
-            if (records.Count < 1)
-            {
-                return;
-            }
-            else if (records.Count == 1)
-            {
-                var first = records.First();
-
-                // Set rpm scale on both charts
-                var recordRPM = first.Engine_speed;
-                if (recordRPM < 1000)
-                {
-                    lowRPM = 0;
-                }
-                else
-                {
-                    lowRPM = recordRPM - 1000;
-                }
-                highRPM = recordRPM + 1000;
-
-                lowRPM = Math.Round(lowRPM);
-                highRPM = Math.Round(highRPM);
-                highMafRpm.Text = highRPM.ToString();
-                highVeRpm.Text = highMafRpm.Text;
-                lowMafRpm.Text = lowRPM.ToString();
-                lowVeRpm.Text = lowMafRpm.Text;
-
-                // Set MAF scale on chart
-                var recordMAF = first.MAF;
-                if (first.MAF_units == "kg/h")
-                {
-                    recordMAF = recordMAF / 3.6;
-                }
-                if (recordMAF < 50)
-                {
-                    lowMAF = 0;
-                }
-                else
-                {
-                    lowMAF = recordMAF - 50;
-                }
-                highMAF = recordMAF + 50;
-
-                lowMAF = Math.Round(lowMAF);
-                highMAF = Math.Round(highMAF);
-                lowMafFlow.Text = lowMAF.ToString();
-                highMafFlow.Text = highMAF.ToString();
-
-                // Set VE scale on chart
-                var recordVE = first.Volumetric_Efficiency;
-                if (recordVE < 25)
-                {
-                    lowVE = 0;
-                }
-                else
-                {
-                    lowVE = recordVE - 25;
-                }
-                highVE = recordVE + 25;
-
-                lowVE = Math.Round(lowVE);
-                highVE = Math.Round(highVE);
-                lowVePercent.Text = lowVE.ToString();
-                highVePercent.Text = highVE.ToString();
-
-                // Add ellipse at proper position
-                var rpmPerPixel = 380 / (highRPM - lowRPM);
-                var mafPerPixel = 380 / (highMAF - lowMAF);
-                var vePerPixel = 380 / (highVE - lowVE);
-
-                var leftMafMargin = (recordMAF - lowMAF) * mafPerPixel;
-                var bottomRpmMargin = (recordRPM - lowRPM) * rpmPerPixel;
-                var leftVeMargin = (recordVE - lowVE) * vePerPixel;
-
-                Ellipse mafEll = new Ellipse();
-                mafEll.Width = 10;
-                mafEll.Height = 10;
-                mafEll.Fill = new SolidColorBrush(Colors.White);
-                mafEll.HorizontalAlignment = HorizontalAlignment.Left;
-                mafEll.VerticalAlignment = VerticalAlignment.Bottom;
-                mafEll.Margin = new Thickness(leftMafMargin, 0, 0, bottomRpmMargin);
-
-                mafPlot.Children.Add(mafEll);
-
-                Ellipse veEll = new Ellipse();
-                veEll.Width = 10;
-                veEll.Height = 10;
-                veEll.Fill = new SolidColorBrush(Colors.White);
-                veEll.HorizontalAlignment = HorizontalAlignment.Left;
-                veEll.VerticalAlignment = VerticalAlignment.Bottom;
-                veEll.Margin = new Thickness(leftVeMargin, 0, 0, bottomRpmMargin);
-
-                vePlot.Children.Add(veEll);
-            }
-            else if (records.Count > 1)
-            {
-
-            }
-        }
-        
     }
 }
