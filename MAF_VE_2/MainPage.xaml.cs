@@ -147,9 +147,9 @@ namespace MAF_VE_2
                 veChartNoResultsLabel.Visibility = Visibility.Collapsed;
             }
 
-            searchedForText.Text = "----";
-            veChartDataDescription.Text = "Results for: ----";
-            mafChartDataDescription.Text = "Results for: ----";
+            searchedForText.Text = "...";
+            veChartDataDescription.Text = "----";
+            mafChartDataDescription.Text = "----";
             ClearChartData();
         }
 
@@ -780,6 +780,7 @@ namespace MAF_VE_2
             bad.IsChecked = false;
             unsure.IsChecked = false;
             condition = "";
+            comments.ClearValue(TextBox.TextProperty);
 
             ShowAllLocalRecords();
         }
@@ -974,7 +975,7 @@ namespace MAF_VE_2
                     if (engine.SelectedItem != null)
                     {
                         ENGINE = engine.SelectedItem.ToString();
-                        searchedForList.Add(ENGINE);
+                        searchedForList.Add(ENGINE + "L");
 
                         if (ENGINE != "")
                         {
@@ -1035,8 +1036,8 @@ namespace MAF_VE_2
                         // Set searchedForText
                         var searchText = string.Join(" ", searchedForList);
                         searchedForText.Text = searchText;
-                        mafChartDataDescription.Text = "Results for: " + searchText;
-                        veChartDataDescription.Text = "Results for: " + searchText;
+                        mafChartDataDescription.Text = searchText;
+                        veChartDataDescription.Text = searchText;
 
                         // Manage noResults visibility, plot data if there are results
                         if (localRecords.Items.Count == 0)

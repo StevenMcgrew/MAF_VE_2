@@ -247,12 +247,12 @@
                                         <Button Name="searchBackButton" Visibility="Collapsed" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" />
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select">
+                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select" Width="108">
                                             </ComboBox>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select">
+                                            <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select" MaxWidth="108" Width="108">
                                             </ComboBox>
                                             <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0,0,0,5" Padding="0" Width="32" Click="makeOptionsButton_Click" Foreground="White">
                                                 <Button.Flyout>
@@ -303,15 +303,15 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <TextBox Name="model" Margin="5,0,0,0"/>
+                                            <TextBox Name="model" Margin="5,0,0,0" MinWidth="84" MaxWidth="108" MaxLength="20" Width="108"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select">
+                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select" Width="108">
                                             </ComboBox>
                                         </StackPanel>
                                     </StackPanel>
-                                    <StackPanel>
+                                    <StackPanel VerticalAlignment="Center">
                                         <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
                                         <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
                                         <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
@@ -356,7 +356,7 @@
                                 <TextBlock Foreground="White">
                                     <Span><Underline>You searched for</Underline>:</Span>
                                 </TextBlock>
-                                <TextBlock Name="searchedForText" TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Red" Margin="15,0,0,0"/>
+                                <TextBlock Name="searchedForText" Foreground="Red" Margin="15,0,0,0" VerticalAlignment="Top" TextTrimming="CharacterEllipsis"/>
                             </StackPanel>
 
                             <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
@@ -558,7 +558,7 @@
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
                                                 <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
-                                                <TextBlock Name="mafChartDataDescription" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red"/>
+                                                <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="Red" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
                                                     <StackPanel Orientation="Horizontal">
@@ -609,7 +609,7 @@
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
                                                 <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
-                                                <TextBlock Name="veChartDataDescription" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red"/>
+                                                <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="Red" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <TextBlock Name="veChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
                                                     <StackPanel Orientation="Horizontal">
