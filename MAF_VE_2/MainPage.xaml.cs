@@ -137,15 +137,19 @@ namespace MAF_VE_2
             if (mafRecords.Count == 0)
             {
                 noResults.Visibility = Visibility.Visible;
+                mafChartNoResultsLabel.Visibility = Visibility.Visible;
+                veChartNoResultsLabel.Visibility = Visibility.Visible;
             }
             else
             {
                 noResults.Visibility = Visibility.Collapsed;
+                mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
+                veChartNoResultsLabel.Visibility = Visibility.Collapsed;
             }
 
-            searchedForText.Text = "Showing all records.";
-            veChartDataDescription.Text = "";
-            mafChartDataDescription.Text = "";
+            searchedForText.Text = "----";
+            veChartDataDescription.Text = "Results for: ----";
+            mafChartDataDescription.Text = "Results for: ----";
             ClearChartData();
         }
 
@@ -910,6 +914,8 @@ namespace MAF_VE_2
         {
             {
                 noResults.Visibility = Visibility.Collapsed;
+                mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
+                veChartNoResultsLabel.Visibility = Visibility.Collapsed;
 
                 string YEAR = "";
                 string MAKE = "";
@@ -1029,13 +1035,15 @@ namespace MAF_VE_2
                         // Set searchedForText
                         var searchText = string.Join(" ", searchedForList);
                         searchedForText.Text = searchText;
-                        mafChartDataDescription.Text = searchText;
-                        veChartDataDescription.Text = searchText;
+                        mafChartDataDescription.Text = "Results for: " + searchText;
+                        veChartDataDescription.Text = "Results for: " + searchText;
 
                         // Manage noResults visibility, plot data if there are results
                         if (localRecords.Items.Count == 0)
                         {
                             noResults.Visibility = Visibility.Visible;
+                            mafChartNoResultsLabel.Visibility = Visibility.Visible;
+                            veChartNoResultsLabel.Visibility = Visibility.Visible;
                         }
                         else
                         {
@@ -1225,6 +1233,13 @@ namespace MAF_VE_2
                 var plotColor = GetPlotColorBasedOnCondition(record);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftMafMargin, bottomRpmMargin);
+
+                var toolTip = new ToolTip();
+                var recordMAF = Math.Round(record.MAF).ToString();
+                var recordRPM = Math.Round(record.Engine_speed).ToString();
+                toolTip.Content = recordMAF + " " + record.MAF_units + "\r" + recordRPM + "rpm";
+                ToolTipService.SetToolTip(ellipse, toolTip);
+
                 mafPlot.Children.Add(ellipse);
             }
         }
@@ -1238,6 +1253,13 @@ namespace MAF_VE_2
                 var plotColor = GetPlotColorBasedOnCondition(record);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftVeMargin, bottomRpmMargin);
+
+                var toolTip = new ToolTip();
+                var recordVE = Math.Round(record.Volumetric_Efficiency).ToString();
+                var recordRPM = Math.Round(record.Engine_speed).ToString();
+                toolTip.Content = recordVE + " %" + "\r" + recordRPM + " rpm";
+                ToolTipService.SetToolTip(ellipse, toolTip);
+
                 vePlot.Children.Add(ellipse);
             }
         }
