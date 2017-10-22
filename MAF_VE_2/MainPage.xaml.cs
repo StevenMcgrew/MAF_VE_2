@@ -144,6 +144,8 @@ namespace MAF_VE_2
             }
 
             searchedForText.Text = "Showing all records.";
+            veChartDataDescription.Text = "";
+            mafChartDataDescription.Text = "";
             ClearChartData();
         }
 
@@ -1025,7 +1027,10 @@ namespace MAF_VE_2
                         localRecords.ItemsSource = query;
 
                         // Set searchedForText
-                        searchedForText.Text = string.Join(" ", searchedForList);
+                        var searchText = string.Join(" ", searchedForList);
+                        searchedForText.Text = searchText;
+                        mafChartDataDescription.Text = searchText;
+                        veChartDataDescription.Text = searchText;
 
                         // Manage noResults visibility, plot data if there are results
                         if (localRecords.Items.Count == 0)

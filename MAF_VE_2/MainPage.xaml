@@ -239,20 +239,22 @@
                                 </StackPanel>
                             </Border>
 
-                            <StackPanel Name="searchPanel" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+
+
+                            <StackPanel Name="searchPanel" Margin="0,0,15,15" VerticalAlignment="Center" Background="#FF191818" CornerRadius="20" Padding="20">
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel>
                                         <Button Name="searchBackButton" Visibility="Collapsed" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" />
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
                                             <ComboBox Name="year" Margin="5" PlaceholderText="Select">
                                             </ComboBox>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
                                             <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select">
                                             </ComboBox>
-                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Foreground="Black" Height="32" Margin="0,0,0,5" Padding="0" Width="32" Click="makeOptionsButton_Click">
+                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0,0,0,5" Padding="0" Width="32" Click="makeOptionsButton_Click" Foreground="White">
                                                 <Button.Flyout>
                                                     <Flyout>
                                                         <StackPanel>
@@ -300,11 +302,11 @@
                                             </Button>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
                                             <TextBox Name="model" Margin="5,0,0,0"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
+                                            <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
                                             <ComboBox Name="engine" Margin="5" PlaceholderText="Select">
                                             </ComboBox>
                                         </StackPanel>
@@ -316,7 +318,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <TextBlock Text="Comments or Keywords:" Margin="5,0,0,0"/>
+                                <TextBlock Text="Comments or Keywords:" Margin="5,0,0,0" Foreground="White"/>
                                 <TextBox Name="comments" TextWrapping="Wrap" Height="53" MaxLength="200" Margin="5,0,0,0" />
 
                                 <StackPanel Orientation="Horizontal">
@@ -354,7 +356,7 @@
                                 <TextBlock Foreground="White">
                                     <Span><Underline>You searched for</Underline>:</Span>
                                 </TextBlock>
-                                <TextBlock Name="searchedForText" TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Gray" Margin="15,0,0,0"/>
+                                <TextBlock Name="searchedForText" TextWrapping="WrapWholeWords" MaxWidth="345" HorizontalAlignment="Left" Foreground="Red" Margin="15,0,0,0"/>
                             </StackPanel>
 
                             <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
@@ -555,7 +557,26 @@
                                                 </TextBlock>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-                                                <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="White"/>
+                                                <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                <TextBlock Name="mafChartDataDescription" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red"/>
+                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Good" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Bad" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Unsure" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                    </StackPanel>
+                                                </StackPanel>
 
                                             </Grid>
 
@@ -572,7 +593,7 @@
                                                 </Grid.RowDefinitions>
 
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
-                                <Span><Underline>VE chart</Underline></Span>
+                                                    <Span><Underline>VE chart</Underline></Span>
                                                 </TextBlock>
                                                 <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
                                                 <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
@@ -586,8 +607,27 @@
                                                 </TextBlock>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                 <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-                                                <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="White"/>
-                                                
+                                                <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                <TextBlock Name="veChartDataDescription" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red"/>
+                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Good" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Bad" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Unsure" Foreground="White"/>
+                                                    </StackPanel>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                    </StackPanel>
+                                                </StackPanel>
+
                                             </Grid>
                                         </StackPanel>
                                     </Viewbox>
