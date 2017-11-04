@@ -247,12 +247,12 @@
                                         <Button Name="searchBackButton" Visibility="Collapsed" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" />
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select" Width="108">
+                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened">
                                             </ComboBox>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select" MaxWidth="108" Width="108">
+                                            <ComboBox Name="make" Margin="5,0,0,5" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened">
                                             </ComboBox>
                                             <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0,0,0,5" Padding="0" Width="32" Click="makeOptionsButton_Click" Foreground="White">
                                                 <Button.Flyout>
@@ -307,7 +307,7 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select" Width="108">
+                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged">
                                             </ComboBox>
                                         </StackPanel>
                                     </StackPanel>

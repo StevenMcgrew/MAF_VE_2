@@ -88,6 +88,7 @@ namespace MAF_VE_2
         private void mainPage_Loaded(object sender, RoutedEventArgs e)
         {
             // Insert engine combobox items
+            engine.Items.Add("Select");  // Add this item so the user has a way to escape having to select something
             double maxEngineSize = 9.0;
             double minEngineSize = 0.1;
             for (double i = minEngineSize; i <= maxEngineSize; i = i + 0.1)
@@ -97,6 +98,7 @@ namespace MAF_VE_2
             }
 
             // Insert year combobox items
+            year.Items.Add("Select"); // Add this item so the user has a way to escape having to select something
               // First, declare some variables
             var localSettings = ApplicationData.Current.LocalSettings;
             int currentMaxYear = DateTime.Today.Year + 2;
@@ -129,6 +131,24 @@ namespace MAF_VE_2
 
             ShowAllLocalRecords();
         }
+        
+
+        private void printMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void shareMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+#region Databases
 
         void ShowAllLocalRecords()
         {
@@ -153,22 +173,11 @@ namespace MAF_VE_2
             ClearChartData();
         }
 
-        private void printMenuItem_Click(object sender, RoutedEventArgs e)
-        {
+        
 
-        }
+        #endregion
 
-        private void shareMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-#region Uncheck radiobuttons if already checked
+#region Unchecking, Unselecting, Selecting 
 
         private void ConditionRadioButtons_Click(object sender, RoutedEventArgs e)
         {
@@ -191,6 +200,56 @@ namespace MAF_VE_2
             condition = radioButton.Content.ToString();
 
             rbCheckFired = true;
+        }
+
+        private void YearMakeOrEngine_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var comboBox = sender as ComboBox;
+
+            if (comboBox.SelectedIndex == -1) // Index -1 is the Unselected state where the Placeholder text shows, so exit this event since we don't need to do anything. This also prevents reevaluating the selection when we set the selection here (breaks the loop).
+            {
+                return;
+            }
+
+            var selectedItem = comboBox.SelectedItem.ToString();
+
+            if (selectedItem == "Select")
+            {
+                var name = comboBox.Name;
+
+                switch (name)
+                {
+                    case "year":
+                        year.SelectedIndex = -1;
+                        break;
+                    case "make":
+                        make.SelectedIndex = -1;
+                        break;
+                    case "engine":
+                        engine.SelectedIndex = -1;
+                        break;
+                }
+            }
+        }
+
+        private void YearOrMake_DropDownOpened(object sender, object e)
+        {
+            var comboBox = sender as ComboBox;
+
+            if (comboBox.SelectedIndex == -1) // Nothing has been selected yet
+            {
+                var name = comboBox.Name;
+
+                switch (name)
+                {
+                    case "year":
+                        year.SelectedIndex = 1; // Go to top of list for user to start out there
+                        break;
+                    case "make":
+                        make.SelectedIndex = 1; // Go to top of list for user to start out there
+                        break;
+                }
+            }
         }
 
 #endregion
@@ -316,10 +375,11 @@ namespace MAF_VE_2
                 }
             }
             allCarMakes.Sort();
+            allCarMakes.Insert(0, "Select"); // Insert this at the top of the list for users to have option to not select any car.
             make.ItemsSource = allCarMakes;
         }
 
-        #endregion
+#endregion
 
 #region SizeChanged handling
 
@@ -1327,7 +1387,9 @@ namespace MAF_VE_2
             }
         }
 
+
         #endregion
 
+        
     }
 }
