@@ -4,10 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Core;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Printing;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -16,7 +21,9 @@ using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Printing;
 using Windows.UI.Xaml.Shapes;
 
 namespace MAF_VE_2
@@ -45,6 +52,14 @@ namespace MAF_VE_2
         double mafPerPixel;
         double vePerPixel;
 
+        #endregion
+
+#region Variables For Printing
+
+        private PrintManager printMan;
+        private PrintDocument printDoc;
+        private IPrintDocumentSource printDocSource;
+
 #endregion
 
 #region Enums
@@ -66,7 +81,9 @@ namespace MAF_VE_2
             Short
         }
 
-#endregion
+        #endregion
+
+#region Startup and Initialization
 
         public MainPage()
         {
@@ -131,19 +148,41 @@ namespace MAF_VE_2
 
             ShowAllLocalRecords();
         }
-        
 
-        private void printMenuItem_Click(object sender, RoutedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
+            // Register for PrintTaskRequested event
+            printMan = PrintManager.GetForCurrentView();
+            printMan.PrintTaskRequested += PrintTaskRequested;
 
+            // Build a PrintDocument and register for callbacks
+            printDoc = new PrintDocument();
+            printDocSource = printDoc.DocumentSource;
+            printDoc.Paginate += Paginate;
+            printDoc.GetPreviewPage += GetPreviewPage;
+            printDoc.AddPages += AddPages;
+
+            // Register the current page as a share source.
+            //dataTransferManager = DataTransferManager.GetForCurrentView();
+            //dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager, DataRequestedEventArgs>(this.ShareImageHandler);
+
+            // For shortcut keys
+            //Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
         }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            //dataTransferManager.DataRequested -= ShareImageHandler;
+            printMan.PrintTaskRequested -= PrintTaskRequested;
+            printDoc.Paginate -= Paginate;
+            printDoc.GetPreviewPage -= GetPreviewPage;
+            printDoc.AddPages -= AddPages;
+            //Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
+        }
+
+#endregion
 
         private void shareMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -625,9 +664,14 @@ namespace MAF_VE_2
             mainPivot.SelectedItem = databasePivotItem;
         }
 
+        private void helpMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            mainPivot.SelectedItem = helpPivotItem;
+        }
+
         #endregion
 
-#region Calculate
+        #region Calculate
 
         private void calculateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1390,6 +1434,170 @@ namespace MAF_VE_2
 
         #endregion
 
-        
+#region Printing
+
+        private async void printMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Print();
+            }
+            catch (Exception ex)
+            {
+                await new MessageDialog("Sorry, a problem occured when trying to print the file.\n\n"
+                                                         + ex.Message + "\n\n" + ex.StackTrace).ShowAsync();
+
+                //StoreServicesCustomEventLogger logger = StoreServicesCustomEventLogger.GetDefault();
+                //logger.Log("MyPrintError" + " " + ex.Message + " " + ex.StackTrace);
+            }
+        }
+
+        async void Print()
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            gridForPrint.Visibility = Visibility.Visible;
+
+            if (gridForPrint.ActualWidth > 1055)
+            {
+                gridForPrint.Width = 1055;
+            }
+
+            if (PrintManager.IsSupported())
+            {
+                try
+                {
+                    // Show print UI
+                    await PrintManager.ShowPrintUIAsync();
+                }
+                catch
+                {
+                    // Printing cannot proceed at this time
+                    ContentDialog noPrintingDialog = new ContentDialog()
+                    {
+                        Title = "Printing error",
+                        Content = "\nSorry, printing can't proceed at this time.",
+                        PrimaryButtonText = "OK"
+                    };
+                    await noPrintingDialog.ShowAsync();
+                }
+            }
+            else
+            {
+                // Printing is not supported on this device
+                ContentDialog noPrintingDialog = new ContentDialog()
+                {
+                    Title = "Printing not supported",
+                    Content = "\nSorry, printing is not supported on this device.",
+                    PrimaryButtonText = "OK"
+                };
+                await noPrintingDialog.ShowAsync();
+                
+                gridForPrint.Visibility = Visibility.Collapsed;
+                popUpPanelBackground.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void PrintTaskRequested(PrintManager sender, PrintTaskRequestedEventArgs args)
+        {
+            // Create the PrintTask.
+            // Defines the title and delegate for PrintTaskSourceRequested
+            var printTask = args.Request.CreatePrintTask("Print", PrintTaskSourceRequrested);
+
+            // Handle PrintTask.Completed to catch failed print jobs
+            printTask.Completed += PrintTaskCompleted;
+        }
+
+        private void PrintTaskSourceRequrested(PrintTaskSourceRequestedArgs args)
+        {
+            // Set the document source.
+            args.SetSource(printDocSource);
+        }
+
+        private void Paginate(object sender, PaginateEventArgs e)
+        {
+            // As I only want to print one Rectangle, so I set the count to 1
+            printDoc.SetPreviewPageCount(1, PreviewPageCountType.Final);
+        }
+
+        private void GetPreviewPage(object sender, GetPreviewPageEventArgs e)
+        {
+            // Provide a UIElement as the print preview.
+            printDoc.SetPreviewPage(e.PageNumber, this.gridForPrint);
+        }
+
+        private void AddPages(object sender, AddPagesEventArgs e)
+        {
+            printDoc.AddPage(this.gridForPrint);
+
+            // Indicate that all of the print pages have been provided
+            printDoc.AddPagesComplete();
+        }
+
+        private async void PrintTaskCompleted(PrintTask sender, PrintTaskCompletedEventArgs args)
+        {
+            // Notify the user when the print operation fails.
+            if (args.Completion == PrintTaskCompletion.Failed)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                {
+                    ContentDialog noPrintingDialog = new ContentDialog()
+                    {
+                        Title = "Printing error",
+                        Content = "\nSorry, failed to print.",
+                        PrimaryButtonText = "OK"
+                    };
+                    await noPrintingDialog.ShowAsync();
+                    
+                    gridForPrint.Visibility = Visibility.Collapsed;
+                    popUpPanelBackground.Visibility = Visibility.Collapsed;
+                });
+            }
+
+            if (args.Completion == PrintTaskCompletion.Abandoned ||
+                args.Completion == PrintTaskCompletion.Canceled ||
+                args.Completion == PrintTaskCompletion.Submitted)
+            {
+                await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    gridForPrint.Visibility = Visibility.Collapsed;
+                    popUpPanelBackground.Visibility = Visibility.Collapsed;
+                });
+            }
+        }
+
+        #endregion
+
+#region Help
+
+        private void instructionsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (instructions.Visibility == Visibility.Collapsed)
+            {
+                instructions.Visibility = Visibility.Visible;
+                expandInstructionsIcon.Glyph = "\uE971";
+            }
+            else
+            {
+                instructions.Visibility = Visibility.Collapsed;
+                expandInstructionsIcon.Glyph = "\uE972";
+            }
+        }
+
+        private void interpretResultsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (interpretResults.Visibility == Visibility.Collapsed)
+            {
+                interpretResults.Visibility = Visibility.Visible;
+                expandInterpretResultsIcon.Glyph = "\uE971";
+            }
+            else
+            {
+                interpretResults.Visibility = Visibility.Collapsed;
+                expandInterpretResultsIcon.Glyph = "\uE972";
+            }
+        }
+
+#endregion
+
     }
 }

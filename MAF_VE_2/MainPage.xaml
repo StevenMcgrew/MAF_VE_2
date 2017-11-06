@@ -705,7 +705,77 @@
             <PivotItem Name="databasePivotItem">
                 <Grid Name="databaseGrid"/>
             </PivotItem>
-            
+
+            <PivotItem Name="helpPivotItem">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="helpGrid">
+                        <StackPanel.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF0F0F0F" Offset="0"/>
+                                <GradientStop Color="#FF19191B" Offset="0.963"/>
+                                <GradientStop Color="#FF0F0F0F" Offset="1"/>
+                                <GradientStop Color="#FF19191B" Offset="0.03"/>
+                            </LinearGradientBrush>
+                        </StackPanel.Background>
+
+                        <Button Name="instructionsButton" Background="#FF3399FF" Click="instructionsButton_Click" Margin="5,5,0,0" Width="257" HorizontalContentAlignment="Left">
+                            <Grid Width="235">
+                                <TextBlock Text="How to calculate MAF and VE"/>
+                                <FontIcon Name="expandInstructionsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                        <RichTextBlock Name="instructions" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
+                            <Paragraph>
+                                <Span Foreground="#FF3399FF">1.</Span>
+                                <Run Text=" Connect your scan tool to the car, and set it to record these two data PIDs: MAF and RPM. If you record more PIDs, the data transfer could be too slow."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">2.</Span>
+                                <Run Text=" Find a safe area to drive the car at wide open throttle (WOT) until the rpms are close to redline. It's important to drive WOT for best calculator results."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">3.</Span>
+                                <Run Text=" Review your recording and find the highest MAF data and use that point for your MAF and RPM input for the calculator."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">4.</Span>
+                                <Run Text=" Input your data: RPM, MAF, Engine size, Air temp, Elevation. Then click the Calculate button to get the results."/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <Button Name="interpretResultsButton" Background="#FF3399FF" Margin="5,5,0,0" Click="interpretResultsButton_Click" Width="257" HorizontalContentAlignment="Left">
+                            <Grid Width="235">
+                                <TextBlock Text="How to interpret the results"/>
+                                <FontIcon Name="expandInterpretResultsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Button>
+                        <RichTextBlock Name="interpretResults" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
+                            <Paragraph>
+                                <Span Foreground="#FF3399FF">1.</Span>
+                                <Run Text=" VE varies with engine design. Average engines may be 80-90%, and well breathing engines 90-100%. Turbo and SC engines will be over 100%."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">2.</Span>
+                                <Run Text=" If a naturally aspirated engine is below 75% VE, that's a good indicator of a problem."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">3.</Span>
+                                <Run Text=" Low VE calculations can be caused by a faulty MAF sensor, but can also be from an engine breathing problem."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">4.</Span>
+                                <Run Text=" To figure out which is the case. Take another road test and record all of the fuel trim data PIDs."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">5.</Span>
+                                <Run Text=" If fuel trims show large positive values at medium to high load, then the MAF sensor is suspect. If fuel trims are closer to zero without much change under load, then check for an engine breathing problem like restricted exhaust or intake, incorrect valve timing, etc..."/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
         </Pivot>
 
         <StackPanel VerticalAlignment="Top" Background="#FF191818">
@@ -782,8 +852,10 @@
                 <Button Name="closeRecordPopUpButton" Content="Close" Margin="0,20,0,0" Click="closeRecordPopUpButton_Click" HorizontalAlignment="Center"/>
 
             </StackPanel>
-            
+
         </Border>
-        
+
+        <Grid Name="gridForPrint"/>
+
     </Grid>
 </Page>
