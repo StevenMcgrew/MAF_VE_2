@@ -60,27 +60,6 @@ namespace MAF_VE_2
         //private PrintDocument printDoc;
         //private IPrintDocumentSource printDocSource;
 
-#endregion
-
-#region Enums
-
-        enum ViewState
-        {
-            Wide,
-            NarrowCalculator,
-            NarrowDatabase,
-            ShortCalculator,
-            ShortSaveOrSearch,
-            ShortDatabase
-        };
-
-        enum PageSize
-        {
-            Wide,
-            Narrow,
-            Short
-        }
-
         #endregion
 
 #region Startup and Initialization
@@ -149,36 +128,36 @@ namespace MAF_VE_2
             ShowAllLocalRecords();
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            // Register for PrintTaskRequested event
-            //printMan = PrintManager.GetForCurrentView();
-            //printMan.PrintTaskRequested += PrintTaskRequested;
+        //protected override void OnNavigatedTo(NavigationEventArgs e)
+        //{
+        //    // Register for PrintTaskRequested event
+        //    printMan = PrintManager.GetForCurrentView();
+        //    printMan.PrintTaskRequested += PrintTaskRequested;
 
-            // Build a PrintDocument and register for callbacks
-            //printDoc = new PrintDocument();
-            //printDocSource = printDoc.DocumentSource;
-            //printDoc.Paginate += Paginate;
-            //printDoc.GetPreviewPage += GetPreviewPage;
-            //printDoc.AddPages += AddPages;
+        //    // Build a PrintDocument and register for callbacks
+        //    printDoc = new PrintDocument();
+        //    printDocSource = printDoc.DocumentSource;
+        //    printDoc.Paginate += Paginate;
+        //    printDoc.GetPreviewPage += GetPreviewPage;
+        //    printDoc.AddPages += AddPages;
 
-            // Register the current page as a share source.
-            //dataTransferManager = DataTransferManager.GetForCurrentView();
-            //dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager, DataRequestedEventArgs>(this.ShareImageHandler);
+        //    // Register the current page as a share source.
+        //    dataTransferManager = DataTransferManager.GetForCurrentView();
+        //    dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager, DataRequestedEventArgs>(this.ShareImageHandler);
 
-            // For shortcut keys
-            //Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
-        }
+        //    // For shortcut keys
+        //    Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
+        //}
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            //dataTransferManager.DataRequested -= ShareImageHandler;
-            //printMan.PrintTaskRequested -= PrintTaskRequested;
-            //printDoc.Paginate -= Paginate;
-            //printDoc.GetPreviewPage -= GetPreviewPage;
-            //printDoc.AddPages -= AddPages;
-            //Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
-        }
+        //protected override void OnNavigatedFrom(NavigationEventArgs e)
+        //{
+        //    dataTransferManager.DataRequested -= ShareImageHandler;
+        //    printMan.PrintTaskRequested -= PrintTaskRequested;
+        //    printDoc.Paginate -= Paginate;
+        //    printDoc.GetPreviewPage -= GetPreviewPage;
+        //    printDoc.AddPages -= AddPages;
+        //    Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
+        //}
 
 #endregion
 
@@ -444,86 +423,24 @@ namespace MAF_VE_2
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var pageSize = GetPageSize(mainPage);
-            RearrangePanels(pageSize);
-
-            var viewState = GetViewState();
-            ManageMenuItems(viewState);
-        }
-
-        private void mainPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            var viewState = GetViewState();
-            ManageMenuItems(viewState);
+            if (mainPage.ActualWidth < 660) // Mobile layout
+            {
+                MoveRecordsToPivotItem();
+                searchMenuItem.Visibility = Visibility.Visible;
+                saveMenuItem.Visibility = Visibility.Visible;
+                calculatorMenuItem.Visibility = Visibility.Visible;
+            }
+            else // Desktop layout
+            {
+                MoveRecordsToFront();
+                mainPivot.SelectedItem = frontPivotItem;
+                searchMenuItem.Visibility = Visibility.Collapsed;
+                saveMenuItem.Visibility = Visibility.Collapsed;
+                calculatorMenuItem.Visibility = Visibility.Collapsed;
+            }
         }
 
         // Functions/Methods for SizeChanged /////////////////////////////////////////////////
-
-        PageSize GetPageSize(Page page)
-        {
-            if ((page.ActualHeight < 700) && (page.ActualWidth < 640))
-            {
-                return PageSize.Short;
-            }
-            else if ((page.ActualWidth < 640) && (page.ActualHeight >=700))
-            {
-                return PageSize.Narrow;
-            }
-            else
-            {
-                return PageSize.Wide;
-            }
-        }
-
-        void RearrangePanels(PageSize pageSize)
-        {
-            switch (pageSize)
-            {
-                case PageSize.Wide:
-                    MoveSearchToFront();
-                    MoveRecordsToFront();
-                    mainPivot.SelectedItem = frontPivotItem;
-                    break;
-
-                case PageSize.Narrow:
-                    MoveRecordsToPivotItem();
-                    MoveSearchToFront();
-                    if (mainPivot.SelectedItem != databasePivotItem)
-                    {
-                        mainPivot.SelectedItem = frontPivotItem;
-                    }
-                    break;
-
-                case PageSize.Short:
-                    MoveRecordsToPivotItem();
-                    MoveSearchToPivotItem();
-                    break;
-
-                default:
-                    MoveSearchToFront();
-                    MoveRecordsToFront();
-                    mainPivot.SelectedItem = frontPivotItem;
-                    break;
-            }
-        }
-
-        void MoveSearchToPivotItem()
-        {
-            //if (leftSlimPanel.Children.Contains(searchPanel))
-            //{
-            //    leftSlimPanel.Children.Remove(searchPanel);
-            //    saveOrSearchGrid.Children.Add(searchPanel);
-            //}
-        }
-
-        void MoveSearchToFront()
-        {
-            //if (saveOrSearchGrid.Children.Contains(searchPanel))
-            //{
-            //    saveOrSearchGrid.Children.Remove(searchPanel);
-            //    leftSlimPanel.Children.Add(searchPanel);
-            //}
-        }
 
         void MoveRecordsToPivotItem()
         {
@@ -547,116 +464,19 @@ namespace MAF_VE_2
             }
         }
 
-        ViewState GetViewState()
-        {
-            var pageSize = GetPageSize(mainPage);
-
-            if (pageSize == PageSize.Short)
-            {
-                if (mainPivot.SelectedItem == frontPivotItem)
-                {
-                    return ViewState.ShortCalculator;
-                }
-                else if (mainPivot.SelectedItem == saveOrSearchPivotItem)
-                {
-                    return ViewState.ShortSaveOrSearch;
-                }
-                else
-                {
-                    return ViewState.ShortDatabase;
-                }
-            }
-            else if (pageSize == PageSize.Narrow)
-            {
-                if (mainPivot.SelectedItem == frontPivotItem)
-                {
-                    return ViewState.NarrowCalculator;
-                }
-                else
-                {
-                    return ViewState.NarrowDatabase;
-                }
-            }
-            else
-            {
-                return ViewState.Wide;
-            }
-        }
-
-        void ManageMenuItems(ViewState view)
-        {
-            switch (view)
-            {
-                case ViewState.Wide:
-                    calculatorMenuItem.IsEnabled = false;
-                    saveOrSearchMenuItem.IsEnabled = false;
-                    databaseMenuItem.IsEnabled = false;
-                    break;
-
-                case ViewState.NarrowCalculator:
-                    calculatorMenuItem.IsEnabled = false;
-                    saveOrSearchMenuItem.IsEnabled = false;
-                    databaseMenuItem.IsEnabled = true;
-                    break;
-
-                case ViewState.NarrowDatabase:
-                    calculatorMenuItem.IsEnabled = true;
-                    saveOrSearchMenuItem.IsEnabled = true;
-                    databaseMenuItem.IsEnabled = false;
-                    break;
-
-                case ViewState.ShortCalculator:
-                    calculatorMenuItem.IsEnabled = false;
-                    saveOrSearchMenuItem.IsEnabled = true;
-                    databaseMenuItem.IsEnabled = true;
-                    break;
-
-                case ViewState.ShortSaveOrSearch:
-                    calculatorMenuItem.IsEnabled = true;
-                    saveOrSearchMenuItem.IsEnabled = false;
-                    databaseMenuItem.IsEnabled = true;
-                    break;
-
-                case ViewState.ShortDatabase:
-                    calculatorMenuItem.IsEnabled = true;
-                    saveOrSearchMenuItem.IsEnabled = true;
-                    databaseMenuItem.IsEnabled = false;
-                    break;
-
-                default:
-                    calculatorMenuItem.IsEnabled = true;
-                    saveOrSearchMenuItem.IsEnabled = true;
-                    databaseMenuItem.IsEnabled = true;
-                    break;
-            }
-        }
-
 #endregion
 
-#region Pivot navigation
+#region Menu navigation
 
         private void calculatorMenuItem_Click(object sender, RoutedEventArgs e)
         {
             mainPivot.SelectedItem = frontPivotItem;
         }
 
-        private void saveOrSearchMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            var viewState = GetViewState();
-
-            if (viewState == ViewState.NarrowDatabase)
-            {
-                mainPivot.SelectedItem = frontPivotItem;
-            }
-            else
-            {
-                mainPivot.SelectedItem = saveOrSearchPivotItem;
-            }
-        }
-
         private void databaseMenuItem_Click(object sender, RoutedEventArgs e)
         {
             mainPivot.SelectedItem = databasePivotItem;
+            recordsViewPivot.SelectedItem = Local;
         }
 
         private void helpMenuItem_Click(object sender, RoutedEventArgs e)
@@ -664,7 +484,7 @@ namespace MAF_VE_2
             mainPivot.SelectedItem = helpPivotItem;
         }
 
-        #endregion
+#endregion
 
 #region Calculate
 
@@ -1456,6 +1276,24 @@ namespace MAF_VE_2
             {
                 interpretResults.Visibility = Visibility.Collapsed;
                 expandInterpretResultsIcon.Glyph = "\uE972";
+            }
+        }
+
+        #endregion
+
+#region Chart viewability
+
+        private void recordsViewPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selectedItem = recordsViewPivot.SelectedItem;
+
+            if (selectedItem == Charts)
+            {
+                searchPanel.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                searchPanel.Visibility = Visibility.Visible;
             }
         }
 

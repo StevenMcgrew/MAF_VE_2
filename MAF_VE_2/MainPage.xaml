@@ -8,10 +8,11 @@
     mc:Ignorable="d" Name="mainPage" SizeChanged="mainPage_SizeChanged" Loaded="mainPage_Loaded">
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid Background="Gray">
+    <Grid>
+        <Image Source="Assets\hdBackground.png" Stretch="UniformToFill"/>
 
-        <Pivot Name="mainPivot" SelectionChanged="mainPivot_SelectionChanged">
-            
+        <Pivot Name="mainPivot">
+
             <PivotItem Name="frontPivotItem">
                 <Grid Name="mainGrid">
                     <Grid.ColumnDefinitions>
@@ -130,14 +131,14 @@
 
                     </ScrollViewer>
 
-                    <Grid Name="recordsPanel" Grid.Column="1">
+                    <Grid Name="recordsPanel" Grid.Column="1" Background="#BF000000">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <StackPanel Name="searchPanel" Grid.Row="0" Background="#BF000000" Padding="10">
+                            <StackPanel Name="searchPanel" Grid.Row="0" Padding="10">
                                 <StackPanel Orientation="Horizontal">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal">
@@ -205,7 +206,7 @@
                                 </StackPanel>
 
                                 <TextBlock Text="Comments or Keywords:" Margin="5,4,0,0" Foreground="White"/>
-                                <TextBox Name="comments" TextWrapping="Wrap" Height="32" MaxLength="200" Margin="5,0,0,0" MinWidth="330" HorizontalAlignment="Left"/>
+                                <TextBox Name="comments" TextWrapping="Wrap" Height="32" MaxLength="200" Margin="5,0,0,0" MinWidth="300" HorizontalAlignment="Left"/>
 
                                 <StackPanel Orientation="Horizontal">
                                     <Button Name="searchButton" Background="#FF3399FF" Margin="5,10,0,0" Click="searchButton_Click">
@@ -225,18 +226,17 @@
 
                                 </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Margin="0,10,0,4">
+                                <StackPanel Name="searchedForPanel" Orientation="Horizontal" Margin="0,10,0,4" Visibility="Collapsed">
                                     <TextBlock Foreground="White">
-                                    <Span><Underline>You searched for</Underline>:</Span>
+                                        <Span><Underline>You searched for</Underline>:</Span>
                                     </TextBlock>
                                     <TextBlock Name="searchedForText" Foreground="Red" TextTrimming="CharacterEllipsis" Margin="5,0,0,0"/>
                                 </StackPanel>
                             </StackPanel>
 
+                            <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged">
 
-                            <Pivot Grid.Row="1" Background="#BF000000" Template="{StaticResource myPivotTemplate}">
-
-                                <PivotItem Header="Local" Style="{StaticResource stylePivotItem}">
+                                <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}">
                                     <StackPanel Background="White" Margin="10">
                                         <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
                                             <Grid.ColumnDefinitions>
@@ -520,33 +520,18 @@
                                 </PivotItem>
 
                             </Pivot>
-
                         </Grid>
-
                     </Grid>
-
                 </Grid>
             </PivotItem>
 
-            <PivotItem Name="saveOrSearchPivotItem">
-                <Grid Name="saveOrSearchGrid"/>
-            </PivotItem>
-            
             <PivotItem Name="databasePivotItem">
                 <Grid Name="databaseGrid"/>
             </PivotItem>
 
             <PivotItem Name="helpPivotItem">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Name="helpGrid">
-                        <StackPanel.Background>
-                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                <GradientStop Color="#FF0F0F0F" Offset="0"/>
-                                <GradientStop Color="#FF19191B" Offset="0.963"/>
-                                <GradientStop Color="#FF0F0F0F" Offset="1"/>
-                                <GradientStop Color="#FF19191B" Offset="0.03"/>
-                            </LinearGradientBrush>
-                        </StackPanel.Background>
+                    <StackPanel Name="helpGrid" Background="#BF000000">
 
                         <Button Name="instructionsButton" Background="#FF3399FF" Click="instructionsButton_Click" Margin="5,5,0,0" Width="257" HorizontalContentAlignment="Left">
                             <Grid Width="235">
@@ -608,7 +593,7 @@
 
         </Pivot>
 
-        <StackPanel VerticalAlignment="Top" Background="#FF191818">
+        <StackPanel VerticalAlignment="Top" Background="#FF191818" Orientation="Horizontal">
             <Button Name="menuButton" Background="#FF3399FF" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
@@ -616,15 +601,13 @@
                 </StackPanel>
                 <Button.Flyout>
                     <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}" Placement="Bottom">
-                        <MenuFlyoutItem Text="Go to:" IsEnabled="False"/>
-                        <MenuFlyoutItem Name="calculatorMenuItem" Text="            Calculator" Click="calculatorMenuItem_Click"/>
-                        <MenuFlyoutItem Name="saveOrSearchMenuItem" Text="            Save or Search" Click="saveOrSearchMenuItem_Click" />
-                        <MenuFlyoutItem Name="databaseMenuItem" Text="            Database" Click="databaseMenuItem_Click" />
-                        <MenuFlyoutSeparator/>
-                        <MenuFlyoutItem Name="printMenuItem" Text="Print" />
-                        <MenuFlyoutItem Name="shareMenuItem" Text="Share" />
+                        <MenuFlyoutItem Name="calculatorMenuItem" Text="Calculator" Click="calculatorMenuItem_Click"/>
+                        <MenuFlyoutItem Name="searchMenuItem" Text="Open" Click="databaseMenuItem_Click"/>
+                        <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Name="exitMenuItem" Text="Exit"/>
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
