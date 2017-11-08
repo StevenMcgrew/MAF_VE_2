@@ -8,8 +8,12 @@
     mc:Ignorable="d" Name="mainPage" SizeChanged="mainPage_SizeChanged" Loaded="mainPage_Loaded">
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid>
-        <Image Source="Assets\hdBackground.png" Stretch="UniformToFill"/>
+    <Grid Background="#FF201F34">
+        <Image Name="backgroundImage" Stretch="UniformToFill">
+            <Image.Source>
+                <BitmapImage/>
+            </Image.Source>
+        </Image>
 
         <Pivot Name="mainPivot">
 

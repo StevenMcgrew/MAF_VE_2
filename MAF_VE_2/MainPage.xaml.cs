@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Data.Json;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Graphics.Printing;
@@ -25,6 +27,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Printing;
 using Windows.UI.Xaml.Shapes;
+using Windows.Web.Http;
 
 namespace MAF_VE_2
 {
@@ -37,10 +40,11 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
+        List<string> bingImageURLs = new List<string>();
 
 #endregion
 
-#region Variables for charts
+        #region Variables for charts
 
         double lowRPM;
         double highRPM;
@@ -83,8 +87,17 @@ namespace MAF_VE_2
 
         private void mainPage_Loaded(object sender, RoutedEventArgs e)
         {
-            // Insert engine combobox items
-            engine.Items.Add("Select");  // Add this item so the user has a way to escape having to select something
+            AddEngineComboboxItems();
+            AddYearComboboxItems();
+            RefreshMakesComboBox();
+            ShowAllLocalRecords();
+            SetBackgroundImage();
+        }
+
+        void AddEngineComboboxItems()
+        {
+            engine.Items.Add("Select");  // Add this first so the user has a way to escape having to select something
+
             double maxEngineSize = 9.0;
             double minEngineSize = 0.1;
             for (double i = minEngineSize; i <= maxEngineSize; i = i + 0.1)
@@ -92,15 +105,20 @@ namespace MAF_VE_2
                 string itemToAdd = i.ToString("0.0");
                 engine.Items.Add(itemToAdd);
             }
+        }
 
-            // Insert year combobox items
-            year.Items.Add("Select"); // Add this item so the user has a way to escape having to select something
-              // First, declare some variables
+        void AddYearComboboxItems()
+        {
+            // Add this first so the user has a way to escape having to select something
+            year.Items.Add("Select"); 
+
+            // Variables
             var localSettings = ApplicationData.Current.LocalSettings;
             int currentMaxYear = DateTime.Today.Year + 2;
             int storedMaxYear;
             int minYear = 1900;
-              // Second, set storedMaxYear based on whether or not a value has been saved in LocalSettings
+
+            // Set storedMaxYear based on whether or not a value has been saved in LocalSettings
             if (localSettings.Values["maxYear"] != null)
             {
                 storedMaxYear = (int)localSettings.Values["maxYear"];
@@ -110,22 +128,19 @@ namespace MAF_VE_2
                 localSettings.Values["maxYear"] = currentMaxYear;
                 storedMaxYear = currentMaxYear;
             }
-              // Third, update LocalSettings and storedMaxYear if less than currentMaxYear
+
+            // Update LocalSettings and storedMaxYear if less than currentMaxYear
             if (storedMaxYear < currentMaxYear)
             {
                 localSettings.Values["maxYear"] = currentMaxYear;
                 storedMaxYear = currentMaxYear;
             }
-              // Finally, use a loop to add all the years to the "year" combobox
+
+            // Add the years to the combobox
             for (int i = storedMaxYear; i >= minYear; i--)
             {
                 year.Items.Add(i);
             }
-
-            // Insert make combobox items
-            RefreshMakesComboBox();
-
-            ShowAllLocalRecords();
         }
 
         //protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -159,9 +174,63 @@ namespace MAF_VE_2
         //    Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
         //}
 
-#endregion
+        #endregion
 
-#region Databases
+        #region Bing image of the day
+            
+        async void SetBackgroundImage()
+        {
+            // Get JSON for images
+            string region = "en-US";
+            int numberOfImages = 1;
+            string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
+            HttpClient httpClient = new HttpClient();
+            HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
+            string json = await httpResponse.Content.ReadAsStringAsync();
+
+            // Parse JSON and add URLs to a List
+            JsonObject jsonObject;
+            bool IsParsed = JsonObject.TryParse(json, out jsonObject);
+            if (IsParsed)
+            {
+                for (int i = 0; i < numberOfImages; i++)
+                {
+                    bingImageURLs.Add(jsonObject["images"].GetArray()[i].GetObject()["url"].GetString());
+                }
+            }
+
+            // Set image to background
+            foreach (string url in bingImageURLs)
+            {
+                // Original method
+
+                //Image image = new Image();
+                //var bingURL = "https://www.bing.com" + url;
+                //BitmapSource bitmapSource = new BitmapImage(new Uri(bingURL));
+                //image.Source = bitmapSource;
+                //spImages.Children.Add(image);
+
+                // My method
+                string bingURL = "https://www.bing.com" + url;
+                Uri bingUri = new Uri(bingURL);
+                BitmapSource bitmapSource = new BitmapImage(bingUri);
+                backgroundImage.Source = bitmapSource;
+
+                // Save to local folder
+
+                //string fileName = "BingImage.jpg";
+                //RandomAccessStreamReference thumbnail = RandomAccessStreamReference.CreateFromUri(bingUri);
+
+                //StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, thumbnail);
+                //await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+            }
+
+            
+        }
+
+        #endregion
+
+        #region Databases
 
         void ShowAllLocalRecords()
         {
@@ -185,8 +254,6 @@ namespace MAF_VE_2
             mafChartDataDescription.Text = "----";
             ClearChartData();
         }
-
-        
 
         #endregion
 
