@@ -46,7 +46,7 @@
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
                                 <TextBlock Text="MAF" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0" />
                                 <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                     <ComboBoxItem Content="g/s"/>
                                     <ComboBoxItem Content="kg/h"/>
                                 </ComboBox>
@@ -63,7 +63,7 @@
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
                                 <TextBlock Text="Air temperature" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0"/>
                                 <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                     <ComboBoxItem Content="&#186;F"/>
                                     <ComboBoxItem Content="&#186;C"/>
                                 </ComboBox>
@@ -73,20 +73,20 @@
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
                                 <TextBlock Text="Elevation" Foreground="White" Width="145" Margin="3,0,0,0" VerticalAlignment="Center"/>
                                 <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                     <ComboBoxItem Content="ft"/>
                                     <ComboBoxItem Content="m"/>
                                 </ComboBox>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                <Button Name="calculateButton" Background="#FF3399FF" Margin="131,0,0,0" Click="calculateButton_Click">
+                                <Button Name="calculateButton" Style="{StaticResource blueButtonStyle}" Margin="131,0,0,0" Click="calculateButton_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8EF;" VerticalAlignment="Center"/>
                                         <TextBlock Text="Calculate" Margin="4,0,0,0"/>
                                     </StackPanel>
                                 </Button>
-                                <Button Name="clearButton" Background="#FF3399FF" Margin="4,0,0,0" Click="clearButton_Click">
+                                <Button Name="clearButton" Style="{StaticResource blueButtonStyle}" Margin="4,0,0,0" Click="clearButton_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" VerticalAlignment="Center"/>
                                         <TextBlock Text="Clear" Margin="5,0,0,0"/>
@@ -104,12 +104,12 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                 <StackPanel Orientation="Horizontal" Width="205">
                                     <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA21;" Foreground="Red" Margin="0" Padding="10,4,0,0" FontSize="24" Width="32" Height="32">
+                                    <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA21;" Margin="5,0,0,0" FontSize="32" Width="32" Height="32" Style="{StaticResource additionalButtonStyle}" Padding="10,10,0,0" BorderBrush="Transparent" Foreground="Red">
                                         <Button.Flyout>
                                             <Flyout>
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="Based on a naturally aspirated engine&#10;with average airflow ability&#10;and a VE around 77-84%."/>
-                                                    <Button Name="closeExpectedNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Background="Red" Foreground="White" VerticalAlignment="Top" Margin="20,0,0,0" Click="closeExpectedNoteButton_Click"/>
+                                                    <Button Name="closeExpectedNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Style="{StaticResource closeButtonStyle}" VerticalAlignment="Top" Margin="20,0,0,0" Click="closeExpectedNoteButton_Click"/>
                                                 </StackPanel>
                                             </Flyout>
                                         </Button.Flyout>
@@ -147,12 +147,12 @@
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="year" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened"/>
+                                            <ComboBox Name="year" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened"/>
-                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Foreground="White">
+                                            <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
+                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Style="{StaticResource additionalButtonStyle}">
                                                 <Button.Flyout>
                                                     <Flyout>
                                                         <StackPanel>
@@ -181,7 +181,7 @@
                                                                             </ListBox>
                                                                             <StackPanel Orientation="Horizontal">
                                                                                 <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click" IsEnabled="False"/>
-                                                                                <Button Name="cancelDeleteMake" Content="Done" Click="cancelDeleteMake_Click"/>
+                                                                                <Button Name="cancelDeleteMake" Content="Close" Click="cancelDeleteMake_Click"/>
                                                                             </StackPanel>
                                                                         </StackPanel>
                                                                     </Flyout>
@@ -198,7 +198,7 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged">
+                                            <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" Background="White" BorderBrush="#FF7A7A7A">
                                             </ComboBox>
                                         </StackPanel>
                                     </StackPanel>
@@ -213,19 +213,19 @@
                                 <TextBox Name="comments" TextWrapping="Wrap" Height="32" MaxLength="200" Margin="5,0,0,0" MinWidth="300" HorizontalAlignment="Left"/>
 
                                 <StackPanel Orientation="Horizontal">
-                                    <Button Name="searchButton" Background="#FF3399FF" Margin="5,10,0,0" Click="searchButton_Click">
+                                    <Button Name="searchButton" Style="{StaticResource blueButtonStyle}" Margin="5,10,0,0" Click="searchButton_Click">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11A;" VerticalAlignment="Center"/>
                                             <TextBlock Text="Search" Margin="5,0,0,0"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Name="saveButton" Background="#FF3399FF" Margin="10,10,0,0" Width="76" Click="saveButton_Click">
+                                    <Button Name="saveButton" Style="{StaticResource blueButtonStyle}" Margin="10,10,0,0" Width="76" Click="saveButton_Click">
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" VerticalAlignment="Center"/>
                                             <TextBlock Text="Save" Margin="5,0,0,0"/>
                                         </StackPanel>
                                     </Button>
-                                    <Button Name="resetButton" Content="Reset" Background="#FF3399FF" Margin="12,10,0,0" Click="resetButton_Click"/>
+                                    <Button Name="resetButton" Content="Reset" Style="{StaticResource blueButtonStyle}" Margin="12,10,0,0" Click="resetButton_Click"/>
 
 
                                 </StackPanel>
@@ -537,7 +537,7 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Name="helpGrid" Background="#BF000000">
 
-                        <Button Name="instructionsButton" Background="#FF3399FF" Click="instructionsButton_Click" Margin="5,5,0,0" Width="257" HorizontalContentAlignment="Left">
+                        <Button Name="instructionsButton" Style="{StaticResource blueButtonStyle}" Click="instructionsButton_Click" Margin="5,5,0,0" Width="257" HorizontalContentAlignment="Left">
                             <Grid Width="235">
                                 <TextBlock Text="How to calculate MAF and VE"/>
                                 <FontIcon Name="expandInstructionsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right"/>
@@ -562,7 +562,7 @@
                             </Paragraph>
                         </RichTextBlock>
 
-                        <Button Name="interpretResultsButton" Background="#FF3399FF" Margin="5,5,0,0" Click="interpretResultsButton_Click" Width="257" HorizontalContentAlignment="Left">
+                        <Button Name="interpretResultsButton" Style="{StaticResource blueButtonStyle}" Margin="5,5,0,0" Click="interpretResultsButton_Click" Width="257" HorizontalContentAlignment="Left">
                             <Grid Width="235">
                                 <TextBlock Text="How to interpret the results"/>
                                 <FontIcon Name="expandInterpretResultsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right" />
@@ -598,20 +598,20 @@
         </Pivot>
 
         <StackPanel VerticalAlignment="Top" Background="#FF191818" Orientation="Horizontal">
-            <Button Name="menuButton" Background="#FF3399FF" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top">
+            <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
                     <TextBlock Text="Menu" Margin="5,0,0,0"/>
                 </StackPanel>
                 <Button.Flyout>
-                    <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}" Placement="Bottom">
+                    <MenuFlyout Placement="Bottom">
                         <MenuFlyoutItem Name="calculatorMenuItem" Text="Calculator" Click="calculatorMenuItem_Click"/>
                         <MenuFlyoutItem Name="searchMenuItem" Text="Open" Click="databaseMenuItem_Click"/>
                         <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
                         <MenuFlyoutSeparator/>
-                        <MenuFlyoutItem Name="exitMenuItem" Text="Exit"/>
+                        <MenuFlyoutItem Name="exitMenuItem" Text="Exit" Click="exitMenuItem_Click"/>
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>

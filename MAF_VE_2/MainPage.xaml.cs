@@ -44,7 +44,7 @@ namespace MAF_VE_2
 
 #endregion
 
-        #region Variables for charts
+#region Variables for charts
 
         double lowRPM;
         double highRPM;
@@ -91,7 +91,7 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ShowAllLocalRecords();
-            SetBackgroundImage();
+            //SetBackgroundImage();
         }
 
         void AddEngineComboboxItems()
@@ -176,7 +176,7 @@ namespace MAF_VE_2
 
         #endregion
 
-        #region Bing image of the day
+#region Bing image of the day
             
         async void SetBackgroundImage()
         {
@@ -230,7 +230,7 @@ namespace MAF_VE_2
 
         #endregion
 
-        #region Databases
+#region Databases
 
         void ShowAllLocalRecords()
         {
@@ -1364,7 +1364,11 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
+        private void exitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Exit();
+        }
     }
 }
