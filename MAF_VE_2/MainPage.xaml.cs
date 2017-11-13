@@ -493,17 +493,11 @@ namespace MAF_VE_2
             if (mainPage.ActualWidth < 660) // Mobile layout
             {
                 MoveRecordsToPivotItem();
-                searchMenuItem.Visibility = Visibility.Visible;
-                saveMenuItem.Visibility = Visibility.Visible;
-                calculatorMenuItem.Visibility = Visibility.Visible;
             }
             else // Desktop layout
             {
                 MoveRecordsToFront();
                 mainPivot.SelectedItem = frontPivotItem;
-                searchMenuItem.Visibility = Visibility.Collapsed;
-                saveMenuItem.Visibility = Visibility.Collapsed;
-                calculatorMenuItem.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -537,13 +531,41 @@ namespace MAF_VE_2
 
         private void calculatorMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            mainPivot.SelectedItem = frontPivotItem;
+            if (mainPivot.SelectedItem == frontPivotItem)
+            {
+                CalculatorPanelColorStoryboard.Begin();
+            }
+            else
+            {
+                mainPivot.SelectedItem = frontPivotItem;
+            }
         }
 
         private void databaseMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            mainPivot.SelectedItem = databasePivotItem;
-            recordsViewPivot.SelectedItem = Local;
+            if (mainGrid.Children.Contains(recordsPanel)) // View is desktop
+            {
+                if (mainPivot.SelectedItem == helpPivotItem)
+                {
+                    mainPivot.SelectedItem = frontPivotItem;
+                }
+                else
+                {
+                    SearchPanelColorStoryboard.Begin();
+                }
+            }
+            else // View is mobile
+            {
+                if (mainPivot.SelectedItem == databasePivotItem)
+                {
+                    SearchPanelColorStoryboard.Begin();
+                }
+                else
+                {
+                    mainPivot.SelectedItem = databasePivotItem;
+                    recordsViewPivot.SelectedItem = Local;
+                }
+            }
         }
 
         private void helpMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1354,13 +1376,13 @@ namespace MAF_VE_2
         {
             var selectedItem = recordsViewPivot.SelectedItem;
 
-            if (selectedItem == Charts)
+            if (searchPanel.Height < 5) // Charts view is expanded
             {
-                searchPanel.Visibility = Visibility.Collapsed;
+                ShrinkChartsStoryboard.Begin();
             }
-            else
+            else if (selectedItem == Charts) // Charts was selected and the Chart view has not been expanded
             {
-                searchPanel.Visibility = Visibility.Visible;
+                ExpandChartsStoryboard.Begin();
             }
         }
 
