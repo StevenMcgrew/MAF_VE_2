@@ -39,11 +39,11 @@
     </Page.Resources>
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid Background="#FF201F34">
+    <Grid Background="Gray">
         <Image Name="backgroundImage" Stretch="UniformToFill">
-            <Image.Source>
+            <!--<Image.Source>
                 <BitmapImage/>
-            </Image.Source>
+            </Image.Source>-->
         </Image>
 
         <Pivot Name="mainPivot">
@@ -59,7 +59,7 @@
 
                         <StackPanel Name="calculatorPanel" Margin="0,0,15,0" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#BF000000" Padding="10,10,10,15">
 
-                            <TextBlock FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" Margin="0,0,0,15">
+                            <TextBlock FontSize="28" Foreground="White" Margin="0,0,0,15">
                                     <Underline>
                                         <Run Text="Inputs"/>
                                     </Underline>
@@ -125,7 +125,7 @@
                                 </Button>
                             </StackPanel>
 
-                            <TextBlock FontWeight="Bold" FontSize="16" Foreground="#FF3399FF" Margin="0,30,0,15">
+                            <TextBlock FontSize="28" Foreground="White" Margin="0,30,0,15">
                                     <Underline>
                                         <Run Text="Outputs"/>
                                     </Underline>
@@ -135,7 +135,7 @@
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
                                 <StackPanel Orientation="Horizontal" Width="205">
                                     <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                    <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA21;" Margin="5,0,0,0" FontSize="32" Width="32" Height="32" Style="{StaticResource additionalButtonStyle}" Padding="10,10,0,0" BorderBrush="Transparent" Foreground="Red">
+                                    <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA38;" Margin="5,0,0,0" Width="32" Height="32" Style="{StaticResource blueButtonStyle}" Padding="0" >
                                         <Button.Flyout>
                                             <Flyout>
                                                 <StackPanel Orientation="Horizontal">
@@ -166,6 +166,10 @@
 
                     </ScrollViewer>
 
+                    <TextBlock Name="test" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,40" Width="344"/>
+
+                    <TextBlock Name="copyright" Grid.Column="0" FontSize="12" VerticalAlignment="Bottom" Foreground="White" TextWrapping="WrapWholeWords" Width="344"/>
+
                     <ScrollViewer Name="recordsPanel" VerticalScrollBarVisibility="Auto" Grid.Column="1" Background="#BF000000">
                         <Grid>
                             <Grid>
@@ -184,7 +188,7 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
                                                 <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
-                                                <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Style="{StaticResource additionalButtonStyle}">
+                                                <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Style="{StaticResource blueButtonStyle}">
                                                     <Button.Flyout>
                                                         <Flyout>
                                                             <StackPanel>
@@ -270,7 +274,7 @@
                                     </StackPanel>
                                 </StackPanel>
 
-                                <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged">
+                                <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
                                     <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}">
                                         <StackPanel Background="White" Margin="10">
@@ -559,7 +563,7 @@
                             </Grid>
                         </Grid>
                     </ScrollViewer>
-                    
+
                 </Grid>
             </PivotItem>
 
@@ -631,8 +635,8 @@
 
         </Pivot>
 
-        <StackPanel VerticalAlignment="Top" Background="#FF191818" Orientation="Horizontal">
-            <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top">
+        <StackPanel VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+            <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top" Background="#CC000000">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
                     <TextBlock Text="Menu" Margin="5,0,0,0"/>
@@ -657,21 +661,21 @@
 
                 <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
 
-                <Grid HorizontalAlignment="Center">
+                <Grid HorizontalAlignment="Center" Background="LightGray" Padding="10">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="85"/>
+                        <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" HorizontalAlignment="Left">
-                        <TextBlock HorizontalAlignment="Left" Text="RPM"/>
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,10,0">
+                        <TextBlock HorizontalAlignment="Left" Text="Engine Speed"/>
                         <TextBlock HorizontalAlignment="Left" Text="MAF"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Air Temp"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Elevation"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Avg MAF"/>
-                        <TextBlock HorizontalAlignment="Left" Text="MAF Diff"/>
-                        <TextBlock HorizontalAlignment="Left" Text="VE"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Air Temperature"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Elevation" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Expected MAF"/>
+                        <TextBlock HorizontalAlignment="Left" Text="MAF Difference"/>
+                        <TextBlock HorizontalAlignment="Left" Text="VE" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Left" Text="Condition"/>
                     </StackPanel>
 
@@ -679,21 +683,21 @@
                         <TextBlock HorizontalAlignment="Right" Name="RPM"/>
                         <TextBlock HorizontalAlignment="Right" Name="MAF"/>
                         <TextBlock HorizontalAlignment="Right" Name="AIR"/>
-                        <TextBlock HorizontalAlignment="Right" Name="ELEVATION"/>
+                        <TextBlock HorizontalAlignment="Right" Name="ELEVATION" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Right" Name="EXPECTED"/>
                         <TextBlock HorizontalAlignment="Right" Name="DIFF"/>
-                        <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC"/>
+                        <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
                     </StackPanel>
 
                     <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="2,0,0,0">
-                        <TextBlock HorizontalAlignment="Left"/>
+                        <TextBlock HorizontalAlignment="Left" Text="RPM"/>
                         <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
                         <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
-                        <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Left" Text="g/s"/>
                         <TextBlock HorizontalAlignment="Left" Text="%"/>
-                        <TextBlock HorizontalAlignment="Left" Text="%"/>
+                        <TextBlock HorizontalAlignment="Left" Text="%" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Left"/>
                     </StackPanel>
 
@@ -705,8 +709,6 @@
             </StackPanel>
 
         </Border>
-
-        <Grid Name="gridForPrint"/>
 
     </Grid>
 </Page>

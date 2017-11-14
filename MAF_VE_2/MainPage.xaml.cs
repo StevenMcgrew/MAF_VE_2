@@ -40,7 +40,6 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
-        List<string> bingImageURLs = new List<string>();
 
 #endregion
 
@@ -91,7 +90,7 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ShowAllLocalRecords();
-            //SetBackgroundImage();
+            SetBackgroundImage();
         }
 
         void AddEngineComboboxItems()
@@ -188,45 +187,30 @@ namespace MAF_VE_2
             HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
             string json = await httpResponse.Content.ReadAsStringAsync();
 
-            // Parse JSON and add URLs to a List
+            // Parse JSON
             JsonObject jsonObject;
             bool IsParsed = JsonObject.TryParse(json, out jsonObject);
             if (IsParsed)
             {
-                for (int i = 0; i < numberOfImages; i++)
-                {
-                    bingImageURLs.Add(jsonObject["images"].GetArray()[i].GetObject()["url"].GetString());
-                }
-            }
+                string imageUrl = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
+                string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
 
-            // Set image to background
-            foreach (string url in bingImageURLs)
-            {
-                // Original method
-
-                //Image image = new Image();
-                //var bingURL = "https://www.bing.com" + url;
-                //BitmapSource bitmapSource = new BitmapImage(new Uri(bingURL));
-                //image.Source = bitmapSource;
-                //spImages.Children.Add(image);
-
-                // My method
-                string bingURL = "https://www.bing.com" + url;
-                Uri bingUri = new Uri(bingURL);
+                // Set background image and copyright text
+                string UrlForImage = "https://www.bing.com" + imageUrl;
+                Uri bingUri = new Uri(UrlForImage);
                 BitmapSource bitmapSource = new BitmapImage(bingUri);
                 backgroundImage.Source = bitmapSource;
+                copyright.Text = copyrightText;
 
                 // Save to local folder
-
-                //string fileName = "BingImage.jpg";
-                //RandomAccessStreamReference thumbnail = RandomAccessStreamReference.CreateFromUri(bingUri);
-
-                //StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, thumbnail);
+                //string fileName = "BingImageOfTheDay.jpg";
+                //RandomAccessStreamReference RASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+                //StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, RASRstream);
                 //await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
             }
-
-            
         }
+
+
 
         #endregion
 
@@ -889,7 +873,7 @@ namespace MAF_VE_2
             YMME.Text = item.Year + " " +
                         item.Make + " " +
                         item.Model + " " +
-                        item.Engine;
+                        item.Engine + "L";
 
             RPM.Text = item.Engine_speed.ToString();
             MAF.Text = item.MAF.ToString();
