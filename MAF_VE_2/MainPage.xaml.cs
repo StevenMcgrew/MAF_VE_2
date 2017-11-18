@@ -41,9 +41,12 @@ namespace MAF_VE_2
         bool rbCheckFired = false;
         string condition = "";
 
-#endregion
+        ApplicationDataContainer localSettings = null;
+        const string DateOfLastImageDownloadAsSum = "DateOfLastImageDownload";
 
-#region Variables for charts
+        #endregion
+
+        #region Variables for charts
 
         double lowRPM;
         double highRPM;
@@ -73,6 +76,9 @@ namespace MAF_VE_2
             InitializeLocalDatabase();
 
             allCarMakes = new List<string>();
+
+            // Initialize Settings storage
+            localSettings = ApplicationData.Current.LocalSettings;
         }
 
         void InitializeLocalDatabase()
@@ -90,7 +96,7 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ShowAllLocalRecords();
-            SetBackgroundImage();
+            ManageBackgroundImage();
         }
 
         void AddEngineComboboxItems()
@@ -175,42 +181,110 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Bing image of the day
-            
-        async void SetBackgroundImage()
+        #region Bing image of the day
+
+        void ManageBackgroundImage()
         {
-            // Get JSON for images
-            string region = "en-US";
-            int numberOfImages = 1;
-            string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
-            HttpClient httpClient = new HttpClient();
-            HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
-            string json = await httpResponse.Content.ReadAsStringAsync();
-
-            // Parse JSON
-            JsonObject jsonObject;
-            bool IsParsed = JsonObject.TryParse(json, out jsonObject);
-            if (IsParsed)
+            try
             {
-                string imageUrl = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
-                string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
+                Object dateOfLastImageDownloadAsSum = localSettings.Values[DateOfLastImageDownloadAsSum];
+                if (dateOfLastImageDownloadAsSum != null)
+                {
+                    var lastDownloadDateSum = (int)dateOfLastImageDownloadAsSum;
+                    var t = DateTime.Today.Date;
+                    var todaysDateSum = t.Month + t.Day + t.Year;
 
-                // Set background image and copyright text
-                string UrlForImage = "https://www.bing.com" + imageUrl;
-                Uri bingUri = new Uri(UrlForImage);
-                BitmapSource bitmapSource = new BitmapImage(bingUri);
-                backgroundImage.Source = bitmapSource;
-                copyright.Text = copyrightText;
-
-                // Save to local folder
-                //string fileName = "BingImageOfTheDay.jpg";
-                //RandomAccessStreamReference RASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
-                //StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, RASRstream);
-                //await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+                    if (lastDownloadDateSum < todaysDateSum)
+                    {
+                        DownloadImageOfTheDay();
+                        SetBackgroundImage();
+                    }
+                    else
+                    {
+                        SetBackgroundImage();
+                    }
+                }
+                else
+                {
+                    DownloadImageOfTheDay();
+                    SetBackgroundImage();
+                }
+            }
+            catch
+            {
+                var dialog = new MessageDialog("Image manager error").ShowAsync();
             }
         }
 
+        async void SetBackgroundImage()
+        {
+            try
+            {
+                var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("BingImageOfTheDay.jpg");
+                using (var stream = await imageFile.OpenReadAsync())
+                {
+                    var bitmapImage = new BitmapImage();
+                    await bitmapImage.SetSourceAsync(stream);
+                    backgroundImage.Source = bitmapImage;
+                }
+            }
+            catch
+            {
+                var dialog = new MessageDialog("Error setting background image.").ShowAsync();
+            }
 
+            try
+            {
+                var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
+                copyright.Text = await FileIO.ReadTextAsync(copyrightFile);
+            }
+            catch
+            {
+                var dialog = new MessageDialog("Error setting copyright text.").ShowAsync();
+            }
+        }
+            
+        async void DownloadImageOfTheDay()
+        {
+            // Get JSON
+            string region = "en-US";
+            int numberOfImages = 1;
+            string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
+            string JSON;
+            using (HttpClient httpClient = new HttpClient())
+            {
+                HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
+                JSON = await httpResponse.Content.ReadAsStringAsync();
+            }
+
+            // Parse JSON
+            JsonObject jsonObject;
+            bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
+            Uri bingUri;
+            if (IsParsed)
+            {
+                string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
+                string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
+                
+                string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
+                bingUri = new Uri(completeUrlForImage);
+
+                // Save image
+                string fileName = "BingImageOfTheDay.jpg";
+                RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+                StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
+                await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+
+                // Save copyright
+                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+
+                // Store the download date
+                var d = DateTime.Today.Date;
+                var downloadDateSum = d.Month + d.Day + d.Year;
+                localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
+            }
+        }
 
         #endregion
 
