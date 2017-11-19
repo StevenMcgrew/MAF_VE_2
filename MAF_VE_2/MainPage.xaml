@@ -57,7 +57,7 @@
 
                     <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
 
-                        <StackPanel Name="calculatorPanel" Margin="0,0,15,0" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#BF000000" Padding="10,10,10,15">
+                        <StackPanel Name="calculatorPanel" Margin="0,0,15,0" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#99000000" Padding="10,10,10,15">
 
                             <TextBlock FontSize="28" Foreground="White" Margin="0,0,0,15">
                                     <Underline>
@@ -166,11 +166,11 @@
 
                     </ScrollViewer>
 
-                    <TextBlock Name="test" VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="0,0,0,40" Width="344"/>
+                    <Border Name="copyrightBorder" Margin="-12,0,0,10" Grid.Column="0" Background="#BF000000" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <TextBlock Name="copyright" MaxWidth="334" FontSize="12" VerticalAlignment="Top" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left"/>
+                    </Border>
 
-                    <TextBlock Name="copyright" Grid.Column="0" FontSize="12" VerticalAlignment="Bottom" Foreground="White" TextWrapping="WrapWholeWords" Width="344"/>
-
-                    <ScrollViewer Name="recordsPanel" VerticalScrollBarVisibility="Auto" Grid.Column="1" Background="#BF000000">
+                    <ScrollViewer Name="recordsPanel" VerticalScrollBarVisibility="Auto" Grid.Column="1" Background="#99000000">
                         <Grid>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -647,6 +647,7 @@
                         <MenuFlyoutItem Name="searchMenuItem" Text="Open" Click="databaseMenuItem_Click"/>
                         <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Name="backgroundMenuItem" Text="Background" Click="backgroundMenuItem_Click" />
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="exitMenuItem" Text="Exit" Click="exitMenuItem_Click"/>
@@ -655,7 +656,7 @@
             </Button>
         </StackPanel>
 
-        <Border Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
+        <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
 
             <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" MinWidth="360">
 
@@ -708,7 +709,17 @@
 
             </StackPanel>
 
-        </Border>
+            <StackPanel Name="backgroundOptionsPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
+                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White">
+                <Span><Underline>Background options</Underline></Span>
+                <Span>:</Span>
+                </TextBlock>
+                <RadioButton Name="yesImage" Content="Bing image of the day" Foreground="White" Checked="backgroundOption_Checked"/>
+                <RadioButton Name="noImage" Content="No background image" Foreground="White" Margin="0,0,0,20" Checked="backgroundOption_Checked"/>
+                <Button Name="doneBackgroundOptions" HorizontalAlignment="Center" Content="Done" Style="{StaticResource blueButtonStyle}" Click="doneBackgroundOptions_Click"/>
+            </StackPanel>
+
+        </Grid>
 
     </Grid>
 </Page>

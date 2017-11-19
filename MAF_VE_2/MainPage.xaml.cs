@@ -21,6 +21,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
@@ -34,7 +35,7 @@ namespace MAF_VE_2
     public sealed partial class MainPage : Page
     {
 
-#region General variables and fields
+        #region General variables and fields
 
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
@@ -43,6 +44,7 @@ namespace MAF_VE_2
 
         ApplicationDataContainer localSettings = null;
         const string DateOfLastImageDownloadAsSum = "DateOfLastImageDownload";
+        const string BackgroundImageSetting = "BackgroundImageSetting";
 
         #endregion
 
@@ -60,7 +62,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Variables For Printing
+        #region Variables For Printing
 
         //private PrintManager printMan;
         //private PrintDocument printDoc;
@@ -68,7 +70,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Startup and Initialization
+        #region Startup and Initialization
 
         public MainPage()
         {
@@ -96,7 +98,25 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ShowAllLocalRecords();
-            ManageBackgroundImage();
+
+            // Handle background image setting
+            Object backgroundImageSetting = localSettings.Values[BackgroundImageSetting];
+            if (backgroundImageSetting != null)
+            {
+                var backgroundSetting = (bool)backgroundImageSetting;
+                if (backgroundSetting == true)
+                {
+                    yesImage.IsChecked = true;
+                }
+                else
+                {
+                    noImage.IsChecked = true;
+                }
+            }
+            else
+            {
+                yesImage.IsChecked = true;
+            } 
         }
 
         void AddEngineComboboxItems()
@@ -115,7 +135,7 @@ namespace MAF_VE_2
         void AddYearComboboxItems()
         {
             // Add this first so the user has a way to escape having to select something
-            year.Items.Add("Select"); 
+            year.Items.Add("Select");
 
             // Variables
             var localSettings = ApplicationData.Current.LocalSettings;
@@ -212,7 +232,7 @@ namespace MAF_VE_2
             }
             catch
             {
-                var dialog = new MessageDialog("Image manager error").ShowAsync();
+                var dialog = new MessageDialog("A problem occured when managing the background image").ShowAsync();
             }
         }
 
@@ -230,65 +250,84 @@ namespace MAF_VE_2
             }
             catch
             {
-                var dialog = new MessageDialog("Error setting background image.").ShowAsync();
+                var dialog = new MessageDialog("A problem occured when trying to set the background image").ShowAsync();
             }
 
             try
             {
                 var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
-                copyright.Text = await FileIO.ReadTextAsync(copyrightFile);
+                var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
+                copyright.Text = "Image: " + copyrightText;
             }
             catch
             {
-                var dialog = new MessageDialog("Error setting copyright text.").ShowAsync();
+                var dialog = new MessageDialog("A problem occured when trying to display the image copyright information").ShowAsync();
             }
         }
-            
+
         async void DownloadImageOfTheDay()
         {
-            // Get JSON
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
             string JSON;
-            using (HttpClient httpClient = new HttpClient())
+
+            try // Get JSON
             {
-                HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
-                JSON = await httpResponse.Content.ReadAsStringAsync();
+                using (HttpClient httpClient = new HttpClient())
+                {
+                    HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
+                    JSON = await httpResponse.Content.ReadAsStringAsync();
+                }
+            }
+            catch
+            {
+                var dialog = new MessageDialog("A problem occured when getting background image JSON over the network. Check internet connection and try again.").ShowAsync();
+                return;
             }
 
-            // Parse JSON
-            JsonObject jsonObject;
-            bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
-            Uri bingUri;
-            if (IsParsed)
+            try // Parse JSON
             {
-                string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
-                string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
-                
-                string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
-                bingUri = new Uri(completeUrlForImage);
+                JsonObject jsonObject;
+                bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
+                Uri bingUri;
+                if (IsParsed)
+                {
+                    string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
+                    string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
 
-                // Save image
-                string fileName = "BingImageOfTheDay.jpg";
-                RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
-                StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
-                await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+                    string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
+                    bingUri = new Uri(completeUrlForImage);
 
-                // Save copyright
-                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
-                await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+                    // Save image
+                    string fileName = "BingImageOfTheDay.jpg";
+                    RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+                    StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
+                    await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
 
-                // Store the download date
-                var d = DateTime.Today.Date;
-                var downloadDateSum = d.Month + d.Day + d.Year;
-                localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
+                    // Save copyright
+                    StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
+                    await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+
+                    // Store the download date
+                    var d = DateTime.Today.Date;
+                    var downloadDateSum = d.Month + d.Day + d.Year;
+                    localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
+                }
+                else
+                {
+                    var dialog = new MessageDialog("Unable to parse JSON for background image").ShowAsync();
+                }
+            }
+            catch
+            {
+                var dialog = new MessageDialog("A problem occured when parsing and saving background image data").ShowAsync();
             }
         }
 
         #endregion
 
-#region Databases
+        #region Databases
 
         void ShowAllLocalRecords()
         {
@@ -315,7 +354,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Unchecking, Unselecting, Selecting 
+        #region Unchecking, Unselecting, Selecting 
 
         private void ConditionRadioButtons_Click(object sender, RoutedEventArgs e)
         {
@@ -390,9 +429,9 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
-#region Add or Delete a make
+        #region Add or Delete a make
 
         private async void okAddMakeButton_Click(object sender, RoutedEventArgs e)
         {
@@ -517,9 +556,9 @@ namespace MAF_VE_2
             make.ItemsSource = allCarMakes;
         }
 
-#endregion
+        #endregion
 
-#region SizeChanged handling
+        #region SizeChanged handling
 
         private void Charts_SizeChanged(object sender, SizeChangedEventArgs e)
         {
@@ -557,6 +596,15 @@ namespace MAF_VE_2
                 MoveRecordsToFront();
                 mainPivot.SelectedItem = frontPivotItem;
             }
+
+            if (mainPage.ActualHeight < 600)
+            {
+                copyrightBorder.Opacity = 0.0;
+            }
+            else
+            {
+                copyrightBorder.Opacity = 1.0;
+            }
         }
 
         // Functions/Methods for SizeChanged /////////////////////////////////////////////////
@@ -583,9 +631,9 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
-#region Menu navigation
+        #region Menu navigation
 
         private void calculatorMenuItem_Click(object sender, RoutedEventArgs e)
         {
@@ -631,9 +679,9 @@ namespace MAF_VE_2
             mainPivot.SelectedItem = helpPivotItem;
         }
 
-#endregion
+        #endregion
 
-#region Calculate
+        #region Calculate
 
         private void calculateButton_Click(object sender, RoutedEventArgs e)
         {
@@ -788,7 +836,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Calculator TextChanged and SelectionChanged
+        #region Calculator TextChanged and SelectionChanged
 
         private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -823,7 +871,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Clear and Reset buttons
+        #region Clear and Reset buttons
 
         private void clearButton_Click(object sender, RoutedEventArgs e)
         {
@@ -853,7 +901,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Save
+        #region Save
 
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -936,14 +984,14 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
-#region Record click
+        #region Record click
 
         private void localRecords_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = e.ClickedItem as MAFcalculation;
-            
+
             YMME.Text = item.Year + " " +
                         item.Make + " " +
                         item.Model + " " +
@@ -975,7 +1023,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Search
+        #region Search
 
         private async void searchButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1069,7 +1117,7 @@ namespace MAF_VE_2
                         // Split comments into individual words and remove separators like commas and white space
                         string[] separators = { ",", ".", "!", "?", ";", ":", " " };
                         string[] words = COMMENTS.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-                        
+
                         foreach (var word in words)
                         {
                             // Add each word as a keyword search of the Comments in the database
@@ -1138,9 +1186,9 @@ namespace MAF_VE_2
             }
         }
 
-#endregion
+        #endregion
 
-#region Plot data
+        #region Plot data
 
         void PlotDataOnCharts(List<MAFcalculation> records)
         {
@@ -1396,7 +1444,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Help
+        #region Help
 
         private void instructionsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -1428,7 +1476,7 @@ namespace MAF_VE_2
 
         #endregion
 
-#region Chart viewability
+        #region Chart viewability
 
         private void recordsViewPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -1450,5 +1498,41 @@ namespace MAF_VE_2
         {
             Application.Current.Exit();
         }
+
+        #region Background options
+
+        private void backgroundMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            backgroundOptionsPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void backgroundOption_Checked(object sender, RoutedEventArgs e)
+        {
+            var radbtn = sender as RadioButton;
+            var choice = radbtn.Name;
+            if (localSettings != null)
+            {
+                if (choice == "yesImage")
+                {
+                    ManageBackgroundImage();
+                    localSettings.Values[BackgroundImageSetting] = true;
+                }
+                else
+                {
+                    backgroundImage.ClearValue(Image.SourceProperty);
+                    copyright.ClearValue(TextBlock.TextProperty);
+                    localSettings.Values[BackgroundImageSetting] = false;
+                }
+            }
+        }
+
+        private void doneBackgroundOptions_Click(object sender, RoutedEventArgs e)
+        {
+            backgroundOptionsPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        #endregion
     }
 }
