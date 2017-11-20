@@ -218,16 +218,22 @@ namespace MAF_VE_2
                     {
                         DownloadImageOfTheDay();
                         SetBackgroundImage();
+
+                        test.Text = "Download path";
                     }
                     else
                     {
                         SetBackgroundImage();
+
+                        test.Text = "File load path";
                     }
                 }
                 else
                 {
                     DownloadImageOfTheDay();
                     SetBackgroundImage();
+
+                    test.Text = "Setting null, download path";
                 }
             }
             catch
@@ -346,9 +352,9 @@ namespace MAF_VE_2
                 veChartNoResultsLabel.Visibility = Visibility.Collapsed;
             }
 
-            searchedForText.Text = "...";
-            veChartDataDescription.Text = "----";
-            mafChartDataDescription.Text = "----";
+            searchedForText.Text = "all records";
+            veChartDataDescription.Text = "Perform a search to see data in this chart";
+            mafChartDataDescription.Text = "Perform a search to see data in this chart";
             ClearChartData();
         }
 
@@ -563,26 +569,37 @@ namespace MAF_VE_2
         private void Charts_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             double newWidth = e.NewSize.Width;
-            double newHeight = e.NewSize.Height;
-            double orientationCheck = 1;
 
-            if (newHeight != 0)
-            {
-                orientationCheck = newWidth / newHeight;
-            }
-
-            if (orientationCheck == 1) // Perfect square
-            {
-                return;
-            }
-            else if (orientationCheck > 1) // Landscape
-            {
-                ChartsStackPanel.Orientation = Orientation.Horizontal;
-            }
-            else if (orientationCheck < 1) // Portrait
+            if (newWidth < 700)
             {
                 ChartsStackPanel.Orientation = Orientation.Vertical;
             }
+            else if (newWidth > 700)
+            {
+                ChartsStackPanel.Orientation = Orientation.Horizontal;
+            }
+
+            //double newWidth = e.NewSize.Width;
+            //double newHeight = e.NewSize.Height;
+            //double orientationCheck = 1;
+
+            //if (newHeight != 0)
+            //{
+            //    orientationCheck = newWidth / newHeight;
+            //}
+
+            //if (orientationCheck == 1) // Perfect square
+            //{
+            //    return;
+            //}
+            //else if (orientationCheck > 1) // Landscape
+            //{
+            //    ChartsStackPanel.Orientation = Orientation.Horizontal;
+            //}
+            //else if (orientationCheck < 1) // Portrait
+            //{
+            //    ChartsStackPanel.Orientation = Orientation.Vertical;
+            //}
         }
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -597,7 +614,7 @@ namespace MAF_VE_2
                 mainPivot.SelectedItem = frontPivotItem;
             }
 
-            if (mainPage.ActualHeight < 600)
+            if (mainPage.ActualHeight < 560)
             {
                 copyrightBorder.Opacity = 0.0;
             }

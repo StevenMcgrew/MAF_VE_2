@@ -139,7 +139,7 @@
                                         <Button.Flyout>
                                             <Flyout>
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="Based on a naturally aspirated engine&#10;with average airflow ability&#10;and a VE around 77-84%."/>
+                                                    <TextBlock Text="*Based on a naturally aspirated engine&#10;with average airflow ability."/>
                                                     <Button Name="closeExpectedNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Style="{StaticResource closeButtonStyle}" VerticalAlignment="Top" Margin="20,0,0,0" Click="closeExpectedNoteButton_Click"/>
                                                 </StackPanel>
                                             </Flyout>
@@ -263,110 +263,118 @@
                                         </Button>
                                         <Button Name="resetButton" Content="Reset" Style="{StaticResource blueButtonStyle}" Margin="12,10,0,0" Click="resetButton_Click"/>
 
-
-                                    </StackPanel>
-
-                                    <StackPanel Name="searchedForPanel" Orientation="Horizontal" Margin="0,10,0,0" Visibility="Collapsed">
-                                        <TextBlock Foreground="White">
-                                        <Span><Underline>You searched for</Underline>:</Span>
-                                        </TextBlock>
-                                        <TextBlock Name="searchedForText" Foreground="Red" TextTrimming="CharacterEllipsis" Margin="5,0,0,0"/>
                                     </StackPanel>
                                 </StackPanel>
 
                                 <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
-                                    <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}">
-                                        <StackPanel Background="White" Margin="10">
-                                            <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="64" />
-                                                    <!--Year-->
-                                                    <ColumnDefinition Width="90" />
-                                                    <!--Make-->
-                                                    <ColumnDefinition Width="100" />
-                                                    <!--Model-->
-                                                    <ColumnDefinition Width="50" />
-                                                    <!--Engine-->
-                                                    <ColumnDefinition Width="90"/>
-                                                    <!--Condition-->
-                                                    <ColumnDefinition Width="57"/>
-                                                    <!--VE-->
-                                                    <ColumnDefinition Width="78"/>
-                                                    <!--MAF-->
-                                                    <ColumnDefinition Width="Auto"/>
-                                                    <!--Comments-->
-                                                </Grid.ColumnDefinitions>
+                                    <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}" >
 
-                                                <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
-                                                <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
-                                                <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
-                                                <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
-                                                <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
-                                                <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE%" />
-                                                <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
-                                                <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0" Text="Comments/Keywords" />
+                                        <Grid Padding="10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
 
-                                                <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
-                                                <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                            <StackPanel Name="searchedForPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Visible" Margin="0,-5,0,10">
+                                                <TextBlock Foreground="White">
+                                                    <Span><Underline>Showing results for</Underline>:</Span>
+                                                </TextBlock>
+                                                <TextBlock Name="searchedForText" Foreground="White" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" HorizontalAlignment="Left"/>
+                                            </StackPanel>
 
-                                            </Grid>
+                                            <StackPanel Grid.Row="1" Background="White">
 
-                                            <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+                                                <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="64" />
+                                                        <!--Year-->
+                                                        <ColumnDefinition Width="90" />
+                                                        <!--Make-->
+                                                        <ColumnDefinition Width="100" />
+                                                        <!--Model-->
+                                                        <ColumnDefinition Width="50" />
+                                                        <!--Engine-->
+                                                        <ColumnDefinition Width="90"/>
+                                                        <!--Condition-->
+                                                        <ColumnDefinition Width="57"/>
+                                                        <!--VE-->
+                                                        <ColumnDefinition Width="78"/>
+                                                        <!--MAF-->
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <!--Comments-->
+                                                    </Grid.ColumnDefinitions>
 
-                                            <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
-                                                <ListView.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Grid Name="gridForData">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="52"/>
-                                                                <!--Year-->
-                                                                <ColumnDefinition Width="90"/>
-                                                                <!--Make-->
-                                                                <ColumnDefinition Width="100"/>
-                                                                <!--Model-->
-                                                                <ColumnDefinition Width="50"/>
-                                                                <!--Engine-->
-                                                                <ColumnDefinition Width="90"/>
-                                                                <!--Condition-->
-                                                                <ColumnDefinition Width="57"/>
-                                                                <!--VE-->
-                                                                <ColumnDefinition Width="44"/>
-                                                                <!--MAF-->
-                                                                <ColumnDefinition Width="34"/>
-                                                                <!--MAF units-->
-                                                                <ColumnDefinition Width="Auto"/>
-                                                                <!--Comments-->
-                                                            </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
+                                                    <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
+                                                    <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
+                                                    <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
+                                                    <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
+                                                    <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE%" />
+                                                    <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
+                                                    <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0" Text="Comments/Keywords" />
 
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
+                                                    <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
 
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ListView.ItemTemplate>
-                                            </ListView>
+                                                </Grid>
 
-                                        </StackPanel>
+                                                <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+
+                                                <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
+                                                    <ListView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Name="gridForData">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="52"/>
+                                                                    <!--Year-->
+                                                                    <ColumnDefinition Width="90"/>
+                                                                    <!--Make-->
+                                                                    <ColumnDefinition Width="100"/>
+                                                                    <!--Model-->
+                                                                    <ColumnDefinition Width="50"/>
+                                                                    <!--Engine-->
+                                                                    <ColumnDefinition Width="90"/>
+                                                                    <!--Condition-->
+                                                                    <ColumnDefinition Width="57"/>
+                                                                    <!--VE-->
+                                                                    <ColumnDefinition Width="44"/>
+                                                                    <!--MAF-->
+                                                                    <ColumnDefinition Width="34"/>
+                                                                    <!--MAF units-->
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <!--Comments-->
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
+
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ListView.ItemTemplate>
+                                                </ListView>
+
+                                            </StackPanel>
+                                            
+                                        </Grid>
+
                                     </PivotItem>
 
                                     <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
                                         <StackPanel Background="White" Margin="10">
 
-                                            <TextBlock Text="Not yet available. Planned for a future update." FontSize="36" Margin="10"/>
-
                                             <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="64" />
@@ -406,7 +414,7 @@
 
                                             </Grid>
 
-                                            <TextBlock Name="globalNoResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+                                            <TextBlock Name="globalNoResults" Text="Not yet available. Planned for future release." Margin="10,5,5,5" Visibility="Visible"/>
 
                                             <ListView Name="globalRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
                                                 <ListView.ItemTemplate>
@@ -454,56 +462,6 @@
                                     <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged">
                                         <Viewbox>
                                             <StackPanel Name="ChartsStackPanel" Orientation="Horizontal">
-                                                <Grid Name="MAFchart" Width="500" Height="500" Background="Black" Margin="5">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="60"/>
-                                                        <ColumnDefinition Width="*"/>
-                                                        <ColumnDefinition Width="60"/>
-                                                    </Grid.ColumnDefinitions>
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="60"/>
-                                                        <RowDefinition Height="*"/>
-                                                        <RowDefinition Height="60"/>
-                                                    </Grid.RowDefinitions>
-
-                                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
-                                                    <Span><Underline>MAF chart</Underline></Span>
-                                                    </TextBlock>
-                                                    <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
-                                                    <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
-                                                    <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                    <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
-                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
-                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
-                                                        <TextBlock.RenderTransform>
-                                                            <CompositeTransform Rotation="-90"/>
-                                                        </TextBlock.RenderTransform>
-                                                    </TextBlock>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-                                                    <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
-                                                    <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="Red" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
-                                                    <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
-                                                    <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                            <TextBlock Text="Good" Foreground="White"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1" />
-                                                            <TextBlock Text="Bad" Foreground="White"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                            <TextBlock Text="Unsure" Foreground="White"/>
-                                                        </StackPanel>
-                                                        <StackPanel Orientation="Horizontal">
-                                                            <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                            <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
-                                                        </StackPanel>
-                                                    </StackPanel>
-
-                                                </Grid>
 
                                                 <Grid Name="VEchart" Width="500" Height="500" Background="Black" Margin="5">
                                                     <Grid.ColumnDefinitions>
@@ -533,7 +491,7 @@
                                                     <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
                                                     <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
                                                     <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
-                                                    <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="Red" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                    <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                     <TextBlock Name="veChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
                                                     <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
                                                         <StackPanel Orientation="Horizontal">
@@ -555,6 +513,58 @@
                                                     </StackPanel>
 
                                                 </Grid>
+
+                                                <Grid Name="MAFchart" Width="500" Height="500" Background="Black" Margin="5">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="60"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="60"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="60"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="60"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
+                                                        <Span><Underline>MAF chart</Underline></Span>
+                                                    </TextBlock>
+                                                    <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
+                                                    <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
+                                                        <TextBlock.RenderTransform>
+                                                            <CompositeTransform Rotation="-90"/>
+                                                        </TextBlock.RenderTransform>
+                                                    </TextBlock>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
+                                                    <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                    <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                    <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
+                                                    <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Good" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1" />
+                                                            <TextBlock Text="Bad" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Unsure" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                </Grid>
+                                                
                                             </StackPanel>
                                         </Viewbox>
                                     </PivotItem>
@@ -654,6 +664,7 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
+            <TextBlock Name="test" Foreground="White"/>
         </StackPanel>
 
         <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
