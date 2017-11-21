@@ -208,13 +208,13 @@
                                                                         <Flyout x:Name="deleteMakeFlyout" Closed="deleteMakeFlyout_Closed">
                                                                             <StackPanel>
                                                                                 <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
-                                                                                <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="250  " SelectionChanged="MakesToDelete_SelectionChanged">
-                                                                                    <ListBox.ItemTemplate>
+                                                                                <ListView Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="250  " SelectionChanged="MakesToDelete_SelectionChanged">
+                                                                                    <ListView.ItemTemplate>
                                                                                         <DataTemplate>
                                                                                             <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
                                                                                         </DataTemplate>
-                                                                                    </ListBox.ItemTemplate>
-                                                                                </ListBox>
+                                                                                    </ListView.ItemTemplate>
+                                                                                </ListView>
                                                                                 <StackPanel Orientation="Horizontal">
                                                                                     <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click" IsEnabled="False"/>
                                                                                     <Button Name="cancelDeleteMake" Content="Close" Click="cancelDeleteMake_Click"/>

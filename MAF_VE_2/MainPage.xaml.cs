@@ -217,7 +217,6 @@ namespace MAF_VE_2
                     if (lastDownloadDateSum < todaysDateSum)
                     {
                         DownloadImageOfTheDay();
-                        SetBackgroundImage();
 
                         test.Text = "Download path";
                     }
@@ -231,7 +230,6 @@ namespace MAF_VE_2
                 else
                 {
                     DownloadImageOfTheDay();
-                    SetBackgroundImage();
 
                     test.Text = "Setting null, download path";
                 }
@@ -319,6 +317,9 @@ namespace MAF_VE_2
                     var d = DateTime.Today.Date;
                     var downloadDateSum = d.Month + d.Day + d.Year;
                     localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
+
+                    // Set the background image
+                    SetBackgroundImage();
                 }
                 else
                 {
