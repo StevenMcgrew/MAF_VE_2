@@ -1479,7 +1479,7 @@
                         ZoomMode="Disabled"
                         Template="{StaticResource ScrollViewerScrollBarlessTemplate}"
                         BringIntoViewOnFocusChange="False">
-                        <PivotPanel x:Name="Panel" VerticalAlignment="Stretch">
+                        <PivotPanel x:Name="Panel" VerticalAlignment="Stretch" ManipulationMode="None"> <!--Added ManipulationMode as None, so swiping left/right between pivot items is disabled-->
                             <Grid x:Name="PivotLayoutElement">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="30" /> <!--This is tabs height-->

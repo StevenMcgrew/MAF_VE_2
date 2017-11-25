@@ -39,7 +39,7 @@
     </Page.Resources>
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid Background="Gray">
+    <Grid Background="#FFA0A0A0">
         <Image Name="backgroundImage" Stretch="UniformToFill">
             <!--<Image.Source>
                 <BitmapImage/>
@@ -92,7 +92,7 @@
 
                             <StackPanel Orientation="Horizontal" Margin="0,2">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
-                                <TextBlock Text="Air temperature" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                <TextBlock Text="Intake Air Temp" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0"/>
                                 <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
                                 <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
                                     <ComboBoxItem Content="&#186;F"/>
@@ -594,19 +594,19 @@
                         <RichTextBlock Name="instructions" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
                             <Paragraph>
                                 <Span Foreground="#FF3399FF">1.</Span>
-                                <Run Text=" Connect your scan tool to the car, and set it to record these two data PIDs: MAF and RPM. If you record more PIDs, the data transfer could be too slow."/>
+                                <Run Text=" Connect your scan tool to the car, and set it to record these data PIDs: RPM, MAF and IAT. If you record more PIDs, the data transfer could be too slow."/>
                                 <LineBreak/>
                                 <LineBreak/>
                                 <Span Foreground="#FF3399FF">2.</Span>
-                                <Run Text=" Find a safe area to drive the car at wide open throttle (WOT) until the rpms are close to redline. It's important to drive WOT for best calculator results."/>
+                                <Run Text=" Find a safe area to drive the car at wide open throttle (WOT) until the RPMs are close to redline. It's important to drive WOT for best calculator results."/>
                                 <LineBreak/>
                                 <LineBreak/>
                                 <Span Foreground="#FF3399FF">3.</Span>
-                                <Run Text=" Review your recording and find the highest MAF data and use that point for your MAF and RPM input for the calculator."/>
+                                <Run Text=" Review your recording and find the highest MAF data and use that point for your MAF, RPM, and IAT input for the calculator."/>
                                 <LineBreak/>
                                 <LineBreak/>
                                 <Span Foreground="#FF3399FF">4.</Span>
-                                <Run Text=" Input your data: RPM, MAF, Engine size, Air temp, Elevation. Then click the Calculate button to get the results."/>
+                                <Run Text=" Input your data: RPM, MAF, Engine size, IAT, and Elevation. Then click the Calculate button to get the results."/>
                             </Paragraph>
                         </RichTextBlock>
 
@@ -619,7 +619,7 @@
                         <RichTextBlock Name="interpretResults" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
                             <Paragraph>
                                 <Span Foreground="#FF3399FF">1.</Span>
-                                <Run Text=" VE varies with engine design. Average engines may be 80-90%, and well breathing engines 90-100%. Turbo and SC engines will be over 100%."/>
+                                <Run Text=" VE varies with engine design. Average engines may be 80-85%, and well breathing engines 90-100%. Turbo and SC engines will be over 100%."/>
                                 <LineBreak/>
                                 <LineBreak/>
                                 <Span Foreground="#FF3399FF">2.</Span>

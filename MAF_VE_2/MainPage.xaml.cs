@@ -255,6 +255,7 @@ namespace MAF_VE_2
             catch
             {
                 var dialog = new MessageDialog("A problem occured when trying to set the background image").ShowAsync();
+                return;
             }
 
             try
@@ -274,7 +275,7 @@ namespace MAF_VE_2
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
-            string JSON;
+            string JSON = "";
 
             try // Get JSON
             {
@@ -287,6 +288,7 @@ namespace MAF_VE_2
             catch
             {
                 var dialog = new MessageDialog("A problem occured when getting background image JSON over the network. Check internet connection and try again.").ShowAsync();
+                SetBackgroundImage();
                 return;
             }
 
@@ -317,9 +319,6 @@ namespace MAF_VE_2
                     var d = DateTime.Today.Date;
                     var downloadDateSum = d.Month + d.Day + d.Year;
                     localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
-
-                    // Set the background image
-                    SetBackgroundImage();
                 }
                 else
                 {
@@ -330,6 +329,9 @@ namespace MAF_VE_2
             {
                 var dialog = new MessageDialog("A problem occured when parsing and saving background image data").ShowAsync();
             }
+
+            // Set the background image
+            SetBackgroundImage();
         }
 
         #endregion
