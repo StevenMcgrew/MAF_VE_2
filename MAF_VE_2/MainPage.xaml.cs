@@ -1,32 +1,17 @@
 ﻿using MAF_VE_2.Models;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
-using Windows.ApplicationModel.Core;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Data.Json;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Graphics.Printing;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI;
-using Windows.UI.Core;
 using Windows.UI.Popups;
-using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Documents;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-using Windows.UI.Xaml.Printing;
 using Windows.UI.Xaml.Shapes;
 using Windows.Web.Http;
 
@@ -41,6 +26,7 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
+        bool downloadedImage = false;
 
         ApplicationDataContainer localSettings = null;
         const string DateOfLastImageDownloadAsSum = "DateOfLastImageDownload";
@@ -217,31 +203,26 @@ namespace MAF_VE_2
                     if (lastDownloadDateSum < todaysDateSum)
                     {
                         DownloadImageOfTheDay();
-
-                        test.Text = "Download path";
                     }
                     else
                     {
                         SetBackgroundImage();
-
-                        test.Text = "File load path";
                     }
                 }
                 else
                 {
                     DownloadImageOfTheDay();
-
-                    test.Text = "Setting null, download path";
                 }
             }
             catch
             {
-                var dialog = new MessageDialog("A problem occured when managing the background image").ShowAsync();
+                SetBackgroundImage();
             }
         }
 
         async void SetBackgroundImage()
         {
+            // Set background image first
             try
             {
                 var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("BingImageOfTheDay.jpg");
@@ -254,19 +235,37 @@ namespace MAF_VE_2
             }
             catch
             {
-                var dialog = new MessageDialog("A problem occured when trying to set the background image").ShowAsync();
+                backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
                 return;
             }
 
+            // Then set copyright text
+            bool copyrightSetSuccessfully = false;
             try
             {
                 var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
                 var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
-                copyright.Text = "Image: " + copyrightText;
+                if (downloadedImage)
+                {
+                    copyright.Text = "Image of the day: " + copyrightText;
+                }
+                else
+                {
+                    copyright.Text = "Image: " + copyrightText;
+                }
+                copyrightSetSuccessfully = true;
             }
             catch
             {
-                var dialog = new MessageDialog("A problem occured when trying to display the image copyright information").ShowAsync();
+                copyright.Text = "Image: Could not get copyright info";
+                copyrightSetSuccessfully = false;
+            }
+            finally
+            {
+                if (copyrightSetSuccessfully)
+                {
+                    downloadedImage = false; // reset this to false for the next time around
+                }
             }
         }
 
@@ -287,7 +286,6 @@ namespace MAF_VE_2
             }
             catch
             {
-                var dialog = new MessageDialog("A problem occured when getting background image JSON over the network. Check internet connection and try again.").ShowAsync();
                 SetBackgroundImage();
                 return;
             }
@@ -319,15 +317,17 @@ namespace MAF_VE_2
                     var d = DateTime.Today.Date;
                     var downloadDateSum = d.Month + d.Day + d.Year;
                     localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
-                }
-                else
-                {
-                    var dialog = new MessageDialog("Unable to parse JSON for background image").ShowAsync();
+
+                    downloadedImage = true;
                 }
             }
             catch
             {
-                var dialog = new MessageDialog("A problem occured when parsing and saving background image data").ShowAsync();
+                var localFiles = await ApplicationData.Current.LocalFolder.GetFilesAsync();
+                foreach (var file in localFiles)
+                {
+                    await file.DeleteAsync();
+                }
             }
 
             // Set the background image
@@ -581,28 +581,6 @@ namespace MAF_VE_2
             {
                 ChartsStackPanel.Orientation = Orientation.Horizontal;
             }
-
-            //double newWidth = e.NewSize.Width;
-            //double newHeight = e.NewSize.Height;
-            //double orientationCheck = 1;
-
-            //if (newHeight != 0)
-            //{
-            //    orientationCheck = newWidth / newHeight;
-            //}
-
-            //if (orientationCheck == 1) // Perfect square
-            //{
-            //    return;
-            //}
-            //else if (orientationCheck > 1) // Landscape
-            //{
-            //    ChartsStackPanel.Orientation = Orientation.Horizontal;
-            //}
-            //else if (orientationCheck < 1) // Portrait
-            //{
-            //    ChartsStackPanel.Orientation = Orientation.Vertical;
-            //}
         }
 
         private void mainPage_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1289,15 +1267,15 @@ namespace MAF_VE_2
             double minRecordRpm = records.Min(p => p.Engine_speed);
             double maxRecordRpm = records.Max(p => p.Engine_speed);
 
-            if (minRecordRpm < 1000)
+            if (minRecordRpm < 500)
             {
                 lowRPM = 0;
             }
             else
             {
-                lowRPM = minRecordRpm - 1000;
+                lowRPM = minRecordRpm - 500;
             }
-            highRPM = maxRecordRpm + 1000;
+            highRPM = maxRecordRpm + 500;
 
             lowRPM = Math.Round(lowRPM);
             highRPM = Math.Round(highRPM);
@@ -1313,15 +1291,15 @@ namespace MAF_VE_2
             double minRecordMaf = records.Min(p => p.MAF);
             double maxRecordMaf = records.Max(p => p.MAF);
 
-            if (minRecordMaf < 50)
+            if (minRecordMaf < 25)
             {
                 lowMAF = 0;
             }
             else
             {
-                lowMAF = minRecordMaf - 50;
+                lowMAF = minRecordMaf - 25;
             }
-            highMAF = maxRecordMaf + 50;
+            highMAF = maxRecordMaf + 25;
 
             lowMAF = Math.Round(lowMAF);
             highMAF = Math.Round(highMAF);
@@ -1335,15 +1313,15 @@ namespace MAF_VE_2
             double minRecordVe = records.Min(p => p.Volumetric_Efficiency);
             double maxRecordVe = records.Max(p => p.Volumetric_Efficiency);
 
-            if (minRecordVe < 25)
+            if (minRecordVe < 10)
             {
                 lowVE = 0;
             }
             else
             {
-                lowVE = minRecordVe - 25;
+                lowVE = minRecordVe - 10;
             }
-            highVE = maxRecordVe + 25;
+            highVE = maxRecordVe + 10;
 
             lowVE = Math.Round(lowVE);
             highVE = Math.Round(highVE);
@@ -1514,11 +1492,6 @@ namespace MAF_VE_2
 
         #endregion
 
-        private void exitMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            Application.Current.Exit();
-        }
-
         #region Background options
 
         private void backgroundMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1554,5 +1527,10 @@ namespace MAF_VE_2
         }
 
         #endregion
+
+        private void exitMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Exit();
+        }
     }
 }

@@ -664,7 +664,6 @@
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
-            <TextBlock Name="test" Foreground="White"/>
         </StackPanel>
 
         <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
@@ -673,17 +672,17 @@
 
                 <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
 
-                <Grid HorizontalAlignment="Center" Background="LightGray" Padding="10">
+                <Grid HorizontalAlignment="Center" Padding="10" Background="LightGray" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,10,0">
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,20,0">
                         <TextBlock HorizontalAlignment="Left" Text="Engine Speed"/>
                         <TextBlock HorizontalAlignment="Left" Text="MAF"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Air Temperature"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Intake Air Temp"/>
                         <TextBlock HorizontalAlignment="Left" Text="Elevation" Margin="0,0,0,20"/>
                         <TextBlock HorizontalAlignment="Left" Text="Expected MAF"/>
                         <TextBlock HorizontalAlignment="Left" Text="MAF Difference"/>
@@ -691,7 +690,7 @@
                         <TextBlock HorizontalAlignment="Left" Text="Condition"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Left">
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Left" >
                         <TextBlock HorizontalAlignment="Right" Name="RPM"/>
                         <TextBlock HorizontalAlignment="Right" Name="MAF"/>
                         <TextBlock HorizontalAlignment="Right" Name="AIR"/>
@@ -702,7 +701,7 @@
                         <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
                     </StackPanel>
 
-                    <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="2,0,0,0">
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0">
                         <TextBlock HorizontalAlignment="Left" Text="RPM"/>
                         <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
                         <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
