@@ -1072,10 +1072,8 @@
 
         <!--The Pivot theme template (I changed some things in here)-->
         <ControlTemplate x:Key="myPivotTemplate" TargetType="Pivot">
-            <Grid x:Name="RootElement"
-                HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
-                VerticalAlignment="{TemplateBinding VerticalAlignment}"
-                Background="{TemplateBinding Background}">
+            <Grid x:Name="RootElement" HorizontalAlignment="{TemplateBinding HorizontalAlignment}" VerticalAlignment="{TemplateBinding VerticalAlignment}" Background="{TemplateBinding Background}">
+                
                 <Grid.Resources>
                     <Style x:Key="BaseContentControlStyle" TargetType="ContentControl">
                         <Setter Property="FontFamily" Value="{StaticResource fontPivotHeader}" />
@@ -1287,6 +1285,7 @@
                     <!--This is the end of the PivotHeaderItem style-->
 
                 </Grid.Resources>
+                
                 <VisualStateManager.VisualStateGroups>
                     <VisualStateGroup x:Name="Orientation">
                         <VisualState x:Name="Portrait">
@@ -1370,7 +1369,9 @@
                     Visibility="Collapsed"
                     Content="{TemplateBinding Title}"
                     ContentTemplate="{TemplateBinding TitleTemplate}" />
+                
                 <Grid Grid.Row="1">
+                    
                     <Grid.Resources>
                         <ControlTemplate x:Key="NextTemplate" TargetType="Button">
                             <Border x:Name="Root"
@@ -1467,18 +1468,23 @@
                             </Border>
                         </ControlTemplate>
                     </Grid.Resources>
+                    
                     <ScrollViewer x:Name="ScrollViewer"
                         Margin="{TemplateBinding Padding}"
                         HorizontalSnapPointsType="MandatorySingle"
                         HorizontalSnapPointsAlignment="Center"
                         HorizontalScrollBarVisibility="Hidden"
-                        VerticalScrollMode="Disabled"
+                        
                         VerticalScrollBarVisibility="Disabled"
                         VerticalSnapPointsType="None"
                         VerticalContentAlignment="Stretch"
                         ZoomMode="Disabled"
                         Template="{StaticResource ScrollViewerScrollBarlessTemplate}"
                         BringIntoViewOnFocusChange="False">
+                                    <!--Took this out of the scrollviewer property settings-->
+                                    <!--VerticalScrollMode="Disabled"-->
+                                    
+
                         <PivotPanel x:Name="Panel" VerticalAlignment="Stretch" ManipulationMode="None"> <!--Added ManipulationMode as None, so swiping left/right between pivot items is disabled-->
                             <Grid x:Name="PivotLayoutElement">
                                 <Grid.RowDefinitions>
