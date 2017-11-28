@@ -488,9 +488,8 @@
                                                             <CompositeTransform Rotation="-90"/>
                                                         </TextBlock.RenderTransform>
                                                     </TextBlock>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-                                                    <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                    <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1,0,0,1"/>
+                                                    <Grid Name="vePlot" Grid.Row="1" Grid.Column="1"/>
                                                     <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                     <TextBlock Name="veChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
                                                     <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
@@ -539,9 +538,8 @@
                                                             <CompositeTransform Rotation="-90"/>
                                                         </TextBlock.RenderTransform>
                                                     </TextBlock>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
-                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
-                                                    <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                    <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1,0,0,1"/>
+                                                    <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1"/>
                                                     <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                     <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
                                                     <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
