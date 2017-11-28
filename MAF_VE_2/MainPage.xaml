@@ -7,514 +7,729 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Name="mainPage" SizeChanged="mainPage_SizeChanged" Loaded="mainPage_Loaded">
 
-    <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid Background="Gray">
+    <Page.Resources>
+        <Storyboard x:Name="CalculatorPanelColorStoryboard">
+            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" Storyboard.TargetName="calculatorPanel">
+                <EasingColorKeyFrame KeyTime="0:0:0.2" Value="#BFFFFFFF"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#BF000000"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.6" Value="#BFFFFFFF"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.8" Value="#BF000000"/>
+            </ColorAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="SearchPanelColorStoryboard">
+            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" Storyboard.TargetName="searchPanel">
+                <EasingColorKeyFrame KeyTime="0:0:0.2" Value="#BFFFFFFF"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#00000000"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.6" Value="#BFFFFFFF"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.8" Value="#00000000"/>
+            </ColorAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="ExpandChartsStoryboard">
+            <DoubleAnimationUsingKeyFrames EnableDependentAnimation="True" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="searchPanel">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="275"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="2"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="ShrinkChartsStoryboard">
+            <DoubleAnimationUsingKeyFrames EnableDependentAnimation="True" Storyboard.TargetProperty="(FrameworkElement.Height)" Storyboard.TargetName="searchPanel">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="2"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="275"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
+    </Page.Resources>
 
-        <Pivot Name="mainPivot" SelectionChanged="mainPivot_SelectionChanged">
+    <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
+    <Grid Background="#FFA0A0A0">
+        <Image Name="backgroundImage" Stretch="UniformToFill">
+            <!--<Image.Source>
+                <BitmapImage/>
+            </Image.Source>-->
+        </Image>
+
+        <Pivot Name="mainPivot">
+
             <PivotItem Name="frontPivotItem">
                 <Grid Name="mainGrid">
-
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
                     <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
-                        
-                        <StackPanel Name="leftSlimPanel" VerticalAlignment="Center" HorizontalAlignment="Center">
 
-                            <Border Name="calculatorPanel" Background="#FF191818" CornerRadius="20" Margin="0,0,15,15" Padding="0" VerticalAlignment="Top">
-                                <StackPanel Margin="10,10,10,20" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <StackPanel Name="calculatorPanel" Margin="0,0,15,0" VerticalAlignment="Top" HorizontalAlignment="Center" Background="#99000000" Padding="10,10,10,15">
 
-                                    <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,0,0,15">
+                            <TextBlock FontSize="28" Foreground="White" Margin="0,0,0,15">
                                     <Underline>
                                         <Run Text="Inputs"/>
                                     </Underline>
                                     <Run Text=":"/>
-                                    </TextBlock>
+                            </TextBlock>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEC48;" Foreground="White" VerticalAlignment="Center" Margin="0,2,0,0" Width="20"/>
-                                        <TextBlock Text="Engine speed" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" Width="160"/>
-                                        <TextBox Name="rpm" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <TextBlock Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEC48;" Foreground="White" VerticalAlignment="Center" Margin="0,2,0,0" Width="20"/>
+                                <TextBlock Text="Engine speed" Foreground="White" VerticalAlignment="Center" Margin="3,0,0,0" Width="145"/>
+                                <TextBox Name="rpm" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="2,0,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
+                                <TextBlock Text="MAF" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0" />
+                                <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                    <ComboBoxItem Content="g/s"/>
+                                    <ComboBoxItem Content="kg/h"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEA8B;" Foreground="White" VerticalAlignment="Center" Margin="0,0,0,2" Width="20"/>
+                                <TextBlock Text="Engine size" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                <TextBox Name="engineSize" TextAlignment="Right" MaxLength="3" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                <TextBlock Text="L" Margin="2,0,0,0" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
+                                <TextBlock Text="Intake Air Temp" Foreground="White" Width="145" VerticalAlignment="Center" Margin="3,0,0,0"/>
+                                <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                    <ComboBoxItem Content="&#186;F"/>
+                                    <ComboBoxItem Content="&#186;C"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
+                                <TextBlock Text="Elevation" Foreground="White" Width="145" Margin="3,0,0,0" VerticalAlignment="Center"/>
+                                <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
+                                <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
+                                    <ComboBoxItem Content="ft"/>
+                                    <ComboBoxItem Content="m"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Name="calculateButton" Style="{StaticResource blueButtonStyle}" Margin="131,0,0,0" Click="calculateButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8EF;" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Calculate" Margin="4,0,0,0"/>
                                     </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE877;" Foreground="White" VerticalAlignment="Center" Margin="0,1,0,0" Width="20" />
-                                        <TextBlock Text="MAF" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0" />
-                                        <TextBox Name="maf" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="mafUnits" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" Margin="4,0,0,0" SelectedIndex="0" SelectedValuePath="Content" SelectionChanged="ComboBox_SelectionChanged" Width="74">
-                                            <ComboBoxItem Content="g/s"/>
-                                            <ComboBoxItem Content="kg/h"/>
-                                        </ComboBox>
+                                </Button>
+                                <Button Name="clearButton" Style="{StaticResource blueButtonStyle}" Margin="4,0,0,0" Click="clearButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Clear" Margin="5,0,0,0"/>
                                     </StackPanel>
+                                </Button>
+                            </StackPanel>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xEA8B;" Foreground="White" VerticalAlignment="Center" Margin="0,0,0,2" Width="20"/>
-                                        <TextBlock Text="Engine size" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                        <TextBox Name="engineSize" TextAlignment="Right" MaxLength="3" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <TextBlock Text="L" Margin="2,0,0,0" Foreground="White" VerticalAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE9CA;" Foreground="White" Width="20" VerticalAlignment="Center" Padding="5,0,0,0"/>
-                                        <TextBlock Text="Air temperature" Foreground="White" Width="160" VerticalAlignment="Center" Margin="3,0,0,0"/>
-                                        <TextBox Name="airTemp" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="airTempUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74">
-                                            <ComboBoxItem Content="&#186;F"/>
-                                            <ComboBoxItem Content="&#186;C"/>
-                                        </ComboBox>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE909;" Foreground="White" Width="20" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Elevation" Foreground="White" Width="160" Margin="3,0,0,0" VerticalAlignment="Center"/>
-                                        <TextBox Name="altitude" TextAlignment="Right" MaxLength="5" InputScope="Number" TextChanged="TextBox_TextChanged"/>
-                                        <ComboBox Name="altitudeUnits" SelectedValuePath="Content" Margin="4,0,0,0" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" SelectionChanged="ComboBox_SelectionChanged" Width="74" Height="30">
-                                            <ComboBoxItem Content="ft"/>
-                                            <ComboBoxItem Content="m"/>
-                                        </ComboBox>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                        <Button Name="calculateButton" Background="#FF3399FF" Margin="134,0,0,0" Click="calculateButton_Click">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE8EF;" VerticalAlignment="Center"/>
-                                                <TextBlock Text="Calculate" Margin="4,0,0,0"/>
-                                            </StackPanel>
-                                        </Button>
-                                        <Button Name="clearButton" Background="#FF3399FF" Margin="4,0,0,0" Click="clearButton_Click">
-                                            <StackPanel Orientation="Horizontal">
-                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE894;" VerticalAlignment="Center"/>
-                                                <TextBlock Text="Clear" Margin="5,0,0,0"/>
-                                            </StackPanel>
-                                        </Button>
-                                    </StackPanel>
-
-                                    <TextBlock FontWeight="Bold" FontSize="20" Foreground="#FF3399FF" Margin="0,30,0,15">
+                            <TextBlock FontSize="28" Foreground="White" Margin="0,30,0,15">
                                     <Underline>
                                         <Run Text="Outputs"/>
                                     </Underline>
                                     <Run Text=":"/>
-                                    </TextBlock>
+                            </TextBlock>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
-                                        <StackPanel Orientation="Horizontal" Width="225">
-                                            <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
-                                            <Button Name="asteriskButton" Content="*" Foreground="White"/>
-                                            <!--<ComboBox SelectedValuePath="Content" Background="White" BorderBrush="#FF7A7A7A" Foreground="Black" SelectedIndex="0" Margin="0">
-                                        <ComboBoxItem Content="77"/>
-                                        <ComboBoxItem Content="78"/>
-                                        <ComboBoxItem Content="79"/>
-                                        <ComboBoxItem Content="80"/>
-                                        <ComboBoxItem Content="81"/>
-                                        <ComboBoxItem Content="82"/>
-                                        <ComboBoxItem Content="83"/>
-                                        <ComboBoxItem Content="84"/>
-                                        <ComboBoxItem Content="85"/>
-                                        <ComboBoxItem Content="86"/>
-                                        <ComboBoxItem Content="87"/>
-                                        <ComboBoxItem Content="88"/>
-                                        <ComboBoxItem Content="89"/>
-                                        <ComboBoxItem Content="90"/>
-                                        <ComboBoxItem Content="91"/>
-                                        <ComboBoxItem Content="92"/>
-                                        <ComboBoxItem Content="93"/>
-                                        <ComboBoxItem Content="94"/>
-                                        <ComboBoxItem Content="95"/>
-                                        <ComboBoxItem Content="96"/>
-                                        <ComboBoxItem Content="97"/>
-                                        <ComboBoxItem Content="98"/>
-                                        <ComboBoxItem Content="99"/>
-                                        <ComboBoxItem Content="100"/>
-                                        <ComboBoxItem Content="101"/>
-                                        <ComboBoxItem Content="102"/>
-                                        <ComboBoxItem Content="103"/>
-                                        <ComboBoxItem Content="104"/>
-                                        <ComboBoxItem Content="105"/>
-                                        <ComboBoxItem Content="106"/>
-                                        <ComboBoxItem Content="107"/>
-                                        <ComboBoxItem Content="108"/>
-                                        <ComboBoxItem Content="109"/>
-                                        <ComboBoxItem Content="110"/>
-                                        <ComboBoxItem Content="111"/>
-                                        <ComboBoxItem Content="112"/>
-                                        <ComboBoxItem Content="113"/>
-                                        <ComboBoxItem Content="114"/>
-                                        <ComboBoxItem Content="115"/>
-                                        <ComboBoxItem Content="116"/>
-                                        <ComboBoxItem Content="117"/>
-                                        <ComboBoxItem Content="118"/>
-                                        <ComboBoxItem Content="119"/>
-                                        <ComboBoxItem Content="120"/>
-                                        <ComboBoxItem Content="121"/>
-                                        <ComboBoxItem Content="122"/>
-                                        <ComboBoxItem Content="123"/>
-                                        <ComboBoxItem Content="124"/>
-                                        <ComboBoxItem Content="125"/>
-                                        <ComboBoxItem Content="126"/>
-                                        <ComboBoxItem Content="127"/>
-                                        <ComboBoxItem Content="128"/>
-                                        <ComboBoxItem Content="129"/>
-                                        <ComboBoxItem Content="130"/>
-                                        <ComboBoxItem Content="131"/>
-                                        <ComboBoxItem Content="132"/>
-                                        <ComboBoxItem Content="133"/>
-                                        <ComboBoxItem Content="134"/>
-                                        <ComboBoxItem Content="135"/>
-                                        <ComboBoxItem Content="136"/>
-                                        <ComboBoxItem Content="137"/>
-                                        <ComboBoxItem Content="138"/>
-                                        <ComboBoxItem Content="139"/>
-                                        <ComboBoxItem Content="140"/>
-                                        <ComboBoxItem Content="141"/>
-                                        <ComboBoxItem Content="142"/>
-                                        <ComboBoxItem Content="143"/>
-                                        <ComboBoxItem Content="144"/>
-                                        <ComboBoxItem Content="145"/>
-                                        <ComboBoxItem Content="146"/>
-                                        <ComboBoxItem Content="147"/>
-                                        <ComboBoxItem Content="148"/>
-                                        <ComboBoxItem Content="149"/>
-                                        <ComboBoxItem Content="150"/>
-                                        <ComboBoxItem Content="151"/>
-                                        <ComboBoxItem Content="152"/>
-                                        <ComboBoxItem Content="153"/>
-                                        <ComboBoxItem Content="154"/>
-                                        <ComboBoxItem Content="155"/>
-                                        <ComboBoxItem Content="156"/>
-                                        <ComboBoxItem Content="157"/>
-                                        <ComboBoxItem Content="158"/>
-                                        <ComboBoxItem Content="159"/>
-                                        <ComboBoxItem Content="160"/>
-                                        <ComboBoxItem Content="161"/>
-                                        <ComboBoxItem Content="162"/>
-                                        <ComboBoxItem Content="163"/>
-                                        <ComboBoxItem Content="164"/>
-                                        <ComboBoxItem Content="165"/>
-                                        <ComboBoxItem Content="166"/>
-                                        <ComboBoxItem Content="167"/>
-                                        <ComboBoxItem Content="168"/>
-                                        <ComboBoxItem Content="169"/>
-                                        <ComboBoxItem Content="170"/>
-                                        <ComboBoxItem Content="171"/>
-                                        <ComboBoxItem Content="172"/>
-                                        <ComboBoxItem Content="173"/>
-                                        <ComboBoxItem Content="174"/>
-                                        <ComboBoxItem Content="175"/>
-                                        <ComboBoxItem Content="176"/>
-                                        <ComboBoxItem Content="177"/>
-                                        <ComboBoxItem Content="178"/>
-                                        <ComboBoxItem Content="179"/>
-                                        <ComboBoxItem Content="180"/>
-                                    </ComboBox>-->
-                                        </StackPanel>
-                                        <TextBox Name="expectedMAF" TextAlignment="Right" IsReadOnly="True"/>
-                                        <TextBlock Name="expectedMAFUnits" Text="g/s" Margin="3,0,0,0" Foreground="White" VerticalAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="MAF Difference" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                        <TextBox Name="mafDifference" TextAlignment="Right" IsReadOnly="True"/>
-                                        <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="Volumetric Efficiency" Foreground="White" Width="215" Margin="10,0,0,0" VerticalAlignment="Center"/>
-                                        <TextBox Name="VE" TextAlignment="Right" IsReadOnly="True"/>
-                                        <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
-                                    </StackPanel>
-
-                                </StackPanel>
-                            </Border>
-
-                            <StackPanel Name="searchPanel" Margin="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal">
-                                    <StackPanel>
-                                        <Button Name="searchBackButton" Visibility="Collapsed" Content="Back" Background="#FF3399FF" Margin="12,10,10,10" />
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                            <ComboBox Name="year" Margin="5" PlaceholderText="Select">
-                                            </ComboBox>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                            <ComboBox Name="make" Margin="5,0,5,5" PlaceholderText="Select">
-                                            </ComboBox>
-                                            <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Click="makeOptionsButton_Click">
-                                                <Button.Flyout>
-                                                    <Flyout>
-                                                        <StackPanel>
-                                                            <Button Name="addMakeButton" Content="Add Make" Margin="0,0,0,10" Click="addMakeButton_Click">
-                                                                <Button.Flyout>
-                                                                    <Flyout>
-                                                                        <RelativePanel>
-                                                                            <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
-                                                                            <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
-                                                                            <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
-                                                                        </RelativePanel>
-                                                                    </Flyout>
-                                                                </Button.Flyout>
-                                                            </Button>
-                                                            <Button Name="deleteMakeButton" Content="Delete Make" IsEnabled="False" Click="deleteMakeButton_Click">
-                                                                <Button.Flyout>
-                                                                    <Flyout>
-                                                                        <StackPanel>
-                                                                            <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
-                                                                            <ListBox Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="300">
-                                                                                <ListBox.ItemTemplate>
-                                                                                    <DataTemplate>
-                                                                                        <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
-                                                                                    </DataTemplate>
-                                                                                </ListBox.ItemTemplate>
-                                                                                <ListBoxItem Content="No custom Makes found"/>
-                                                                            </ListBox>
-                                                                            <StackPanel Orientation="Horizontal">
-                                                                                <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click"/>
-                                                                                <Button Name="cancelDeleteMake" Content="Done" Click="cancelDeleteMake_Click"/>
-                                                                            </StackPanel>
-                                                                        </StackPanel>
-                                                                    </Flyout>
-                                                                </Button.Flyout>
-                                                            </Button>
-                                                        </StackPanel>
-                                                    </Flyout>
-                                                    <!--<Flyout>
-                                                        <RelativePanel>
-                                                            <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
-                                                            <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
-                                                            <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
-                                                        </RelativePanel>
-                                                    </Flyout>-->
-                                                </Button.Flyout>
-                                            </Button>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                            <TextBox Name="model" Margin="5,0,0,0"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45"/>
-                                            <ComboBox Name="engine" Margin="5" PlaceholderText="Select">
-                                            </ComboBox>
-                                        </StackPanel>
-                                    </StackPanel>
-                                    <StackPanel>
-                                        <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Margin="20,0,0,0" Foreground="Lime" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
-                                        <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Margin="20,0,0,0" Foreground="Red" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
-                                        <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Margin="20,0,0,0" Foreground="Yellow" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <TextBlock Text="Comments or Keywords:" Margin="5,0,0,0"/>
-                                <TextBox Name="comments" TextWrapping="Wrap" Height="53" MaxLength="200" Margin="5,0,0,0" />
-
-                                <StackPanel Orientation="Horizontal">
-                                    <Button Name="searchButton" Background="#FF3399FF" Margin="5,10,0,0">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11A;" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Search" Margin="5,0,0,0"/>
-                                        </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                                <StackPanel Orientation="Horizontal" Width="205">
+                                    <TextBlock Text="Expected MAF" Foreground="White" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    <Button Name="expectedMafNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xEA38;" Margin="5,0,0,0" Width="32" Height="32" Style="{StaticResource blueButtonStyle}" Padding="0" >
+                                        <Button.Flyout>
+                                            <Flyout>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="*Based on a naturally aspirated engine&#10;with average airflow ability."/>
+                                                    <Button Name="closeExpectedNoteButton" FontFamily="Segoe MDL2 Assets" Content="&#xE10A;" Style="{StaticResource closeButtonStyle}" VerticalAlignment="Top" Margin="20,0,0,0" Click="closeExpectedNoteButton_Click"/>
+                                                </StackPanel>
+                                            </Flyout>
+                                        </Button.Flyout>
                                     </Button>
-                                    <Button Name="saveButton" Background="#FF3399FF" Margin="10,10,0,0" Width="76" Click="saveButton_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" VerticalAlignment="Center"/>
-                                            <TextBlock Text="Save" Margin="5,0,0,0"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Name="resetButton" Content="Reset" Background="#FF3399FF" Margin="12,10,0,0" Click="resetButton_Click"/>
-                                    <!--<Button Name="btnDeleteAll" Content="Delete All" Background="#FF3399FF" Margin="12,10,0,0" Click="btnDeleteAll_Click" />-->
                                 </StackPanel>
+                                <TextBox Name="expectedMAF" TextAlignment="Right" IsReadOnly="True"/>
+                                <TextBlock Name="expectedMAFUnits" Text="g/s" Margin="3,0,0,0" Foreground="White" VerticalAlignment="Center"/>
+                            </StackPanel>
 
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="MAF Difference" Foreground="White" Width="195" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                <TextBox Name="mafDifference" TextAlignment="Right" IsReadOnly="True"/>
+                                <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,2">
+                                <TextBlock Text="Volumetric Efficiency" Foreground="White" Width="195" Margin="10,0,0,0" VerticalAlignment="Center"/>
+                                <TextBox Name="VE" TextAlignment="Right" IsReadOnly="True"/>
+                                <TextBlock Text="%" Margin="3,0,0,0" Foreground="White"/>
                             </StackPanel>
 
                         </StackPanel>
-                        
+
                     </ScrollViewer>
 
-                    <Grid Name="recordsPanel" Grid.Column="1" >
-                        
+                    <Border Name="copyrightBorder" Margin="-12,0,0,10" Grid.Column="0" Background="#BF000000" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                        <TextBlock Name="copyright" MaxWidth="334" FontSize="12" VerticalAlignment="Top" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left"/>
+                    </Border>
+
+                    <ScrollViewer Name="recordsPanel" VerticalScrollBarVisibility="Auto" Grid.Column="1" Background="#99000000">
                         <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
 
-                            <StackPanel Orientation="Horizontal">
-                                <Grid Background="CadetBlue" Width="200" Height="200"/>
-                                <TextBox Header="You searched for:" Text="2000 Ford Ranger 3.0L VIN U Good" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                            </StackPanel>
+                                <StackPanel Name="searchPanel" Grid.Row="0" Padding="10" HorizontalAlignment="Left" Height="275" Background="#00000000">
+                                    <StackPanel Orientation="Horizontal">
+                                        <StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
+                                                <ComboBox Name="year" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
+                                                <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
+                                                <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Style="{StaticResource blueButtonStyle}">
+                                                    <Button.Flyout>
+                                                        <Flyout>
+                                                            <StackPanel>
+                                                                <Button Name="addMakeButton" Content="Add Make" Margin="0,0,0,10" Click="addMakeButton_Click">
+                                                                    <Button.Flyout>
+                                                                        <Flyout>
+                                                                            <RelativePanel>
+                                                                                <TextBox Header="Add Make:" Name="addMakeTextBox" MinWidth="170" MaxLength="13"/>
+                                                                                <Button Name="okAddMakeButton" Content="OK" RelativePanel.Below="addMakeTextBox" Margin="10" Width="64" Click="okAddMakeButton_Click"/>
+                                                                                <Button Name="cancelAddMakeButton" Margin="10" Content="Cancel" RelativePanel.RightOf="okAddMakeButton" RelativePanel.Below="addMakeTextBox" Width="64" Click="cancelAddMakeButton_Click"/>
+                                                                            </RelativePanel>
+                                                                        </Flyout>
+                                                                    </Button.Flyout>
+                                                                </Button>
+                                                                <Button Name="deleteMakeButton" Content="Delete Make" IsEnabled="False" Click="deleteMakeButton_Click">
+                                                                    <Button.Flyout>
+                                                                        <Flyout x:Name="deleteMakeFlyout" Closed="deleteMakeFlyout_Closed">
+                                                                            <StackPanel>
+                                                                                <TextBlock Text="Select the Make you want to delete:" Margin="0,0,0,10"/>
+                                                                                <ListView Name="MakesToDelete" Background="White" Margin="0,0,0,10" Height="250  " SelectionChanged="MakesToDelete_SelectionChanged">
+                                                                                    <ListView.ItemTemplate>
+                                                                                        <DataTemplate>
+                                                                                            <TextBlock Name="deleteableMake" Text="{Binding Path=Make}"/>
+                                                                                        </DataTemplate>
+                                                                                    </ListView.ItemTemplate>
+                                                                                </ListView>
+                                                                                <StackPanel Orientation="Horizontal">
+                                                                                    <Button Name="deleteMake" Content="Delete" Margin="0,0,10,0" Click="deleteMake_Click" IsEnabled="False"/>
+                                                                                    <Button Name="cancelDeleteMake" Content="Close" Click="cancelDeleteMake_Click"/>
+                                                                                </StackPanel>
+                                                                            </StackPanel>
+                                                                        </Flyout>
+                                                                    </Button.Flyout>
+                                                                </Button>
+                                                            </StackPanel>
+                                                        </Flyout>
+                                                    </Button.Flyout>
+                                                </Button>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Model" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
+                                                <TextBox Name="model" Margin="5,2,2,2" MinWidth="84" MaxWidth="108" MaxLength="20" Width="108"/>
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
+                                                <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" Background="White" BorderBrush="#FF7A7A7A">
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <StackPanel VerticalAlignment="Center" Margin="35,0,0,0">
+                                            <RadioButton GroupName="conditionBtns" Name="good" Content="Good" Foreground="Lime" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
+                                            <RadioButton GroupName="conditionBtns" Name="bad" Content="Bad" Foreground="Red" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
+                                            <RadioButton GroupName="conditionBtns" Name="unsure" Content="Unsure" Foreground="Yellow" MinWidth="90" Checked="ConditionRadioButtons_Checked" Click="ConditionRadioButtons_Click"/>
+                                        </StackPanel>
+                                    </StackPanel>
 
-                            <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
-                                <PivotItem Header="Local" Style="{StaticResource stylePivotItem}">
-                                    <StackPanel Background="White" Margin="10">
+                                    <TextBlock Text="Comments or Keywords:" Margin="5,4,0,0" Foreground="White"/>
+                                    <TextBox Name="comments" TextWrapping="Wrap" Height="32" MaxLength="200" Margin="5,0,0,0" MinWidth="300" HorizontalAlignment="Left"/>
 
-                                        <ListBox Margin="2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="42" />
-                                                    <ColumnDefinition Width="80" />
-                                                    <ColumnDefinition Width="90" />
-                                                    <ColumnDefinition Width="40" />
-                                                    <ColumnDefinition Width="50" />
-                                                    <ColumnDefinition Width="78"/>
-                                                    <ColumnDefinition Width="67"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="Year" HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="1" Text="Make" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2" Text="Model" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="3" Text="Eng." HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="4" Text="RPM" HorizontalAlignment="Left" FontWeight="Bold" />
-                                                <TextBlock Grid.Column="5" Text="Air Temp." FontWeight="Bold"/>
-                                                <TextBlock Grid.Column="6" Text="Altitude" FontWeight="Bold"/>
-                                            </Grid>
-                                        </ListBox>
-                                        
-                                        <ListBox Margin="2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="42" />
-                                                    <ColumnDefinition Width="80" />
-                                                    <ColumnDefinition Width="90" />
-                                                    <ColumnDefinition Width="40" />
-                                                    <ColumnDefinition Width="50" />
-                                                    <ColumnDefinition Width="68"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="8888" />
-                                                <TextBlock Grid.Column="1" Text="Forddfdfeedfdfdf" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2" Text="Explorernunuun" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="3" Text="8.8L" HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="4" Text="8888" HorizontalAlignment="Left"/>
-                                                <TextBlock Grid.Column="5" Text="888F" TextTrimming="CharacterEllipsis"/>
-                                            </Grid>
-                                        </ListBox>
-
-                                        <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
-
-                                        <ListView Name="localRecords" Margin="2,0,2,2" Background="White" ScrollViewer.VerticalScrollBarVisibility="Visible" IsItemClickEnabled="True" SelectionMode="None" >
-                                            <ListView.ItemTemplate>
-                                                <DataTemplate>
-                                                    <Grid Name="gridForData" Width="300">
-
-                                                        <Grid.ColumnDefinitions>
-                                                            <ColumnDefinition Width="42" />
-                                                            <ColumnDefinition Width="80" />
-                                                            <ColumnDefinition Width="90" />
-                                                            <ColumnDefinition Width="40" />
-                                                            <ColumnDefinition Width="50" />
-                                                        </Grid.ColumnDefinitions>
-
-                                                        <TextBlock Grid.Column="0" Text="{Binding Path=Year}" HorizontalAlignment="Left" />
-                                                        <TextBlock Grid.Column="1" Text="{Binding Path=Make}" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Grid.Column="2" Text="{Binding Path=Model}" HorizontalAlignment="Left" Width="85" TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Grid.Column="3" Text="{Binding Path=Engine}" HorizontalAlignment="Left" />
-                                                        <TextBlock Grid.Column="4" Text="{Binding Path=Condition}" HorizontalAlignment="Left" Name="tblkListCondition" />
-
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ListView.ItemTemplate>
-                                        </ListView>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Name="searchButton" Style="{StaticResource blueButtonStyle}" Margin="5,10,0,0" Click="searchButton_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11A;" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Search" Margin="5,0,0,0"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Name="saveButton" Style="{StaticResource blueButtonStyle}" Margin="10,10,0,0" Width="76" Click="saveButton_Click">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE74E;" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Save" Margin="5,0,0,0"/>
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Name="resetButton" Content="Reset" Style="{StaticResource blueButtonStyle}" Margin="12,10,0,0" Click="resetButton_Click"/>
 
                                     </StackPanel>
-                                </PivotItem>
-                                
-                                <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
-                                    
-                                </PivotItem>
-                                
-                            </Pivot>
+                                </StackPanel>
 
-                        </Grid>
-                        <!--<Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <Grid Grid.Row="0">
-                                <ListView Background="White" Margin="20,20,0,20" Width="1500"/>
-                            </Grid>
-                            <Grid Grid.Row="1">
-                                <ListBox Margin="2,10,2,0" Background="#FFC2C3C9" BorderBrush="Black" BorderThickness="0,0,0,1">
-                                    <Grid Width="320">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="42" />
-                                            <ColumnDefinition Width="80" />
-                                            <ColumnDefinition Width="90" />
-                                            <ColumnDefinition Width="40" />
-                                            <ColumnDefinition Width="50" />
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Text="Year" HorizontalAlignment="Left" FontWeight="Bold" />
-                                        <TextBlock Grid.Column="1" Text="Make" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Column="2" Text="Model" HorizontalAlignment="Left" FontWeight="Bold" TextTrimming="CharacterEllipsis" />
-                                        <TextBlock Grid.Column="3" Text="Eng." HorizontalAlignment="Left" FontWeight="Bold" />
-                                        <TextBlock Grid.Column="4" Text="Cond." HorizontalAlignment="Left" FontWeight="Bold" />
-                                    </Grid>
-                                </ListBox>
+                                <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
-                                <ListView Name="localRecords" Margin="2,0,2,2" Background="White" ScrollViewer.VerticalScrollBarVisibility="Visible" Height="320" IsItemClickEnabled="True" SelectionMode="None" >
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Name="gridForData" Width="300">
+                                    <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}" >
 
+                                        <Grid Padding="10">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <StackPanel Name="searchedForPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Visible" Margin="0,-5,0,10">
+                                                <TextBlock Foreground="White">
+                                                    <Span><Underline>Showing results for</Underline>:</Span>
+                                                </TextBlock>
+                                                <TextBlock Name="searchedForText" Foreground="White" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" HorizontalAlignment="Left"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Row="1" Background="White">
+
+                                                <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="64" />
+                                                        <!--Year-->
+                                                        <ColumnDefinition Width="90" />
+                                                        <!--Make-->
+                                                        <ColumnDefinition Width="100" />
+                                                        <!--Model-->
+                                                        <ColumnDefinition Width="50" />
+                                                        <!--Engine-->
+                                                        <ColumnDefinition Width="90"/>
+                                                        <!--Condition-->
+                                                        <ColumnDefinition Width="57"/>
+                                                        <!--VE-->
+                                                        <ColumnDefinition Width="78"/>
+                                                        <!--MAF-->
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <!--Comments-->
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
+                                                    <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
+                                                    <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
+                                                    <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
+                                                    <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
+                                                    <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE%" />
+                                                    <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
+                                                    <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0" Text="Comments/Keywords" />
+
+                                                    <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                    <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+
+                                                </Grid>
+
+                                                <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+
+                                                <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
+                                                    <ListView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid Name="gridForData">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="52"/>
+                                                                    <!--Year-->
+                                                                    <ColumnDefinition Width="90"/>
+                                                                    <!--Make-->
+                                                                    <ColumnDefinition Width="100"/>
+                                                                    <!--Model-->
+                                                                    <ColumnDefinition Width="50"/>
+                                                                    <!--Engine-->
+                                                                    <ColumnDefinition Width="90"/>
+                                                                    <!--Condition-->
+                                                                    <ColumnDefinition Width="57"/>
+                                                                    <!--VE-->
+                                                                    <ColumnDefinition Width="44"/>
+                                                                    <!--MAF-->
+                                                                    <ColumnDefinition Width="34"/>
+                                                                    <!--MAF units-->
+                                                                    <ColumnDefinition Width="Auto"/>
+                                                                    <!--Comments-->
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
+                                                                <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
+
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ListView.ItemTemplate>
+                                                </ListView>
+
+                                            </StackPanel>
+                                            
+                                        </Grid>
+
+                                    </PivotItem>
+
+                                    <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
+                                        <StackPanel Background="White" Margin="10">
+
+                                            <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
                                                 <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="42" />
-                                                    <ColumnDefinition Width="80" />
+                                                    <ColumnDefinition Width="64" />
+                                                    <!--Year-->
                                                     <ColumnDefinition Width="90" />
-                                                    <ColumnDefinition Width="40" />
+                                                    <!--Make-->
+                                                    <ColumnDefinition Width="100" />
+                                                    <!--Model-->
                                                     <ColumnDefinition Width="50" />
+                                                    <!--Engine-->
+                                                    <ColumnDefinition Width="90"/>
+                                                    <!--Condition-->
+                                                    <ColumnDefinition Width="57"/>
+                                                    <!--VE-->
+                                                    <ColumnDefinition Width="78"/>
+                                                    <!--MAF-->
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <!--Comments-->
                                                 </Grid.ColumnDefinitions>
 
-                                                <TextBlock Grid.Column="0" Text="{Binding Path=Year}" HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="1" Text="{Binding Path=Make}" HorizontalAlignment="Left" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="2" Text="{Binding Path=Model}" HorizontalAlignment="Left" Width="85" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Grid.Column="3" Text="{Binding Path=Engine}" HorizontalAlignment="Left" />
-                                                <TextBlock Grid.Column="4" Text="{Binding Path=Condition}" HorizontalAlignment="Left" Name="tblkListCondition" />
+                                                <TextBlock Grid.Column="0"  VerticalAlignment="Center" Margin="17,0,0,0" Text="Year"/>
+                                                <TextBlock Grid.Column="1"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Make" />
+                                                <TextBlock Grid.Column="2"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Model"/>
+                                                <TextBlock Grid.Column="3"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Eng." />
+                                                <TextBlock Grid.Column="4"  VerticalAlignment="Center" Margin="5,0,0,0" Text="Condition" />
+                                                <TextBlock Grid.Column="5"  VerticalAlignment="Center" Margin="5,0,0,0" Text="VE%" />
+                                                <TextBlock Grid.Column="6"  VerticalAlignment="Center" Margin="5,0,0,0" Text="MAF" />
+                                                <TextBlock Grid.Column="7"  VerticalAlignment="Center" Margin="5,0" Text="Comments/Keywords" />
+
+                                                <Rectangle Grid.Column="0"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="1"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="2"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="3"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="4"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="5"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
+                                                <Rectangle Grid.Column="6"  HorizontalAlignment="Right" Width="1" Fill="Black" UseLayoutRounding="False"/>
 
                                             </Grid>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                </ListView>
 
-                                <TextBlock Name="noResults" Text="No results found..." Foreground="White" Margin="10,5,5,5" Visibility="Collapsed"/>
-                                
+                                            <TextBlock Name="globalNoResults" Text="Not yet available. Planned for future release." Margin="10,5,5,5" Visibility="Visible"/>
+
+                                            <ListView Name="globalRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Name="gridForGlobalData">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="52"/>
+                                                                <!--Year-->
+                                                                <ColumnDefinition Width="90"/>
+                                                                <!--Make-->
+                                                                <ColumnDefinition Width="100"/>
+                                                                <!--Model-->
+                                                                <ColumnDefinition Width="50"/>
+                                                                <!--Engine-->
+                                                                <ColumnDefinition Width="90"/>
+                                                                <!--Condition-->
+                                                                <ColumnDefinition Width="57"/>
+                                                                <!--VE-->
+                                                                <ColumnDefinition Width="44"/>
+                                                                <!--MAF-->
+                                                                <ColumnDefinition Width="34"/>
+                                                                <!--MAF units-->
+                                                                <ColumnDefinition Width="Auto"/>
+                                                                <!--Comments-->
+                                                            </Grid.ColumnDefinitions>
+
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
+
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                            </ListView>
+
+                                        </StackPanel>
+                                    </PivotItem>
+
+                                    <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged">
+                                        <Viewbox>
+                                            <StackPanel Name="ChartsStackPanel" Orientation="Horizontal">
+
+                                                <Grid Name="VEchart" Width="500" Height="500" Background="Black" Margin="5">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="60"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="60"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="60"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="60"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
+                                                    <Span><Underline>VE chart</Underline></Span>
+                                                    </TextBlock>
+                                                    <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
+                                                    <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="VE (%)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
+                                                        <TextBlock.RenderTransform>
+                                                            <CompositeTransform Rotation="-90"/>
+                                                        </TextBlock.RenderTransform>
+                                                    </TextBlock>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
+                                                    <Grid Name="vePlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                    <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                    <TextBlock Name="veChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
+                                                    <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Good" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Bad" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Unsure" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                </Grid>
+
+                                                <Grid Name="MAFchart" Width="500" Height="500" Background="Black" Margin="5">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="60"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="60"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="60"/>
+                                                        <RowDefinition Height="*"/>
+                                                        <RowDefinition Height="60"/>
+                                                    </Grid.RowDefinitions>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
+                                                        <Span><Underline>MAF chart</Underline></Span>
+                                                    </TextBlock>
+                                                    <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
+                                                    <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                    <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                    <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
+                                                        <TextBlock.RenderTransform>
+                                                            <CompositeTransform Rotation="-90"/>
+                                                        </TextBlock.RenderTransform>
+                                                    </TextBlock>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" HorizontalAlignment="Left" Width="2"/>
+                                                    <Rectangle Grid.Row="1" Grid.Column="1" Fill="White" VerticalAlignment="Bottom" Height="2"/>
+                                                    <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1" Background="Black"/>
+                                                    <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                    <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
+                                                    <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Good" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1" />
+                                                            <TextBlock Text="Bad" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Unsure" Foreground="White"/>
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                            <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+
+                                                </Grid>
+                                                
+                                            </StackPanel>
+                                        </Viewbox>
+                                    </PivotItem>
+
+                                </Pivot>
                             </Grid>
-                        </Grid>-->
-                        
-                    </Grid>
-                    
+                        </Grid>
+                    </ScrollViewer>
+
                 </Grid>
             </PivotItem>
 
-            <PivotItem Name="saveOrSearchPivotItem" Background="#FF812020">
-                <Grid Name="saveOrSearchGrid"/>
-            </PivotItem>
-            <PivotItem Name="databasePivotItem" Background="#FF244F8D">
+            <PivotItem Name="databasePivotItem">
                 <Grid Name="databaseGrid"/>
             </PivotItem>
+
+            <PivotItem Name="helpPivotItem">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel Name="helpGrid" Background="#BF000000">
+
+                        <Button Name="instructionsButton" Style="{StaticResource blueButtonStyle}" Click="instructionsButton_Click" Margin="5,5,0,0" Width="257" HorizontalContentAlignment="Left">
+                            <Grid Width="235">
+                                <TextBlock Text="How to calculate MAF and VE"/>
+                                <FontIcon Name="expandInstructionsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right"/>
+                            </Grid>
+                        </Button>
+                        <RichTextBlock Name="instructions" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
+                            <Paragraph>
+                                <Span Foreground="#FF3399FF">1.</Span>
+                                <Run Text=" Connect your scan tool to the car, and set it to record these data PIDs: RPM, MAF and IAT. If you record more PIDs, the data transfer could be too slow."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">2.</Span>
+                                <Run Text=" Find a safe area to drive the car at wide open throttle (WOT) until the RPMs are close to redline. It's important to drive WOT for best calculator results."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">3.</Span>
+                                <Run Text=" Review your recording and find the highest MAF data and use that point for your MAF, RPM, and IAT input for the calculator."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">4.</Span>
+                                <Run Text=" Input your data: RPM, MAF, Engine size, IAT, and Elevation. Then click the Calculate button to get the results."/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                        <Button Name="interpretResultsButton" Style="{StaticResource blueButtonStyle}" Margin="5,5,0,0" Click="interpretResultsButton_Click" Width="257" HorizontalContentAlignment="Left">
+                            <Grid Width="235">
+                                <TextBlock Text="How to interpret the results"/>
+                                <FontIcon Name="expandInterpretResultsIcon" FontFamily="Segoe MDL2 Assets" Glyph="&#xE972;" HorizontalAlignment="Right" />
+                            </Grid>
+                        </Button>
+                        <RichTextBlock Name="interpretResults" Margin="30,20,10,20" Foreground="White" Visibility="Collapsed">
+                            <Paragraph>
+                                <Span Foreground="#FF3399FF">1.</Span>
+                                <Run Text=" VE varies with engine design. Average engines may be 80-85%, and well breathing engines 90-100%. Turbo and SC engines will be over 100%."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">2.</Span>
+                                <Run Text=" If a naturally aspirated engine is below 75% VE, that's a good indicator of a problem."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">3.</Span>
+                                <Run Text=" Low VE calculations can be caused by a faulty MAF sensor, but can also be from an engine breathing problem."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">4.</Span>
+                                <Run Text=" To figure out which is the case. Take another road test and record all of the fuel trim data PIDs."/>
+                                <LineBreak/>
+                                <LineBreak/>
+                                <Span Foreground="#FF3399FF">5.</Span>
+                                <Run Text=" If fuel trims show large positive values at medium to high load, then the MAF sensor is suspect. If fuel trims are closer to zero without much change under load, then check for an engine breathing problem like restricted exhaust or intake, incorrect valve timing, etc..."/>
+                            </Paragraph>
+                        </RichTextBlock>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </PivotItem>
+
         </Pivot>
 
-        <StackPanel VerticalAlignment="Top" Background="#FF191818">
-            <Button Name="menuButton" Background="#FF3399FF" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top">
+        <StackPanel VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+            <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top" Background="#CC000000">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
                     <TextBlock Text="Menu" Margin="5,0,0,0"/>
                 </StackPanel>
                 <Button.Flyout>
-                    <MenuFlyout MenuFlyoutPresenterStyle="{StaticResource styleMenuFlyout}" Placement="Bottom">
-                        <MenuFlyoutItem Text="Go to:" IsEnabled="False"/>
-                        <MenuFlyoutItem Name="calculatorMenuItem" Text="            Calculator" Click="calculatorMenuItem_Click"/>
-                        <MenuFlyoutItem Name="saveOrSearchMenuItem" Text="            Save or Search" Click="saveOrSearchMenuItem_Click" />
-                        <MenuFlyoutItem Name="databaseMenuItem" Text="            Database" Click="databaseMenuItem_Click" />
+                    <MenuFlyout Placement="Bottom">
+                        <MenuFlyoutItem Name="calculatorMenuItem" Text="Calculator" Click="calculatorMenuItem_Click"/>
+                        <MenuFlyoutItem Name="searchMenuItem" Text="Open" Click="databaseMenuItem_Click"/>
+                        <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
-                        <MenuFlyoutItem Name="printMenuItem" Text="Print" Click="printMenuItem_Click" />
-                        <MenuFlyoutItem Name="shareMenuItem" Text="Share" Click="shareMenuItem_Click" />
-                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Name="backgroundMenuItem" Text="Background" Click="backgroundMenuItem_Click" />
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
+                        <MenuFlyoutSeparator/>
+                        <MenuFlyoutItem Name="exitMenuItem" Text="Exit" Click="exitMenuItem_Click"/>
                     </MenuFlyout>
                 </Button.Flyout>
             </Button>
         </StackPanel>
-        
+
+        <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
+
+            <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" MinWidth="360">
+
+                <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+
+                <Grid HorizontalAlignment="Center" Padding="10" Background="LightGray" >
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,20,0">
+                        <TextBlock HorizontalAlignment="Left" Text="Engine Speed"/>
+                        <TextBlock HorizontalAlignment="Left" Text="MAF"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Intake Air Temp"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Elevation" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Expected MAF"/>
+                        <TextBlock HorizontalAlignment="Left" Text="MAF Difference"/>
+                        <TextBlock HorizontalAlignment="Left" Text="VE" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Left" Text="Condition"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Left" >
+                        <TextBlock HorizontalAlignment="Right" Name="RPM"/>
+                        <TextBlock HorizontalAlignment="Right" Name="MAF"/>
+                        <TextBlock HorizontalAlignment="Right" Name="AIR"/>
+                        <TextBlock HorizontalAlignment="Right" Name="ELEVATION" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Right" Name="EXPECTED"/>
+                        <TextBlock HorizontalAlignment="Right" Name="DIFF"/>
+                        <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0">
+                        <TextBlock HorizontalAlignment="Left" Text="RPM"/>
+                        <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
+                        <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Left" Text="g/s"/>
+                        <TextBlock HorizontalAlignment="Left" Text="%"/>
+                        <TextBlock HorizontalAlignment="Left" Text="%" Margin="0,0,0,20"/>
+                        <TextBlock HorizontalAlignment="Left"/>
+                    </StackPanel>
+
+                </Grid>
+
+                <TextBox Name="COMMENTS" Header="Comments/Keywords:" IsReadOnly="True" HorizontalAlignment="Center" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextWrapping="Wrap" MaxWidth="345" Margin="0,20,0,0"/>
+                <Button Name="closeRecordPopUpButton" Content="Close" Margin="0,20,0,0" Click="closeRecordPopUpButton_Click" HorizontalAlignment="Center"/>
+
+            </StackPanel>
+
+            <StackPanel Name="backgroundOptionsPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
+                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White">
+                <Span><Underline>Background options</Underline></Span>
+                <Span>:</Span>
+                </TextBlock>
+                <RadioButton Name="yesImage" Content="Bing image of the day" Foreground="White" Checked="backgroundOption_Checked"/>
+                <RadioButton Name="noImage" Content="No background image" Foreground="White" Margin="0,0,0,20" Checked="backgroundOption_Checked"/>
+                <Button Name="doneBackgroundOptions" HorizontalAlignment="Center" Content="Done" Style="{StaticResource blueButtonStyle}" Click="doneBackgroundOptions_Click"/>
+            </StackPanel>
+
+        </Grid>
+
     </Grid>
 </Page>

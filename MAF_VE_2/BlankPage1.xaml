@@ -7,22 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
 
-        <StackPanel Orientation="Horizontal">
-            <Grid Background="CadetBlue" Width="200" Height="200"/>
-            <TextBox Header="You searched for:" Text="2000 Ford Ranger 3.0L VIN U Good" TextWrapping="Wrap"/>
-            
-        </StackPanel>
-
-        <Pivot Grid.Row="1" Background="#FF191818" Template="{StaticResource myPivotTemplate}">
-            <PivotItem Header="Local" Style="{StaticResource stylePivotItem}"/>
-            <PivotItem Header="Global" Style="{StaticResource stylePivotItem}"/>
-        </Pivot>
-
+    <Grid Background="Gray">
     </Grid>
+
 </Page>
