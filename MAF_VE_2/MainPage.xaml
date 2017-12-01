@@ -46,7 +46,7 @@
             </Image.Source>-->
         </Image>
 
-        <Pivot Name="mainPivot">
+        <Pivot Name="mainPivot" Template="{StaticResource mainPivotTemplate}">
 
             <PivotItem Name="frontPivotItem">
                 <Grid Name="mainGrid">

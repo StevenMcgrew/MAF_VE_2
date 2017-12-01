@@ -113,7 +113,7 @@ namespace MAF_VE_2
             double minEngineSize = 0.1;
             for (double i = minEngineSize; i <= maxEngineSize; i = i + 0.1)
             {
-                string itemToAdd = i.ToString("0.0");
+                string itemToAdd = i.ToString("0.0") + "L";
                 engine.Items.Add(itemToAdd);
             }
         }
@@ -674,6 +674,7 @@ namespace MAF_VE_2
 
         private void helpMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            //Frame.Navigate(typeof(BlankPage1));
             mainPivot.SelectedItem = helpPivotItem;
         }
 
@@ -1087,7 +1088,7 @@ namespace MAF_VE_2
                     if (engine.SelectedItem != null)
                     {
                         ENGINE = engine.SelectedItem.ToString();
-                        searchedForList.Add(ENGINE + "L");
+                        searchedForList.Add(ENGINE);
 
                         if (ENGINE != "")
                         {
