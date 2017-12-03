@@ -3,8 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
 using Windows.Data.Json;
 using Windows.Storage;
+using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Popups;
@@ -254,10 +258,12 @@ namespace MAF_VE_2
                     copyright.Text = "Image: " + copyrightText;
                 }
                 copyrightSetSuccessfully = true;
+                copyrightButton.BorderThickness = new Thickness(1);
             }
             catch
             {
                 copyright.Text = "Image: Could not get copyright info";
+                copyrightButton.BorderThickness = new Thickness(1);
                 copyrightSetSuccessfully = false;
             }
             finally
@@ -334,6 +340,97 @@ namespace MAF_VE_2
             SetBackgroundImage();
         }
 
+        private void copyrightButton_Click(object sender, RoutedEventArgs e)
+        {
+            mainPivotFadeOutStory.Begin();
+            menuButton.Opacity = 0.00;
+            copyright2.Text = copyright.Text;
+            imageSavePanel.Visibility = Visibility.Visible;
+        }
+
+        private void closeImageSaverButton_Click(object sender, RoutedEventArgs e)
+        {
+            mainPivotFadeInStory.Begin();
+            menuButton.Opacity = 1.00;
+            imageSavePanel.Visibility = Visibility.Collapsed;
+        }
+
+        private async void saveImageButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Get image file from LocalFolder
+            StorageFile imageFile;
+            try
+            {
+                imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("BingImageOfTheDay.jpg");
+            }
+            catch
+            {
+                await new MessageDialog("Sorry, there was a problem getting the image file.").ShowAsync();
+                return;
+            }
+
+            // Let user save image with FileSavePicker
+            try
+            {
+                FileSavePicker savePicker = new FileSavePicker();
+                savePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+                savePicker.SuggestedFileName = await CreateFileNameFromCopyrightInfo();
+                savePicker.FileTypeChoices.Add(".jpg Joint Photographic Experts Group", new List<string>() { ".jpg" });
+                StorageFile file = await savePicker.PickSaveFileAsync();
+
+                if (file != null)
+                {
+                    await imageFile.CopyAndReplaceAsync(file);
+                }
+            }
+            catch
+            {
+                await new MessageDialog("Sorry, there was a problem saving the image file.").ShowAsync();
+            }
+        }
+
+        async Task<string> CreateFileNameFromCopyrightInfo()
+        {
+            string fileName = "Bing_image_of_the_day";
+            try
+            {
+                // Get and set initial fileName
+                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
+                string copyrightText = await FileIO.ReadTextAsync(copyrightFile);
+                fileName = copyrightText;
+
+                // Remove copyright info from the end of the string
+                int indexOfChar = fileName.IndexOf('(');
+                if (indexOfChar > 1)
+                {
+                    fileName = fileName.Remove(indexOfChar - 1);
+                }
+
+                // Rebuild string with common characters only
+                StringBuilder sb = new StringBuilder();
+                foreach (char c in fileName)
+                {
+                    if ((c >= '0' && c <= '9') ||
+                        (c >= 'A' && c <= 'Z') ||
+                        (c >= 'a' && c <= 'z') ||
+                        (c == ' '))
+                    {
+                        sb.Append(c);
+                    }
+                }
+                fileName = sb.ToString();
+
+                // Replace spaces with underscores.
+                fileName = fileName.Replace(' ', '_');
+            }
+            catch
+            {
+                fileName = "Bing_image_of_the_day";
+            }
+
+            return fileName;
+        }
+
         #endregion
 
         #region Databases
@@ -388,11 +485,21 @@ namespace MAF_VE_2
             rbCheckFired = true;
         }
 
-        private void YearMakeOrEngine_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void YearOrMake_DropDownOpened(object sender, object e)
         {
             var comboBox = sender as ComboBox;
 
-            if (comboBox.SelectedIndex == -1) // Index -1 is the Unselected state where the Placeholder text shows, so exit this event since we don't need to do anything. This also prevents reevaluating the selection when we set the selection here (breaks the loop).
+            if (comboBox.SelectedIndex == -1) // Nothing has been selected yet
+            {
+                comboBox.SelectedIndex = 0;
+            }
+        }
+
+        private void YearMakeOrEngine_DropDownClosed(object sender, object e)
+        {
+            var comboBox = sender as ComboBox;
+
+            if (comboBox.SelectedIndex == -1)  // No item is selected.........Index -1 is the unselected state where the Placeholder text shows, so exit this event since we don't need to do anything. This also prevents reevaluating the selection when we set the selection here (breaks the loop).
             {
                 return;
             }
@@ -401,40 +508,7 @@ namespace MAF_VE_2
 
             if (selectedItem == "Select")
             {
-                var name = comboBox.Name;
-
-                switch (name)
-                {
-                    case "year":
-                        year.SelectedIndex = -1;
-                        break;
-                    case "make":
-                        make.SelectedIndex = -1;
-                        break;
-                    case "engine":
-                        engine.SelectedIndex = -1;
-                        break;
-                }
-            }
-        }
-
-        private void YearOrMake_DropDownOpened(object sender, object e)
-        {
-            var comboBox = sender as ComboBox;
-
-            if (comboBox.SelectedIndex == -1) // Nothing has been selected yet
-            {
-                var name = comboBox.Name;
-
-                switch (name)
-                {
-                    case "year":
-                        year.SelectedIndex = 1; // Go to top of list for user to start out there
-                        break;
-                    case "make":
-                        make.SelectedIndex = 1; // Go to top of list for user to start out there
-                        break;
-                }
+                comboBox.SelectedIndex = -1;
             }
         }
 
@@ -597,11 +671,11 @@ namespace MAF_VE_2
 
             if (mainPage.ActualHeight < 560)
             {
-                copyrightBorder.Opacity = 0.0;
+                copyrightButton.Opacity = 0.0;
             }
             else
             {
-                copyrightBorder.Opacity = 1.0;
+                copyrightButton.Opacity = 1.0;
             }
         }
 
@@ -994,7 +1068,7 @@ namespace MAF_VE_2
             YMME.Text = item.Year + " " +
                         item.Make + " " +
                         item.Model + " " +
-                        item.Engine + "L";
+                        item.Engine;
 
             RPM.Text = item.Engine_speed.ToString();
             MAF.Text = item.MAF.ToString();
@@ -1018,7 +1092,6 @@ namespace MAF_VE_2
             popUpPanelBackground.Visibility = Visibility.Collapsed;
             recordPopUp.Visibility = Visibility.Collapsed;
         }
-
 
         #endregion
 
@@ -1491,6 +1564,11 @@ namespace MAF_VE_2
             }
         }
 
+        private void PivotItem_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            recordsPanel.ChangeView(null, recordsPanel.VerticalOffset - e.GetCurrentPoint(recordsPanel).Properties.MouseWheelDelta, null);
+        }
+
         #endregion
 
         #region Background options
@@ -1516,6 +1594,7 @@ namespace MAF_VE_2
                 {
                     backgroundImage.ClearValue(Image.SourceProperty);
                     copyright.ClearValue(TextBlock.TextProperty);
+                    copyrightButton.BorderThickness = new Thickness(0);
                     localSettings.Values[BackgroundImageSetting] = false;
                 }
             }
@@ -1529,9 +1608,48 @@ namespace MAF_VE_2
 
         #endregion
 
+        #region Other menu items
+
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Exit();
         }
+
+        private void aboutMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            aboutPopUp.Visibility = Visibility.Visible;
+            
+            aboutTextBody.Text = "Version " + GetAppVersion() + "\n" +
+                                 "Copyright \u00A9 2017 Steven McGrew \n" +
+                                 "All rights reserved";
+        }
+
+        private void aboutCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+            aboutPopUp.Visibility = Visibility.Collapsed;
+        }
+
+        string GetAppVersion()
+        {
+            Package package = Package.Current;
+            PackageId packageId = package.Id;
+            PackageVersion version = packageId.Version;
+
+            ushort[] versionProperties =
+            {
+                version.Major,
+                version.Minor,
+                version.Build,
+                version.Revision
+            };
+
+            return String.Join(".", versionProperties);
+        }
+
+        #endregion
+
+        
     }
 }

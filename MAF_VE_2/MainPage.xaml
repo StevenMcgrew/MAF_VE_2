@@ -36,6 +36,12 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:0.7" Value="275"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+        <Storyboard x:Name="mainPivotFadeOutStory">
+            <DoubleAnimation Duration="0:0:0.5" To="0" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="mainPivot" d:IsOptimized="True"/>
+        </Storyboard>
+        <Storyboard x:Name="mainPivotFadeInStory">
+            <DoubleAnimation Duration="0:0:0.5" To="1" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="mainPivot" d:IsOptimized="True"/>
+        </Storyboard>
     </Page.Resources>
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
@@ -166,9 +172,15 @@
 
                     </ScrollViewer>
 
-                    <Border Name="copyrightBorder" Margin="-12,0,0,10" Grid.Column="0" Background="#BF000000" VerticalAlignment="Bottom" HorizontalAlignment="Center">
+                    <Button Name="copyrightButton" Style="{StaticResource blueButtonStyle}" BorderThickness="0" Margin="-12,0,0,10" Grid.Column="0" Background="#BF000000" VerticalAlignment="Bottom" HorizontalAlignment="Center" Padding="0" MaxWidth="334" FontSize="12" Foreground="White" Click="copyrightButton_Click">
+                        <Button.Content>
+                            <TextBlock Name="copyright" MaxWidth="334" FontSize="12" VerticalAlignment="Top" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left"/>
+                        </Button.Content>
+                    </Button>
+
+                    <!--<Border Name="copyrightBorder" Margin="-12,0,0,10" Grid.Column="0" Background="#BF000000" VerticalAlignment="Bottom" HorizontalAlignment="Center">
                         <TextBlock Name="copyright" MaxWidth="334" FontSize="12" VerticalAlignment="Top" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left"/>
-                    </Border>
+                    </Border>-->
 
                     <ScrollViewer Name="recordsPanel" VerticalScrollBarVisibility="Auto" Grid.Column="1" Background="#99000000">
 
@@ -183,11 +195,11 @@
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Year" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="year" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
+                                            <ComboBox Name="year" Margin="5,2,2,2" PlaceholderText="Select" Width="108" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A" DropDownClosed="YearMakeOrEngine_DropDownClosed"/>
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Make" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
+                                            <ComboBox Name="make" Margin="5,2,0,2" PlaceholderText="Select" MaxWidth="108" Width="108" DropDownClosed="YearMakeOrEngine_DropDownClosed" DropDownOpened="YearOrMake_DropDownOpened" Background="White" BorderBrush="#FF7A7A7A"/>
                                             <Button Name="makeOptionsButton" FontFamily="Segoe MDL2 Assets" Content="&#xE948;" Height="32" Margin="0" Padding="0" Width="32" Click="makeOptionsButton_Click" Style="{StaticResource blueButtonStyle}">
                                                 <Button.Flyout>
                                                     <Flyout>
@@ -234,7 +246,7 @@
                                         </StackPanel>
                                         <StackPanel Orientation="Horizontal">
                                             <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                            <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" SelectionChanged="YearMakeOrEngine_SelectionChanged" Background="White" BorderBrush="#FF7A7A7A">
+                                            <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" DropDownClosed="YearMakeOrEngine_DropDownClosed" Background="White" BorderBrush="#FF7A7A7A">
                                             </ComboBox>
                                         </StackPanel>
                                     </StackPanel>
@@ -268,7 +280,7 @@
 
                             <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
-                                <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}" >
+                                <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}" PointerWheelChanged="PivotItem_PointerWheelChanged" >
 
                                     <Grid Padding="10">
                                         <Grid.RowDefinitions>
@@ -276,12 +288,12 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
 
-                                        <StackPanel Name="searchedForPanel" Grid.Row="0" Orientation="Horizontal" Visibility="Visible" Margin="0,-5,0,10">
-                                            <TextBlock Foreground="White">
+                                        <Grid Name="searchedForPanel" Grid.Row="0" Margin="0,-5,0,10">
+                                            <TextBlock Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top">
                                                     <Span><Underline>Showing results for</Underline>:</Span>
                                             </TextBlock>
-                                            <TextBlock Name="searchedForText" Foreground="White" TextTrimming="CharacterEllipsis" Margin="5,0,0,0" HorizontalAlignment="Left"/>
-                                        </StackPanel>
+                                            <TextBlock Name="searchedForText" Foreground="White" Margin="135,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords"/>
+                                        </Grid>
 
                                         <StackPanel Grid.Row="1" Background="White">
 
@@ -326,7 +338,7 @@
 
                                             <TextBlock Name="noResults" Text="No results found" Margin="10,5,5,5" Visibility="Collapsed"/>
 
-                                            <ListView Name="localRecords" Background="White" ScrollViewer.VerticalScrollBarVisibility="Auto" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" >
+                                            <ListView Name="localRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Disabled" >
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate>
                                                         <Grid Name="gridForData">
@@ -372,7 +384,7 @@
 
                                 </PivotItem>
 
-                                <PivotItem Header="Global" Style="{StaticResource stylePivotItem}">
+                                <PivotItem Header="Global" Style="{StaticResource stylePivotItem}" PointerWheelChanged="PivotItem_PointerWheelChanged" >
                                     <StackPanel Background="White" Margin="10">
 
                                         <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
@@ -459,8 +471,8 @@
                                     </StackPanel>
                                 </PivotItem>
 
-                                <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged">
-                                    <Viewbox>
+                                <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged" PointerWheelChanged="PivotItem_PointerWheelChanged" >
+                                    <Viewbox ScrollViewer.VerticalScrollBarVisibility="Disabled" ManipulationMode="None">
                                         <StackPanel Name="ChartsStackPanel" Orientation="Horizontal">
 
                                             <Grid Name="VEchart" Width="500" Height="500" Background="Black" Margin="5">
@@ -569,6 +581,8 @@
 
                             </Pivot>
 
+                            <Rectangle Grid.Row="1" Height="32" VerticalAlignment="Top" Margin="205,0,0,0" Fill="Transparent"/>
+
                         </Grid>
 
                     </ScrollViewer>
@@ -644,7 +658,7 @@
 
         </Pivot>
 
-        <StackPanel VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+        <StackPanel Name="menuPanel" VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
             <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top" Background="#CC000000">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>
@@ -658,6 +672,7 @@
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="backgroundMenuItem" Text="Background" Click="backgroundMenuItem_Click" />
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
+                        <MenuFlyoutItem Name="aboutMenuItem" Text="About" Click="aboutMenuItem_Click"/>
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="exitMenuItem" Text="Exit" Click="exitMenuItem_Click"/>
                     </MenuFlyout>
@@ -667,9 +682,9 @@
 
         <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
 
-            <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" MinWidth="360">
+            <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" MinWidth="360" BorderBrush="Black" BorderThickness="1">
 
-                <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center" IsTextSelectionEnabled="True"/>
 
                 <Grid HorizontalAlignment="Center" Padding="10" Background="LightGray" >
                     <Grid.ColumnDefinitions>
@@ -728,7 +743,23 @@
                 <Button Name="doneBackgroundOptions" HorizontalAlignment="Center" Content="Done" Style="{StaticResource blueButtonStyle}" Click="doneBackgroundOptions_Click"/>
             </StackPanel>
 
+            <StackPanel Name="aboutPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
+                <TextBlock Text="MAF VE Calculator" FontWeight="Bold" Margin="0,0,0,10" Foreground="White" FontSize="18"/>
+                <TextBlock Name="aboutTextBody" Foreground="White" IsTextSelectionEnabled="True"/>
+                <Button Name="aboutCloseButton" Content="OK" Style="{StaticResource blueButtonStyle}" Click="aboutCloseButton_Click" Margin="0,20,0,0" HorizontalAlignment="Center"/>
+            </StackPanel>
+
         </Grid>
+
+        <StackPanel Name="imageSavePanel" Visibility="Collapsed" VerticalAlignment="Bottom" Margin="10">
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                <Button Name="closeImageSaverButton" Content="Back" Style="{StaticResource blueButtonStyle}" Margin="0,0,10,0" Foreground="White" FontSize="12" Click="closeImageSaverButton_Click"/>
+                <Button Name="saveImageButton" Content="Save Image" Style="{StaticResource blueButtonStyle}" Foreground="White" FontSize="12" Click="saveImageButton_Click"/>
+            </StackPanel>
+            <Border Name="copyrightButton2" Background="#BF000000" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <TextBlock Name="copyright2" FontSize="12" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True"/>
+            </Border>
+        </StackPanel>
 
     </Grid>
 </Page>
