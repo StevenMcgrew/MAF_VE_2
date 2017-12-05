@@ -106,7 +106,9 @@ namespace MAF_VE_2
             else
             {
                 yesImage.IsChecked = true;
-            } 
+            }
+
+            DownloadImageIfNew();
         }
 
         void AddEngineComboboxItems()
@@ -193,37 +195,6 @@ namespace MAF_VE_2
 
         #region Bing image of the day
 
-        void ManageBackgroundImage()
-        {
-            try
-            {
-                Object dateOfLastImageDownloadAsSum = localSettings.Values[DateOfLastImageDownloadAsSum];
-                if (dateOfLastImageDownloadAsSum != null)
-                {
-                    var lastDownloadDateSum = (int)dateOfLastImageDownloadAsSum;
-                    var t = DateTime.Today.Date;
-                    var todaysDateSum = t.Month + t.Day + t.Year;
-
-                    if (lastDownloadDateSum < todaysDateSum)
-                    {
-                        DownloadImageOfTheDay();
-                    }
-                    else
-                    {
-                        SetBackgroundImage();
-                    }
-                }
-                else
-                {
-                    DownloadImageOfTheDay();
-                }
-            }
-            catch
-            {
-                SetBackgroundImage();
-            }
-        }
-
         async void SetBackgroundImage()
         {
             // Set background image first
@@ -275,7 +246,7 @@ namespace MAF_VE_2
             }
         }
 
-        async void DownloadImageOfTheDay()
+        async void DownloadImageIfNew()
         {
             string region = "en-US";
             int numberOfImages = 1;
@@ -292,7 +263,6 @@ namespace MAF_VE_2
             }
             catch
             {
-                SetBackgroundImage();
                 return;
             }
 
@@ -306,34 +276,45 @@ namespace MAF_VE_2
                     string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
                     string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
 
-                    string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
-                    bingUri = new Uri(completeUrlForImage);
+                    // Check if new image by comparing copyright text
+                    StorageFile savedCopyrightFile;
+                    string savedCopyrightText = "none";
+                    try
+                    {
+                        savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
+                        savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
+                    }
+                    catch
+                    {
+                        // No file. An image has not been downloaded before.
+                    }
 
-                    // Save image
-                    string fileName = "BingImageOfTheDay.jpg";
-                    RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
-                    StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
-                    await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+                    if (copyrightText == savedCopyrightText)
+                    {
+                        return; // same image as last time, so don't download again
+                    }
+                    else
+                    {
+                        string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
+                        bingUri = new Uri(completeUrlForImage);
 
-                    // Save copyright
-                    StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
-                    await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+                        // Save image
+                        string fileName = "BingImageOfTheDay.jpg";
+                        RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+                        StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
+                        await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
 
-                    // Store the download date
-                    var d = DateTime.Today.Date;
-                    var downloadDateSum = d.Month + d.Day + d.Year;
-                    localSettings.Values[DateOfLastImageDownloadAsSum] = downloadDateSum;
+                        // Save copyright
+                        StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
+                        await FileIO.WriteTextAsync(copyrightFile, copyrightText);
 
-                    downloadedImage = true;
+                        downloadedImage = true;
+                    }
                 }
             }
             catch
             {
-                var localFiles = await ApplicationData.Current.LocalFolder.GetFilesAsync();
-                foreach (var file in localFiles)
-                {
-                    await file.DeleteAsync();
-                }
+                return;
             }
 
             // Set the background image
@@ -344,6 +325,8 @@ namespace MAF_VE_2
         {
             mainPivotFadeOutStory.Begin();
             menuButton.Opacity = 0.00;
+            mainPivot.IsHitTestVisible = false;
+            menuButton.IsHitTestVisible = false;
             copyright2.Text = copyright.Text;
             imageSavePanel.Visibility = Visibility.Visible;
         }
@@ -352,6 +335,8 @@ namespace MAF_VE_2
         {
             mainPivotFadeInStory.Begin();
             menuButton.Opacity = 1.00;
+            mainPivot.IsHitTestVisible = true;
+            menuButton.IsHitTestVisible = true;
             imageSavePanel.Visibility = Visibility.Collapsed;
         }
 
@@ -1587,7 +1572,7 @@ namespace MAF_VE_2
             {
                 if (choice == "yesImage")
                 {
-                    ManageBackgroundImage();
+                    SetBackgroundImage();
                     localSettings.Values[BackgroundImageSetting] = true;
                 }
                 else
