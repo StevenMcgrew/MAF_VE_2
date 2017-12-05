@@ -1549,11 +1549,6 @@ namespace MAF_VE_2
             }
         }
 
-        private void PivotItem_PointerWheelChanged(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            recordsPanel.ChangeView(null, recordsPanel.VerticalOffset - e.GetCurrentPoint(recordsPanel).Properties.MouseWheelDelta, null);
-        }
-
         #endregion
 
         #region Background options

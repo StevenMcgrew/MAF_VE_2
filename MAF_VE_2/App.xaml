@@ -1777,22 +1777,20 @@
                             </Border>
                         </ControlTemplate>
                     </Grid.Resources>
-                    
+
                     <ScrollViewer x:Name="ScrollViewer"
                         Margin="{TemplateBinding Padding}"
                         HorizontalSnapPointsType="MandatorySingle"
                         HorizontalSnapPointsAlignment="Center"
                         HorizontalScrollBarVisibility="Hidden"
-                        
+                        VerticalScrollMode="Disabled"
                         VerticalScrollBarVisibility="Disabled"
                         VerticalSnapPointsType="None"
                         VerticalContentAlignment="Stretch"
                         ZoomMode="Disabled"
                         Template="{StaticResource ScrollViewerScrollBarlessTemplate}"
                         BringIntoViewOnFocusChange="False">
-                                    <!--Took this out of the scrollviewer property settings-->
-                                    <!--VerticalScrollMode="Disabled"-->
-                                    
+
 
                         <PivotPanel x:Name="Panel" VerticalAlignment="Stretch" ManipulationMode="None"> <!--Added ManipulationMode as None, so swiping left/right between pivot items is disabled-->
                             <Grid x:Name="PivotLayoutElement">
