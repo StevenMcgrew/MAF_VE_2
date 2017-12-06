@@ -366,6 +366,7 @@ namespace MAF_VE_2
                 if (file != null)
                 {
                     await imageFile.CopyAndReplaceAsync(file);
+                    savedPopupStory.Begin();
                 }
             }
             catch
@@ -1026,9 +1027,9 @@ namespace MAF_VE_2
                     Temp_units = airTempUnits.SelectedValue.ToString(),
                     Altitude_units = altitudeUnits.SelectedValue.ToString()
                 });
-
-                //await new MessageDialog("Saved successfully").ShowAsync();
+                
                 ShowAllLocalRecords();
+                savedPopupStory.Begin();
 
                 good.ClearValue(RadioButton.IsCheckedProperty);
                 bad.ClearValue(RadioButton.IsCheckedProperty);

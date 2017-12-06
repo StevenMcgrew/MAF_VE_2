@@ -42,6 +42,28 @@
         <Storyboard x:Name="mainPivotFadeInStory">
             <DoubleAnimation Duration="0:0:0.5" To="1" Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="mainPivot" d:IsOptimized="True"/>
         </Storyboard>
+        <Storyboard x:Name="savedPopupStory">
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateY)" Storyboard.TargetName="savedNoticePanel">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <PowerEase EasingMode="EaseIn"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="-10"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.1" Value="-9.9"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="100"/>
+            </DoubleAnimationUsingKeyFrames>
+            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="savedNoticePanel">
+                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1">
+                    <EasingDoubleKeyFrame.EasingFunction>
+                        <PowerEase EasingMode="EaseIn"/>
+                    </EasingDoubleKeyFrame.EasingFunction>
+                </EasingDoubleKeyFrame>
+                <EasingDoubleKeyFrame KeyTime="0:0:0.8" Value="0.99"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.1" Value="0.001"/>
+                <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0"/>
+            </DoubleAnimationUsingKeyFrames>
+        </Storyboard>
     </Page.Resources>
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
@@ -375,7 +397,7 @@
 
                                         </StackPanel>
                                     </ScrollViewer>
-                                    
+
                                 </Grid>
 
                             </PivotItem>
@@ -468,12 +490,12 @@
 
                                     </StackPanel>
                                 </ScrollViewer>
-                                
+
                             </PivotItem>
 
                             <PivotItem Name="Charts" Header="Charts" Style="{StaticResource stylePivotItem}" SizeChanged="Charts_SizeChanged">
 
-                                <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled">
+                                <ScrollViewer VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Disabled" Padding="5">
                                     <Viewbox>
                                         <StackPanel Name="ChartsStackPanel" Orientation="Horizontal">
 
@@ -580,12 +602,12 @@
                                         </StackPanel>
                                     </Viewbox>
                                 </ScrollViewer>
-                                
+
                             </PivotItem>
 
                         </Pivot>
 
-                        <!--<Rectangle Grid.Row="1" Height="32" VerticalAlignment="Top" Margin="205,0,0,0" Fill="Transparent"/>-->
+
 
                     </Grid>
 
@@ -761,6 +783,14 @@
             <Border Name="copyrightButton2" Background="#BF000000" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <TextBlock Name="copyright2" FontSize="12" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True"/>
             </Border>
+        </StackPanel>
+
+        <StackPanel Name="savedNoticePanel" BorderBrush="White" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,125,0,0" Background="#FF232323" Padding="20" Width="200" RenderTransformOrigin="0.5,0.5" Opacity="0" IsHitTestVisible="False">
+            <StackPanel.RenderTransform>
+                <CompositeTransform TranslateY="100"/>
+            </StackPanel.RenderTransform>
+            <TextBlock FontSize="24" Text="Saved" HorizontalAlignment="Center" Foreground="White"/>
+            <TextBlock FontSize="48" FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" HorizontalAlignment="Center" Foreground="#FF3399FF"/>
         </StackPanel>
 
     </Grid>
