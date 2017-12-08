@@ -64,10 +64,24 @@
                 <EasingDoubleKeyFrame KeyTime="0:0:1.2" Value="0"/>
             </DoubleAnimationUsingKeyFrames>
         </Storyboard>
+        <Storyboard x:Name="searchedForPanelStory">
+            <DoubleAnimation Duration="0:0:1.5" From="0.01" To="1440.01" Storyboard.TargetProperty="(UIElement.Projection).(PlaneProjection.RotationX)" Storyboard.TargetName="searchedForPanel" d:IsOptimized="True">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut"/>
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
     </Page.Resources>
 
     <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
-    <Grid Background="#FFA0A0A0">
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FF04172B" Offset="1"/>
+                <GradientStop Color="#FFA5C4E2"/>
+                <GradientStop Color="#FF0C203C" Offset="0.888"/>
+            </LinearGradientBrush>
+        </Grid.Background>
         <Image Name="backgroundImage" Stretch="UniformToFill">
             <!--<Image.Source>
                 <BitmapImage/>
@@ -304,11 +318,14 @@
                                         <RowDefinition Height="*"/>
                                     </Grid.RowDefinitions>
 
-                                    <Grid Name="searchedForPanel" Grid.Row="0" Margin="0,-5,0,10">
+                                    <Grid Name="searchedForPanel" Grid.Row="0" Margin="0,-5,0,10" >
+                                        <Grid.Projection>
+                                            <PlaneProjection/>
+                                        </Grid.Projection>
                                         <TextBlock Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top">
                                                     <Span><Underline>Showing results for</Underline>:</Span>
                                         </TextBlock>
-                                        <TextBlock Name="searchedForText" Foreground="White" Margin="135,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords"/>
+                                        <TextBlock Name="searchedForText" Text="2000 Ford Explorer 4.0L" Foreground="White" Margin="135,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords" />
                                     </Grid>
 
                                     <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
@@ -791,6 +808,10 @@
             </StackPanel.RenderTransform>
             <TextBlock FontSize="24" Text="Saved" HorizontalAlignment="Center" Foreground="White"/>
             <TextBlock FontSize="48" FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" HorizontalAlignment="Center" Foreground="#FF3399FF"/>
+        </StackPanel>
+
+        <StackPanel Name="backgroundImageLogPanel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
+            <TextBlock Text="Background Image Log:"/>
         </StackPanel>
 
     </Grid>

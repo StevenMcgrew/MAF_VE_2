@@ -31,6 +31,8 @@ namespace MAF_VE_2
         bool rbCheckFired = false;
         string condition = "";
         bool downloadedImage = false;
+        const string ImageFileName = "BingImageOfTheDay.jpg";
+        const string CopyrightFileName = "Copyright.txt";
 
         ApplicationDataContainer localSettings = null;
         const string DateOfLastImageDownloadAsSum = "DateOfLastImageDownload";
@@ -107,8 +109,6 @@ namespace MAF_VE_2
             {
                 yesImage.IsChecked = true;
             }
-
-            DownloadImageIfNew();
         }
 
         void AddEngineComboboxItems()
@@ -200,16 +200,22 @@ namespace MAF_VE_2
             // Set background image first
             try
             {
-                var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("BingImageOfTheDay.jpg");
+                ImageLog("Try get image file...");
+
+                var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
                 using (var stream = await imageFile.OpenReadAsync())
                 {
                     var bitmapImage = new BitmapImage();
                     await bitmapImage.SetSourceAsync(stream);
                     backgroundImage.Source = bitmapImage;
                 }
+
+                ImageLog("Got image file and set image...");
             }
             catch
             {
+                ImageLog("Failed to get image file, return...");
+
                 backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
                 return;
             }
@@ -218,7 +224,9 @@ namespace MAF_VE_2
             bool copyrightSetSuccessfully = false;
             try
             {
-                var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
+                ImageLog("Try get copyright file...");
+
+                var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
                 var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
                 if (downloadedImage)
                 {
@@ -230,12 +238,16 @@ namespace MAF_VE_2
                 }
                 copyrightSetSuccessfully = true;
                 copyrightButton.BorderThickness = new Thickness(1);
+
+                ImageLog("Got copyright file and set text...");
             }
             catch
             {
                 copyright.Text = "Image: Could not get copyright info";
                 copyrightButton.BorderThickness = new Thickness(1);
                 copyrightSetSuccessfully = false;
+
+                ImageLog("Failed to get copyright file...");
             }
             finally
             {
@@ -248,6 +260,8 @@ namespace MAF_VE_2
 
         async void DownloadImageIfNew()
         {
+            ImageLog("Start download method...");
+
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
@@ -255,24 +269,34 @@ namespace MAF_VE_2
 
             try // Get JSON
             {
+                ImageLog("Try get JSON...");
+
                 using (HttpClient httpClient = new HttpClient())
                 {
                     HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
                     JSON = await httpResponse.Content.ReadAsStringAsync();
                 }
+
+                ImageLog("Got JSON...");
             }
             catch
             {
-                return;
+                SetBackgroundImage();
+
+                ImageLog("Failed to get JSON, set background called...");
             }
 
             try // Parse JSON
             {
+                ImageLog("Try Parse JSON...");
+
                 JsonObject jsonObject;
                 bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
                 Uri bingUri;
                 if (IsParsed)
                 {
+                    ImageLog("Parse successful...");
+
                     string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
                     string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
 
@@ -281,44 +305,78 @@ namespace MAF_VE_2
                     string savedCopyrightText = "none";
                     try
                     {
-                        savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync("Copyright.txt");
+                        ImageLog("Try compare copyright text");
+
+                        savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
                         savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
                     }
                     catch
                     {
+                        ImageLog("Error when comparing copyright text, or no file available...");
                         // No file. An image has not been downloaded before.
                     }
 
                     if (copyrightText == savedCopyrightText)
                     {
+                        ImageLog("Copyright text the same, return...");
                         return; // same image as last time, so don't download again
                     }
                     else
                     {
+                        ImageLog("Copyright different, download image to file...");
+
                         string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
                         bingUri = new Uri(completeUrlForImage);
 
                         // Save image
-                        string fileName = "BingImageOfTheDay.jpg";
+                        string fileName = ImageFileName;
                         RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
                         StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
                         await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
 
                         // Save copyright
-                        StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync("Copyright.txt", CreationCollisionOption.ReplaceExisting);
+                        StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
                         await FileIO.WriteTextAsync(copyrightFile, copyrightText);
 
                         downloadedImage = true;
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return;
-            }
+                ImageLog("Error on parse or download..." + ex.Message);
 
-            // Set the background image
-            SetBackgroundImage();
+                try
+                {
+                    ImageLog("Deleting image file...");
+                    StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
+                    await file.DeleteAsync();
+                    ImageLog("Image file deleted...");
+                }
+                catch (Exception ex1)
+                {
+                    ImageLog("Failed to delete image file..." + ex1.Message);
+                }
+
+                try
+                {
+                    ImageLog("Deleting copyright file...");
+                    StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
+                    await file.DeleteAsync();
+                    ImageLog("Copyright file deleted...");
+                }
+                catch (Exception ex2)
+                {
+                    ImageLog("Failed to delete copyright file..." + ex2.Message);
+                }
+                
+            }
+            finally
+            {
+                // Set the background image
+                ImageLog("Set background called at end of download method...");
+                SetBackgroundImage();
+            }
         }
 
         private void copyrightButton_Click(object sender, RoutedEventArgs e)
@@ -375,6 +433,40 @@ namespace MAF_VE_2
             }
         }
 
+        private void backgroundMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            backgroundOptionsPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void backgroundOption_Checked(object sender, RoutedEventArgs e)
+        {
+            var radbtn = sender as RadioButton;
+            var choice = radbtn.Name;
+            if (localSettings != null)
+            {
+                if (choice == "yesImage")
+                {
+                    SetBackgroundImage();
+                    DownloadImageIfNew();
+                    localSettings.Values[BackgroundImageSetting] = true;
+                }
+                else
+                {
+                    backgroundImage.ClearValue(Image.SourceProperty);
+                    copyright.ClearValue(TextBlock.TextProperty);
+                    copyrightButton.BorderThickness = new Thickness(0);
+                    localSettings.Values[BackgroundImageSetting] = false;
+                }
+            }
+        }
+
+        private void doneBackgroundOptions_Click(object sender, RoutedEventArgs e)
+        {
+            backgroundOptionsPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
         async Task<string> CreateFileNameFromCopyrightInfo()
         {
             string fileName = "Bing_image_of_the_day";
@@ -417,6 +509,13 @@ namespace MAF_VE_2
             return fileName;
         }
 
+        void ImageLog(string str)
+        {
+            TextBlock t = new TextBlock();
+            t.Text = str;
+            backgroundImageLogPanel.Children.Add(t);
+        }
+
         #endregion
 
         #region Databases
@@ -439,6 +538,7 @@ namespace MAF_VE_2
             }
 
             searchedForText.Text = "all records";
+            searchedForPanelStory.Begin();
             veChartDataDescription.Text = "Perform a search to see data in this chart";
             mafChartDataDescription.Text = "Perform a search to see data in this chart";
             ClearChartData();
@@ -1208,6 +1308,7 @@ namespace MAF_VE_2
                         // Set searchedForText
                         var searchText = string.Join(" ", searchedForList);
                         searchedForText.Text = searchText;
+                        searchedForPanelStory.Begin();
                         mafChartDataDescription.Text = searchText;
                         veChartDataDescription.Text = searchText;
 
@@ -1552,43 +1653,6 @@ namespace MAF_VE_2
 
         #endregion
 
-        #region Background options
-
-        private void backgroundMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            popUpPanelBackground.Visibility = Visibility.Visible;
-            backgroundOptionsPopUp.Visibility = Visibility.Visible;
-        }
-
-        private void backgroundOption_Checked(object sender, RoutedEventArgs e)
-        {
-            var radbtn = sender as RadioButton;
-            var choice = radbtn.Name;
-            if (localSettings != null)
-            {
-                if (choice == "yesImage")
-                {
-                    SetBackgroundImage();
-                    localSettings.Values[BackgroundImageSetting] = true;
-                }
-                else
-                {
-                    backgroundImage.ClearValue(Image.SourceProperty);
-                    copyright.ClearValue(TextBlock.TextProperty);
-                    copyrightButton.BorderThickness = new Thickness(0);
-                    localSettings.Values[BackgroundImageSetting] = false;
-                }
-            }
-        }
-
-        private void doneBackgroundOptions_Click(object sender, RoutedEventArgs e)
-        {
-            backgroundOptionsPopUp.Visibility = Visibility.Collapsed;
-            popUpPanelBackground.Visibility = Visibility.Collapsed;
-        }
-
-        #endregion
-
         #region Other menu items
 
         private void exitMenuItem_Click(object sender, RoutedEventArgs e)
@@ -1630,7 +1694,5 @@ namespace MAF_VE_2
         }
 
         #endregion
-
-        
     }
 }
