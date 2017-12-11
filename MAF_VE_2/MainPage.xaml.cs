@@ -30,7 +30,7 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
-        bool downloadedImage = false;
+        //bool downloadedImage = false;
         const string ImageFileName = "BingImageOfTheDay.jpg";
         const string CopyrightFileName = "Copyright.txt";
 
@@ -91,24 +91,25 @@ namespace MAF_VE_2
             RefreshMakesComboBox();
             ShowAllLocalRecords();
 
+            ManageBackgroundSetting();
             // Handle background image setting
-            Object backgroundImageSetting = localSettings.Values[BackgroundImageSetting];
-            if (backgroundImageSetting != null)
-            {
-                var backgroundSetting = (bool)backgroundImageSetting;
-                if (backgroundSetting == true)
-                {
-                    yesImage.IsChecked = true;
-                }
-                else
-                {
-                    noImage.IsChecked = true;
-                }
-            }
-            else
-            {
-                yesImage.IsChecked = true;
-            }
+            //Object backgroundImageSetting = localSettings.Values[BackgroundImageSetting];
+            //if (backgroundImageSetting != null)
+            //{
+            //    var backgroundSetting = (bool)backgroundImageSetting;
+            //    if (backgroundSetting == true)
+            //    {
+            //        yesImage.IsChecked = true;
+            //    }
+            //    else
+            //    {
+            //        noImage.IsChecked = true;
+            //    }
+            //}
+            //else
+            //{
+            //    yesImage.IsChecked = true;
+            //}
         }
 
         void AddEngineComboboxItems()
@@ -195,189 +196,461 @@ namespace MAF_VE_2
 
         #region Bing image of the day
 
-        async void SetBackgroundImage()
+        void ManageBackgroundSetting()
         {
-            // Set background image first
+            Object backgroundSetting = localSettings.Values[BackgroundImageSetting];
+            bool IsStored = CheckIfSettingIsStored(backgroundSetting);
+            if (IsStored)
+            {
+                bool IsShowImage = CheckIfBackgroundSettingIsShowImage(backgroundSetting);
+                if (IsShowImage)
+                {
+                    yesImage.IsChecked = true;
+                }
+                else
+                {
+                    noImage.IsChecked = true; 
+                }
+            }
+            else
+            {
+                yesImage.IsChecked = true; 
+            }
+        }
+
+        async void ManageBackgroundImage()
+        {
+            IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
+            if (imageFileItem != null) // A file was previously saved and we were able to get it
+            {
+                bool imageWasSet = await SetBackgroundImage(imageFileItem);
+                if (imageWasSet)
+                {
+                    IStorageItem copyrightFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(CopyrightFileName);
+                    if (copyrightFileItem != null)
+                    {
+                        SetCopyrightText(copyrightFileItem);
+                    }
+
+                    DownloadAndSetImageAndCopyrightIfNew();
+                }
+            }
+            else // No file saved yet, or problem getting file
+            {
+                SetDefaultBackgroundImage();
+                DownloadAndSetImageAndCopyrightIfNew();
+            }
+        }
+
+        bool CheckIfSettingIsStored(object setting)
+        {
+            if (setting != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        bool CheckIfBackgroundSettingIsShowImage(object setting)
+        {
             try
             {
-                ImageLog("Try get image file...");
+                bool settingIsShowImage = (bool)setting;
+                if (settingIsShowImage)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                return false;
+                throw new Exception("Problem checking background setting. \n \n" + ex.Message + "\n \n", ex.InnerException);
+            }
+        }
 
-                var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
-                using (var stream = await imageFile.OpenReadAsync())
+        async void SetImageAndCopyright()
+        {
+            IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
+            if (imageFileItem != null)
+            {
+                bool imageWasSet = await SetBackgroundImage(imageFileItem);
+                if (imageWasSet)
+                {
+                    IStorageItem copyrightFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(CopyrightFileName);
+                    if (copyrightFileItem != null)
+                    {
+                        SetCopyrightText(copyrightFileItem);
+                    }
+                }
+            }
+        }
+
+        async Task<bool> SetBackgroundImage(IStorageItem storageItem)
+        {
+            try
+            {
+                StorageFile file = storageItem as StorageFile;
+                using (var stream = await file.OpenReadAsync())
                 {
                     var bitmapImage = new BitmapImage();
                     await bitmapImage.SetSourceAsync(stream);
                     backgroundImage.Source = bitmapImage;
                 }
-
-                ImageLog("Got image file and set image...");
+                return true;
             }
-            catch
+            catch (Exception ex)
             {
-                ImageLog("Failed to get image file, return...");
-
                 backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
-                return;
+                return false;
+                throw new Exception("Problem setting background image. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
+        }
 
-            // Then set copyright text
-            bool copyrightSetSuccessfully = false;
+        async void SetCopyrightText(IStorageItem storageItem)
+        {
             try
             {
-                ImageLog("Try get copyright file...");
+                StorageFile file = storageItem as StorageFile;
+                var copyrightText = await FileIO.ReadTextAsync(file);
 
-                var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-                var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
-                if (downloadedImage)
-                {
-                    copyright.Text = "Image of the day: " + copyrightText;
-                }
-                else
-                {
-                    copyright.Text = "Image: " + copyrightText;
-                }
-                copyrightSetSuccessfully = true;
+                copyright.Text = "Image: " + copyrightText;
                 copyrightButton.BorderThickness = new Thickness(1);
-
-                ImageLog("Got copyright file and set text...");
             }
             catch
             {
                 copyright.Text = "Image: Could not get copyright info";
                 copyrightButton.BorderThickness = new Thickness(1);
-                copyrightSetSuccessfully = false;
-
-                ImageLog("Failed to get copyright file...");
-            }
-            finally
-            {
-                if (copyrightSetSuccessfully)
-                {
-                    downloadedImage = false; // reset this to false for the next time around
-                }
             }
         }
 
-        async void DownloadImageIfNew()
+        async Task<JsonObject> CheckForNewImage()
         {
-            ImageLog("Start download method...");
+            JsonObject jsonObject;
+            string JSON = await GetBingImageJSON();
 
+            if (JSON != null)
+            {
+                jsonObject = ParseJSON(JSON);
+
+                if (jsonObject != null)
+                {
+                    try
+                    {
+                        string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
+                        StorageFile savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
+                        string savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
+
+                        if (copyrightText == savedCopyrightText)
+                        {
+                            return jsonObject = null; // New image not available yet
+                        }
+                        else
+                        {
+                            return jsonObject; // New image is available
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        return jsonObject = null;
+                        throw new Exception("Problem checking for new image. \n \n" + ex.Message + "\n \n", ex.InnerException);
+                    }
+                }
+                else
+                {
+                    return jsonObject = null; // Problem parsing JSON
+                }
+            }
+            else
+            {
+                return jsonObject = null; // Problem getting JSON
+            }
+        }
+
+        async Task<string> GetBingImageJSON()
+        {
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
-            string JSON = "";
+            string JSON;
 
-            try // Get JSON
+            try
             {
-                ImageLog("Try get JSON...");
-
                 using (HttpClient httpClient = new HttpClient())
                 {
                     HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
-                    JSON = await httpResponse.Content.ReadAsStringAsync();
-                }
-
-                ImageLog("Got JSON...");
-            }
-            catch
-            {
-                SetBackgroundImage();
-
-                ImageLog("Failed to get JSON, set background called...");
-            }
-
-            try // Parse JSON
-            {
-                ImageLog("Try Parse JSON...");
-
-                JsonObject jsonObject;
-                bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
-                Uri bingUri;
-                if (IsParsed)
-                {
-                    ImageLog("Parse successful...");
-
-                    string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
-                    string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
-
-                    // Check if new image by comparing copyright text
-                    StorageFile savedCopyrightFile;
-                    string savedCopyrightText = "none";
-                    try
-                    {
-                        ImageLog("Try compare copyright text");
-
-                        savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-                        savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
-                    }
-                    catch
-                    {
-                        ImageLog("Error when comparing copyright text, or no file available...");
-                        // No file. An image has not been downloaded before.
-                    }
-
-                    if (copyrightText == savedCopyrightText)
-                    {
-                        ImageLog("Copyright text the same, return...");
-                        return; // same image as last time, so don't download again
-                    }
-                    else
-                    {
-                        ImageLog("Copyright different, download image to file...");
-
-                        string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
-                        bingUri = new Uri(completeUrlForImage);
-
-                        // Save image
-                        string fileName = ImageFileName;
-                        RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
-                        StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
-                        await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
-
-                        // Save copyright
-                        StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
-                        await FileIO.WriteTextAsync(copyrightFile, copyrightText);
-
-                        downloadedImage = true;
-                    }
+                    return JSON = await httpResponse.Content.ReadAsStringAsync();
                 }
             }
             catch (Exception ex)
             {
-                ImageLog("Error on parse or download..." + ex.Message);
-
-                try
-                {
-                    ImageLog("Deleting image file...");
-                    StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
-                    await file.DeleteAsync();
-                    ImageLog("Image file deleted...");
-                }
-                catch (Exception ex1)
-                {
-                    ImageLog("Failed to delete image file..." + ex1.Message);
-                }
-
-                try
-                {
-                    ImageLog("Deleting copyright file...");
-                    StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-                    await file.DeleteAsync();
-                    ImageLog("Copyright file deleted...");
-                }
-                catch (Exception ex2)
-                {
-                    ImageLog("Failed to delete copyright file..." + ex2.Message);
-                }
-                
-            }
-            finally
-            {
-                // Set the background image
-                ImageLog("Set background called at end of download method...");
-                SetBackgroundImage();
+                return JSON = null;
+                throw new Exception("Problem getting JSON for image. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
+
+        JsonObject ParseJSON(string JSON)
+        {
+            JsonObject jsonObject;
+            try
+            {
+                bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
+                if (IsParsed)
+                {
+                    return jsonObject;
+                }
+                else
+                {
+                    return jsonObject = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                return jsonObject = null;
+                throw new Exception("Problem parsing JSON for image. \n \n" + ex.Message + "\n \n", ex.InnerException);
+            }
+        }
+
+        async void DownloadBingImageToFile(JsonObject jsonObject)
+        {
+            try
+            {
+                string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
+                string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
+                Uri bingUri = new Uri(completeUrlForImage);
+                string fileName = ImageFileName;
+
+                RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+                StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
+                await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Problem downloading new image. Network error or slow internet connetion. \n \n" + ex.Message + "\n \n", ex.InnerException);
+            }
+        }
+
+        async void SaveCopyrightToFile(JsonObject jsonObject)
+        {
+            try
+            {
+                string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
+                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
+                await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Problem saving copyright text. \n \n" + ex.Message + "\n \n", ex.InnerException);
+            }
+        }
+
+        void SetDefaultBackgroundImage()
+        {
+            backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
+        }
+
+        async void DownloadAndSetImageAndCopyrightIfNew()
+        {
+            JsonObject newImageJsonObject = await CheckForNewImage();
+
+            if (newImageJsonObject != null) // New image is available
+            {
+                DownloadBingImageToFile(newImageJsonObject);
+                SaveCopyrightToFile(newImageJsonObject);
+                SetImageAndCopyright();
+            }
+        }
+
+
+        //async void SetBackgroundImage()
+        //{
+        //    // Set background image first
+        //    try
+        //    {
+        //        ImageLog("Try get image file...");
+
+        //        var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
+        //        using (var stream = await imageFile.OpenReadAsync())
+        //        {
+        //            var bitmapImage = new BitmapImage();
+        //            await bitmapImage.SetSourceAsync(stream);
+        //            backgroundImage.Source = bitmapImage;
+        //        }
+
+        //        ImageLog("Got image file and set image...");
+        //    }
+        //    catch
+        //    {
+        //        ImageLog("Failed to get image file, return...");
+
+        //        backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
+        //        return;
+        //    }
+
+        //    // Then set copyright text
+        //    bool copyrightSetSuccessfully = false;
+        //    try
+        //    {
+        //        ImageLog("Try get copyright file...");
+
+        //        var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
+        //        var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
+        //        if (downloadedImage)
+        //        {
+        //            copyright.Text = "Image of the day: " + copyrightText;
+        //        }
+        //        else
+        //        {
+        //            copyright.Text = "Image: " + copyrightText;
+        //        }
+        //        copyrightSetSuccessfully = true;
+        //        copyrightButton.BorderThickness = new Thickness(1);
+
+        //        ImageLog("Got copyright file and set text...");
+        //    }
+        //    catch
+        //    {
+        //        copyright.Text = "Image: Could not get copyright info";
+        //        copyrightButton.BorderThickness = new Thickness(1);
+        //        copyrightSetSuccessfully = false;
+
+        //        ImageLog("Failed to get copyright file...");
+        //    }
+        //    finally
+        //    {
+        //        if (copyrightSetSuccessfully)
+        //        {
+        //            downloadedImage = false; // reset this to false for the next time around
+        //        }
+        //    }
+        //}
+
+        //async void DownloadImageIfNew()
+        //{
+        //    ImageLog("Start download method...");
+
+        //    string region = "en-US";
+        //    int numberOfImages = 1;
+        //    string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
+        //    string JSON = "";
+
+        //    try // Get JSON
+        //    {
+        //        ImageLog("Try get JSON...");
+
+        //        using (HttpClient httpClient = new HttpClient())
+        //        {
+        //            HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
+        //            JSON = await httpResponse.Content.ReadAsStringAsync();
+        //        }
+
+        //        ImageLog("Got JSON...");
+        //    }
+        //    catch
+        //    {
+        //        SetBackgroundImage();
+
+        //        ImageLog("Failed to get JSON, set background called...");
+        //    }
+
+        //    try // Parse JSON
+        //    {
+        //        ImageLog("Try Parse JSON...");
+
+        //        JsonObject jsonObject;
+        //        bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
+        //        Uri bingUri;
+        //        if (IsParsed)
+        //        {
+        //            ImageLog("Parse successful...");
+
+        //            string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
+        //            string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
+
+        //            // Check if new image by comparing copyright text
+        //            StorageFile savedCopyrightFile;
+        //            string savedCopyrightText = "none";
+        //            try
+        //            {
+        //                ImageLog("Try compare copyright text");
+
+        //                savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
+        //                savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
+        //            }
+        //            catch
+        //            {
+        //                ImageLog("Error when comparing copyright text, or no file available...");
+        //                // No file. An image has not been downloaded before.
+        //            }
+
+        //            if (copyrightText == savedCopyrightText)
+        //            {
+        //                ImageLog("Copyright text the same, return...");
+        //                return; // same image as last time, so don't download again
+        //            }
+        //            else
+        //            {
+        //                ImageLog("Copyright different, download image to file...");
+
+        //                string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
+        //                bingUri = new Uri(completeUrlForImage);
+
+        //                // Save image
+        //                string fileName = ImageFileName;
+        //                RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
+        //                StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
+        //                await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+
+        //                // Save copyright
+        //                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
+        //                await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+
+        //                downloadedImage = true;
+        //            }
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        ImageLog("Error on parse or download..." + ex.Message);
+
+        //        try
+        //        {
+        //            ImageLog("Deleting image file...");
+        //            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
+        //            await file.DeleteAsync();
+        //            ImageLog("Image file deleted...");
+        //        }
+        //        catch (Exception ex1)
+        //        {
+        //            ImageLog("Failed to delete image file..." + ex1.Message);
+        //        }
+
+        //        try
+        //        {
+        //            ImageLog("Deleting copyright file...");
+        //            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
+        //            await file.DeleteAsync();
+        //            ImageLog("Copyright file deleted...");
+        //        }
+        //        catch (Exception ex2)
+        //        {
+        //            ImageLog("Failed to delete copyright file..." + ex2.Message);
+        //        }
+                
+        //    }
+        //    finally
+        //    {
+        //        // Set the background image
+        //        ImageLog("Set background called at end of download method...");
+        //        SetBackgroundImage();
+        //    }
+        //}
 
         private void copyrightButton_Click(object sender, RoutedEventArgs e)
         {
@@ -447,8 +720,7 @@ namespace MAF_VE_2
             {
                 if (choice == "yesImage")
                 {
-                    SetBackgroundImage();
-                    DownloadImageIfNew();
+                    ManageBackgroundImage();
                     localSettings.Values[BackgroundImageSetting] = true;
                 }
                 else
@@ -498,8 +770,8 @@ namespace MAF_VE_2
                 }
                 fileName = sb.ToString();
 
-                // Replace spaces with underscores.
-                fileName = fileName.Replace(' ', '_');
+                // Replace spaces with dashes.
+                fileName = fileName.Replace(' ', '-');
             }
             catch
             {
@@ -509,12 +781,12 @@ namespace MAF_VE_2
             return fileName;
         }
 
-        void ImageLog(string str)
-        {
-            TextBlock t = new TextBlock();
-            t.Text = str;
-            backgroundImageLogPanel.Children.Add(t);
-        }
+        //void ImageLog(string str)
+        //{
+        //    TextBlock t = new TextBlock();
+        //    t.Text = str;
+        //    backgroundImageLogPanel.Children.Add(t);
+        //}
 
         #endregion
 

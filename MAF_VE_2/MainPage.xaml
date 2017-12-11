@@ -794,8 +794,8 @@
 
         <StackPanel Name="imageSavePanel" Visibility="Collapsed" VerticalAlignment="Bottom" Margin="10">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <Button Name="closeImageSaverButton" Content="Back" Style="{StaticResource blueButtonStyle}" Margin="0,0,10,0" Foreground="White" FontSize="12" Click="closeImageSaverButton_Click"/>
-                <Button Name="saveImageButton" Content="Save Image" Style="{StaticResource blueButtonStyle}" Foreground="White" FontSize="12" Click="saveImageButton_Click"/>
+                <Button Name="closeImageSaverButton" Content="Go Back" Style="{StaticResource blueButtonStyle}" Margin="0,0,10,0" Foreground="White" FontSize="12" Click="closeImageSaverButton_Click" Width="80"/>
+                <Button Name="saveImageButton" Content="Save Image" Style="{StaticResource blueButtonStyle}" Foreground="White" FontSize="12" Click="saveImageButton_Click" Width="80"/>
             </StackPanel>
             <Border Name="copyrightButton2" Background="#BF000000" HorizontalAlignment="Left" VerticalAlignment="Top">
                 <TextBlock Name="copyright2" FontSize="12" Foreground="White" TextWrapping="WrapWholeWords" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True"/>
@@ -810,9 +810,9 @@
             <TextBlock FontSize="48" FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" HorizontalAlignment="Center" Foreground="#FF3399FF"/>
         </StackPanel>
 
-        <StackPanel Name="backgroundImageLogPanel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
+        <!--<StackPanel Name="backgroundImageLogPanel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
             <TextBlock Text="Background Image Log:"/>
-        </StackPanel>
+        </StackPanel>-->
 
     </Grid>
 </Page>
