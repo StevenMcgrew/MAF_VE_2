@@ -10,12 +10,16 @@ using Windows.Data.Json;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
+using Windows.System;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
+using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using Windows.Web.Http;
 
@@ -24,13 +28,12 @@ namespace MAF_VE_2
     public sealed partial class MainPage : Page
     {
 
-        #region General variables and fields
+        #region General variables
 
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         bool rbCheckFired = false;
         string condition = "";
-        //bool downloadedImage = false;
         const string ImageFileName = "BingImageOfTheDay.jpg";
         const string CopyrightFileName = "Copyright.txt";
 
@@ -90,26 +93,7 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ShowAllLocalRecords();
-
             ManageBackgroundSetting();
-            // Handle background image setting
-            //Object backgroundImageSetting = localSettings.Values[BackgroundImageSetting];
-            //if (backgroundImageSetting != null)
-            //{
-            //    var backgroundSetting = (bool)backgroundImageSetting;
-            //    if (backgroundSetting == true)
-            //    {
-            //        yesImage.IsChecked = true;
-            //    }
-            //    else
-            //    {
-            //        noImage.IsChecked = true;
-            //    }
-            //}
-            //else
-            //{
-            //    yesImage.IsChecked = true;
-            //}
         }
 
         void AddEngineComboboxItems()
@@ -161,36 +145,36 @@ namespace MAF_VE_2
             }
         }
 
-        //protected override void OnNavigatedTo(NavigationEventArgs e)
-        //{
-        //    // Register for PrintTaskRequested event
-        //    printMan = PrintManager.GetForCurrentView();
-        //    printMan.PrintTaskRequested += PrintTaskRequested;
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            //// Register for PrintTaskRequested event
+            //printMan = PrintManager.GetForCurrentView();
+            //printMan.PrintTaskRequested += PrintTaskRequested;
 
-        //    // Build a PrintDocument and register for callbacks
-        //    printDoc = new PrintDocument();
-        //    printDocSource = printDoc.DocumentSource;
-        //    printDoc.Paginate += Paginate;
-        //    printDoc.GetPreviewPage += GetPreviewPage;
-        //    printDoc.AddPages += AddPages;
+            //// Build a PrintDocument and register for callbacks
+            //printDoc = new PrintDocument();
+            //printDocSource = printDoc.DocumentSource;
+            //printDoc.Paginate += Paginate;
+            //printDoc.GetPreviewPage += GetPreviewPage;
+            //printDoc.AddPages += AddPages;
 
-        //    // Register the current page as a share source.
-        //    dataTransferManager = DataTransferManager.GetForCurrentView();
-        //    dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager, DataRequestedEventArgs>(this.ShareImageHandler);
+            //// Register the current page as a share source.
+            //dataTransferManager = DataTransferManager.GetForCurrentView();
+            //dataTransferManager.DataRequested += new TypedEventHandler<DataTransferManager, DataRequestedEventArgs>(this.ShareImageHandler);
 
-        //    // For shortcut keys
-        //    Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
-        //}
+            // For shortcut keys
+            Window.Current.CoreWindow.KeyDown += CoreWindow_KeyDown;
+        }
 
-        //protected override void OnNavigatedFrom(NavigationEventArgs e)
-        //{
-        //    dataTransferManager.DataRequested -= ShareImageHandler;
-        //    printMan.PrintTaskRequested -= PrintTaskRequested;
-        //    printDoc.Paginate -= Paginate;
-        //    printDoc.GetPreviewPage -= GetPreviewPage;
-        //    printDoc.AddPages -= AddPages;
-        //    Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
-        //}
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            //dataTransferManager.DataRequested -= ShareImageHandler;
+            //printMan.PrintTaskRequested -= PrintTaskRequested;
+            //printDoc.Paginate -= Paginate;
+            //printDoc.GetPreviewPage -= GetPreviewPage;
+            //printDoc.AddPages -= AddPages;
+            Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
+        }
 
         #endregion
 
@@ -198,6 +182,8 @@ namespace MAF_VE_2
 
         void ManageBackgroundSetting()
         {
+            Log("ManageBackgroundSetting");
+
             Object backgroundSetting = localSettings.Values[BackgroundImageSetting];
             bool IsStored = CheckIfSettingIsStored(backgroundSetting);
             if (IsStored)
@@ -220,6 +206,8 @@ namespace MAF_VE_2
 
         async void ManageBackgroundImage()
         {
+            Log("ManageBackgroundImage");
+
             IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
             if (imageFileItem != null) // A file was previously saved and we were able to get it
             {
@@ -244,6 +232,8 @@ namespace MAF_VE_2
 
         bool CheckIfSettingIsStored(object setting)
         {
+            Log("CheckIfSettingIsStored");
+
             if (setting != null)
             {
                 return true;
@@ -256,27 +246,32 @@ namespace MAF_VE_2
 
         bool CheckIfBackgroundSettingIsShowImage(object setting)
         {
+            Log("CheckIfBackgroundSettingIsShowImage");
+
             try
             {
                 bool settingIsShowImage = (bool)setting;
                 if (settingIsShowImage)
                 {
+                    Log("Setting is: show image");
                     return true;
                 }
                 else
                 {
+                    Log("Setting is: no image");
                     return false;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
-                throw new Exception("Problem checking background setting. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
 
         async void SetImageAndCopyright()
         {
+            Log("SetImageAndCopyright");
+
             IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
             if (imageFileItem != null)
             {
@@ -294,6 +289,8 @@ namespace MAF_VE_2
 
         async Task<bool> SetBackgroundImage(IStorageItem storageItem)
         {
+            Log("SetBackgroundImage");
+
             try
             {
                 StorageFile file = storageItem as StorageFile;
@@ -315,12 +312,16 @@ namespace MAF_VE_2
 
         async void SetCopyrightText(IStorageItem storageItem)
         {
+            Log("SetCopyrightText");
+
             try
             {
                 StorageFile file = storageItem as StorageFile;
-                var copyrightText = await FileIO.ReadTextAsync(file);
+                DateTimeOffset dateCreated = file.DateCreated;
+                string dateTime = dateCreated.DateTime.ToString();
+                string copyrightText = await FileIO.ReadTextAsync(file);
 
-                copyright.Text = "Image: " + copyrightText;
+                copyright.Text = "Image: " + copyrightText + " " + dateTime;
                 copyrightButton.BorderThickness = new Thickness(1);
             }
             catch
@@ -332,6 +333,8 @@ namespace MAF_VE_2
 
         async Task<JsonObject> CheckForNewImage()
         {
+            Log("CheckForNewImage");
+
             JsonObject jsonObject;
             string JSON = await GetBingImageJSON();
 
@@ -349,10 +352,12 @@ namespace MAF_VE_2
 
                         if (copyrightText == savedCopyrightText)
                         {
+                            Log("No new image available yet");
                             return jsonObject = null; // New image not available yet
                         }
                         else
                         {
+                            Log("New image is available");
                             return jsonObject; // New image is available
                         }
                     }
@@ -375,6 +380,8 @@ namespace MAF_VE_2
 
         async Task<string> GetBingImageJSON()
         {
+            Log("GetBingImageJSON");
+
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
@@ -388,15 +395,17 @@ namespace MAF_VE_2
                     return JSON = await httpResponse.Content.ReadAsStringAsync();
                 }
             }
-            catch (Exception ex)
+            catch
             {
+                Log("No internet connection, or error on network");
                 return JSON = null;
-                throw new Exception("Problem getting JSON for image. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
 
         JsonObject ParseJSON(string JSON)
         {
+            Log("ParseJSON");
+
             JsonObject jsonObject;
             try
             {
@@ -410,15 +419,16 @@ namespace MAF_VE_2
                     return jsonObject = null;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return jsonObject = null;
-                throw new Exception("Problem parsing JSON for image. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
 
         async Task<bool> DownloadBingImageToFile(JsonObject jsonObject)
         {
+            Log("DownloadBingImageToFile");
+
             try
             {
                 string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
@@ -441,6 +451,8 @@ namespace MAF_VE_2
 
         async Task<bool> SaveCopyrightToFile(JsonObject jsonObject)
         {
+            Log("SaveCopyrightToFile");
+
             try
             {
                 string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
@@ -451,18 +463,22 @@ namespace MAF_VE_2
             }
             catch (Exception ex)
             {
+                await new MessageDialog("Problem saving copyright text. \n \n" + ex.Message + "\n \n", ex.InnerException.ToString()).ShowAsync();
                 return false;
-                throw new Exception("Problem saving copyright text. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
 
         void SetDefaultBackgroundImage()
         {
+            Log("SetDefaultBackgroundImage");
+
             backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
         }
 
         async void DownloadAndSetImageAndCopyrightIfNew()
         {
+            Log("DownloadAndSetImageAndCopyrightIfNew");
+
             JsonObject newImageJsonObject = await CheckForNewImage();
 
             if (newImageJsonObject != null) // New image is available
@@ -476,191 +492,6 @@ namespace MAF_VE_2
                 }
             }
         }
-
-
-        //async void SetBackgroundImage()
-        //{
-        //    // Set background image first
-        //    try
-        //    {
-        //        ImageLog("Try get image file...");
-
-        //        var imageFile = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
-        //        using (var stream = await imageFile.OpenReadAsync())
-        //        {
-        //            var bitmapImage = new BitmapImage();
-        //            await bitmapImage.SetSourceAsync(stream);
-        //            backgroundImage.Source = bitmapImage;
-        //        }
-
-        //        ImageLog("Got image file and set image...");
-        //    }
-        //    catch
-        //    {
-        //        ImageLog("Failed to get image file, return...");
-
-        //        backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
-        //        return;
-        //    }
-
-        //    // Then set copyright text
-        //    bool copyrightSetSuccessfully = false;
-        //    try
-        //    {
-        //        ImageLog("Try get copyright file...");
-
-        //        var copyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-        //        var copyrightText = await FileIO.ReadTextAsync(copyrightFile);
-        //        if (downloadedImage)
-        //        {
-        //            copyright.Text = "Image of the day: " + copyrightText;
-        //        }
-        //        else
-        //        {
-        //            copyright.Text = "Image: " + copyrightText;
-        //        }
-        //        copyrightSetSuccessfully = true;
-        //        copyrightButton.BorderThickness = new Thickness(1);
-
-        //        ImageLog("Got copyright file and set text...");
-        //    }
-        //    catch
-        //    {
-        //        copyright.Text = "Image: Could not get copyright info";
-        //        copyrightButton.BorderThickness = new Thickness(1);
-        //        copyrightSetSuccessfully = false;
-
-        //        ImageLog("Failed to get copyright file...");
-        //    }
-        //    finally
-        //    {
-        //        if (copyrightSetSuccessfully)
-        //        {
-        //            downloadedImage = false; // reset this to false for the next time around
-        //        }
-        //    }
-        //}
-
-        //async void DownloadImageIfNew()
-        //{
-        //    ImageLog("Start download method...");
-
-        //    string region = "en-US";
-        //    int numberOfImages = 1;
-        //    string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
-        //    string JSON = "";
-
-        //    try // Get JSON
-        //    {
-        //        ImageLog("Try get JSON...");
-
-        //        using (HttpClient httpClient = new HttpClient())
-        //        {
-        //            HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(bingImageURL));
-        //            JSON = await httpResponse.Content.ReadAsStringAsync();
-        //        }
-
-        //        ImageLog("Got JSON...");
-        //    }
-        //    catch
-        //    {
-        //        SetBackgroundImage();
-
-        //        ImageLog("Failed to get JSON, set background called...");
-        //    }
-
-        //    try // Parse JSON
-        //    {
-        //        ImageLog("Try Parse JSON...");
-
-        //        JsonObject jsonObject;
-        //        bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
-        //        Uri bingUri;
-        //        if (IsParsed)
-        //        {
-        //            ImageLog("Parse successful...");
-
-        //            string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
-        //            string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
-
-        //            // Check if new image by comparing copyright text
-        //            StorageFile savedCopyrightFile;
-        //            string savedCopyrightText = "none";
-        //            try
-        //            {
-        //                ImageLog("Try compare copyright text");
-
-        //                savedCopyrightFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-        //                savedCopyrightText = await FileIO.ReadTextAsync(savedCopyrightFile);
-        //            }
-        //            catch
-        //            {
-        //                ImageLog("Error when comparing copyright text, or no file available...");
-        //                // No file. An image has not been downloaded before.
-        //            }
-
-        //            if (copyrightText == savedCopyrightText)
-        //            {
-        //                ImageLog("Copyright text the same, return...");
-        //                return; // same image as last time, so don't download again
-        //            }
-        //            else
-        //            {
-        //                ImageLog("Copyright different, download image to file...");
-
-        //                string completeUrlForImage = "https://www.bing.com" + partialUrlForImage;
-        //                bingUri = new Uri(completeUrlForImage);
-
-        //                // Save image
-        //                string fileName = ImageFileName;
-        //                RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
-        //                StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
-        //                await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
-
-        //                // Save copyright
-        //                StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
-        //                await FileIO.WriteTextAsync(copyrightFile, copyrightText);
-
-        //                downloadedImage = true;
-        //            }
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        ImageLog("Error on parse or download..." + ex.Message);
-
-        //        try
-        //        {
-        //            ImageLog("Deleting image file...");
-        //            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
-        //            await file.DeleteAsync();
-        //            ImageLog("Image file deleted...");
-        //        }
-        //        catch (Exception ex1)
-        //        {
-        //            ImageLog("Failed to delete image file..." + ex1.Message);
-        //        }
-
-        //        try
-        //        {
-        //            ImageLog("Deleting copyright file...");
-        //            StorageFile file = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
-        //            await file.DeleteAsync();
-        //            ImageLog("Copyright file deleted...");
-        //        }
-        //        catch (Exception ex2)
-        //        {
-        //            ImageLog("Failed to delete copyright file..." + ex2.Message);
-        //        }
-                
-        //    }
-        //    finally
-        //    {
-        //        // Set the background image
-        //        ImageLog("Set background called at end of download method...");
-        //        SetBackgroundImage();
-        //    }
-        //}
 
         private void copyrightButton_Click(object sender, RoutedEventArgs e)
         {
@@ -791,12 +622,12 @@ namespace MAF_VE_2
             return fileName;
         }
 
-        //void ImageLog(string str)
-        //{
-        //    TextBlock t = new TextBlock();
-        //    t.Text = str;
-        //    backgroundImageLogPanel.Children.Add(t);
-        //}
+        void Log(string str)
+        {
+            TextBlock t = new TextBlock();
+            t.Text = str;
+            backgroundImageLogPanel.Children.Add(t);
+        }
 
         #endregion
 
@@ -1976,5 +1807,55 @@ namespace MAF_VE_2
         }
 
         #endregion
+
+        #region Shortcut Keys
+
+        private void CoreWindow_KeyDown(CoreWindow sender, KeyEventArgs args)
+        {
+            var focusedElement = FocusManager.GetFocusedElement();
+
+            if (focusedElement is TextBox) // Only allow some shortcut keys to be handled, because a TextBox has some of the same shortcut keys and only one thing should handle the shortcut action.
+            {
+                var currentStateOfCtrlKey = sender.GetAsyncKeyState(VirtualKey.Control);
+
+                if (currentStateOfCtrlKey == CoreVirtualKeyStates.Down)
+                {
+                    switch (args.VirtualKey)
+                    {
+                        case VirtualKey.Up: backgroundImageLogPanel.Visibility = Visibility.Visible; break;
+                        case VirtualKey.Down: backgroundImageLogPanel.Visibility = Visibility.Collapsed; break;
+                        //case VirtualKey.Y: Redo(); break;
+                        //case VirtualKey.S: Save(); break;
+                        //case VirtualKey.N: New(); break;
+                        //case VirtualKey.O: Open(); break;
+                        //case VirtualKey.P: Print(); break;
+                    }
+                }
+            }
+            else // Allow all global shortcut keys
+            {
+                var currentStateOfCtrlKey = sender.GetAsyncKeyState(VirtualKey.Control);
+
+                if (currentStateOfCtrlKey == CoreVirtualKeyStates.Down)
+                {
+                    switch (args.VirtualKey)
+                    {
+                        case VirtualKey.Up: backgroundImageLogPanel.Visibility = Visibility.Visible; break;
+                        case VirtualKey.Down: backgroundImageLogPanel.Visibility = Visibility.Collapsed; break;
+                        //case VirtualKey.V: Paste(); break;
+                        //case VirtualKey.Z: Undo(); break;
+                        //case VirtualKey.Y: Redo(); break;
+                        //case VirtualKey.S: Save(); break;
+                        //case VirtualKey.N: New(); break;
+                        //case VirtualKey.O: Open(); break;
+                        //case VirtualKey.C: Copy(); break;
+                        //case VirtualKey.P: Print(); break;
+                    }
+                }
+            }
+        }
+
+        #endregion
+
     }
 }

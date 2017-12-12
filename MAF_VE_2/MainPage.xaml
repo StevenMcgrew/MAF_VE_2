@@ -810,9 +810,9 @@
             <TextBlock FontSize="48" FontFamily="Segoe MDL2 Assets" Text="&#xE73E;" HorizontalAlignment="Center" Foreground="#FF3399FF"/>
         </StackPanel>
 
-        <!--<StackPanel Name="backgroundImageLogPanel" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
+        <StackPanel Name="backgroundImageLogPanel" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
             <TextBlock Text="Background Image Log:"/>
-        </StackPanel>-->
+        </StackPanel>
 
     </Grid>
 </Page>
