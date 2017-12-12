@@ -417,7 +417,7 @@ namespace MAF_VE_2
             }
         }
 
-        async void DownloadBingImageToFile(JsonObject jsonObject)
+        async Task<bool> DownloadBingImageToFile(JsonObject jsonObject)
         {
             try
             {
@@ -429,23 +429,29 @@ namespace MAF_VE_2
                 RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
                 StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
                 await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
+
+                return true;
             }
             catch (Exception ex)
             {
+                return false;
                 throw new Exception("Problem downloading new image. Network error or slow internet connetion. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
 
-        async void SaveCopyrightToFile(JsonObject jsonObject)
+        async Task<bool> SaveCopyrightToFile(JsonObject jsonObject)
         {
             try
             {
                 string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
                 StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(copyrightFile, copyrightText);
+
+                return true;
             }
             catch (Exception ex)
             {
+                return false;
                 throw new Exception("Problem saving copyright text. \n \n" + ex.Message + "\n \n", ex.InnerException);
             }
         }
@@ -461,9 +467,13 @@ namespace MAF_VE_2
 
             if (newImageJsonObject != null) // New image is available
             {
-                DownloadBingImageToFile(newImageJsonObject);
-                SaveCopyrightToFile(newImageJsonObject);
-                SetImageAndCopyright();
+                bool imageDownloaded = await DownloadBingImageToFile(newImageJsonObject);
+                bool copyrightSaved = await SaveCopyrightToFile(newImageJsonObject);
+
+                if (imageDownloaded)
+                {
+                    SetImageAndCopyright();
+                }
             }
         }
 
