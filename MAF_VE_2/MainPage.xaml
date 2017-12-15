@@ -699,7 +699,7 @@
 
         </Pivot>
 
-        <StackPanel Name="menuPanel" VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal">
+        <StackPanel Name="menuPanel" VerticalAlignment="Top" Background="Transparent" Orientation="Horizontal" Height="45">
             <Button Name="menuButton" Style="{StaticResource blueButtonStyle}" HorizontalContentAlignment="Left" Width="100" VerticalAlignment="Top" Background="#CC000000">
                 <StackPanel Orientation="Horizontal">
                     <TextBlock FontFamily="Segoe MDL2 Assets" Text=" &#xE700;" VerticalAlignment="Center"/>

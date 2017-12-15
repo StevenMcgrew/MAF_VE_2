@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Data.Json;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using Windows.System;
@@ -348,12 +349,15 @@ namespace MAF_VE_2
             try
             {
                 StorageFile file = storageItem as StorageFile;
-                DateTimeOffset dateCreated = file.DateCreated;
-                string dateTime = dateCreated.DateTime.ToString();
+                BasicProperties props = await file.GetBasicPropertiesAsync();
                 string copyrightText = await FileIO.ReadTextAsync(file);
 
-                copyright.Text = "Image: " + copyrightText + " " + dateTime;
+                copyright.Text = "Image: " + copyrightText;
                 copyrightButton.BorderThickness = new Thickness(1);
+
+                DateTimeOffset dateOfLastMod = props.DateModified;
+                string dateTime = dateOfLastMod.DateTime.ToString();
+                Log("File last modified: " + dateTime);
             }
             catch (Exception ex)
             {
