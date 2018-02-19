@@ -40,6 +40,7 @@ namespace MAF_VE_2
 
         ApplicationDataContainer localSettings;
         const string BackgroundImageSetting = "BackgroundImageSetting";
+        const string ShowBackupReminder = "ShowBackupReminder";
 
         #endregion
 
@@ -486,9 +487,9 @@ namespace MAF_VE_2
             }
             catch (Exception ex)
             {
-                await new MessageDialog("Problem downloading image. \n \n" + ex.Message).ShowAsync();
+                await new MessageDialog("Problem downloading image. A slow internet connection can cause this problem. \n \n" + ex.Message).ShowAsync();
 
-                Log("Failed to download to file...");
+                Log("Failed to download to file, check internet...");
                 return false;
             }
         }
@@ -701,6 +702,74 @@ namespace MAF_VE_2
             veChartDataDescription.Text = "Perform a search to see data in this chart";
             mafChartDataDescription.Text = "Perform a search to see data in this chart";
             ClearChartData();
+        }
+
+        #endregion
+
+        #region Backup options
+
+        void BeginLocalDbBackupOption()
+        {
+            Object backupReminderSetting = localSettings.Values[ShowBackupReminder];
+            bool IsStored = CheckIfSettingIsStored(backupReminderSetting);
+            if (IsStored)
+            {
+                try
+                {
+                    bool showReminder = (bool)backupReminderSetting;
+                    if (showReminder)
+                    {
+                        ShowBackupReminderPopup();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("ShowBackupReminder error:  " + ex.Message);
+                }
+            }
+            else
+            {
+                ShowBackupReminderPopup();
+            }
+        }
+
+        void ShowBackupReminderPopup()
+        {
+            localSettings.Values[ShowBackupReminder] = true;
+
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            askToBackupPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void yesBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void noBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            askToBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void dontAskBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values[ShowBackupReminder] = false;
+
+            askToBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void dataBackupMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            localDbBackupPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void closeBackupPopupButton_Click(object sender, RoutedEventArgs e)
+        {
+            localDbBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
         }
 
         #endregion
@@ -1224,6 +1293,7 @@ namespace MAF_VE_2
         private async void saveButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog1 = new MessageDialog("Must enter Year, Make, Model, Engine, and select Good/Bad/Unsure. Only the comments section is optional.");
+            bool success = false;
 
             string _year;
             string _make;
@@ -1295,10 +1365,19 @@ namespace MAF_VE_2
                 unsure.ClearValue(RadioButton.IsCheckedProperty);
                 condition = "";
                 comments.ClearValue(TextBox.TextProperty);
+
+                success = true;
             }
             catch
             {
                 await new MessageDialog("Failed to save. Make sure your inputs in the calculator are correct. Input requirements: Numbers only; Only one decimal (or no decimals) per input box; No blank input boxes.").ShowAsync();
+            }
+            finally
+            {
+                if (success)
+                {
+                    BeginLocalDbBackupOption();
+                }
             }
         }
 
@@ -1901,7 +1980,12 @@ namespace MAF_VE_2
             }
         }
 
+
+
+
+
         #endregion
 
+        
     }
 }
