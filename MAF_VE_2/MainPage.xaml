@@ -797,19 +797,19 @@
                 <Span><Underline>Local database backup options</Underline></Span>
                 <Span>:</Span>
                 </TextBlock>
-                <ToggleSwitch Name="autoBackupToggle" Foreground="White" Margin="0,0,0,10">
+                <ToggleSwitch Name="autoBackupToggle" Foreground="White" Margin="0,0,0,10" Toggled="autoBackupToggle_Toggled">
                     <ToggleSwitch.HeaderTemplate>
                         <DataTemplate>
                             <ContentPresenter>
-                                <TextBlock Text="Automatic Backups (You will be prompted to choose a save location)" Foreground="White"/>
+                                <TextBlock Text="Automatic Backups" Foreground="White"/>
                             </ContentPresenter>
                         </DataTemplate>
                     </ToggleSwitch.HeaderTemplate>
                 </ToggleSwitch>
                 <TextBlock Foreground="White" Text="If you uninstalled this app and lost your database, you can import a previously saved database backup file. **Any current local data will be overwritten by the imported database." TextWrapping="WrapWholeWords"/>
-                <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,20"/>
+                <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,20" Click="importButton_Click"/>
                 <TextBlock Foreground="White" Text="If you want to import a database file without overwritting the current local data, use this import and merge option." TextWrapping="WrapWholeWords"/>
-                <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40"/>
+                <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importAndMergeButton_Click"/>
                 <Button Name="closeBackupPopupButton" Content="Close" HorizontalAlignment="Center" Style="{StaticResource blueButtonStyle}" Click="closeBackupPopupButton_Click"/>
             </StackPanel>
 

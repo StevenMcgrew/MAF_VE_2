@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Data.Json;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
 using Windows.Storage.FileProperties;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
@@ -41,6 +42,7 @@ namespace MAF_VE_2
         ApplicationDataContainer localSettings;
         const string BackgroundImageSetting = "BackgroundImageSetting";
         const string ShowBackupReminder = "ShowBackupReminder";
+        const string DbBackupFileToken = "DbBackupFileToken";
 
         #endregion
 
@@ -82,7 +84,7 @@ namespace MAF_VE_2
         void InitializeLocalDatabase()
         {
             // Connect to local database and create tables if they don't exist
-            string localDatabasePath = System.IO.Path.Combine(Windows.Storage.ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
+            string localDatabasePath = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
             localDatabaseConnection = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), localDatabasePath);
             localDatabaseConnection.CreateTable<MAFcalculation>();
             localDatabaseConnection.CreateTable<LocalCarMake>();
@@ -742,6 +744,61 @@ namespace MAF_VE_2
         }
 
         private void yesBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveLocalDatabaseBackup();
+        }
+
+        private void autoBackupToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            var toggleSwitch = sender as ToggleSwitch;
+
+            if (toggleSwitch.IsOn)
+            {
+                
+            }
+        }
+
+        async void SaveLocalDatabaseBackup()
+        {
+            localDatabaseConnection.Close();
+
+            try
+            {
+                var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
+
+                if (dbFile != null)
+                {
+                    var savePicker = new FileSavePicker();
+                    savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+                    savePicker.FileTypeChoices.Add(".sqlite SQLite database", new List<string>() { ".sqlite" });
+                    savePicker.SuggestedFileName = "MAF-VE-backup.sqlite";
+
+                    var file = await savePicker.PickSaveFileAsync();
+                    if (file != null)
+                    {
+                        await dbFile.CopyAndReplaceAsync(file);
+
+                        string token = StorageApplicationPermissions.FutureAccessList.Add(file);
+                        localSettings.Values[DbBackupFileToken] = token;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var dialog = await new MessageDialog("A problem occured when trying to save database file. " + ex.Message).ShowAsync();
+            }
+            finally
+            {
+                InitializeLocalDatabase();
+            }
+        }
+
+        private void importButton_Click(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void importAndMergeButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
@@ -1979,6 +2036,7 @@ namespace MAF_VE_2
                 }
             }
         }
+
 
 
 
