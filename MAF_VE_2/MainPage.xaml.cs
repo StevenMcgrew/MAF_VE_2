@@ -43,6 +43,8 @@ namespace MAF_VE_2
         const string BackgroundImageSetting = "BackgroundImageSetting";
         const string ShowBackupReminder = "ShowBackupReminder";
         const string DbBackupFileToken = "DbBackupFileToken";
+        const string AutoBackupIsOn = "AutoBackupIsOn";
+        const string localRecordCountAtLastBackup = "localRecordCountAtLastBackup";
 
         #endregion
 
@@ -95,6 +97,7 @@ namespace MAF_VE_2
             AddEngineComboboxItems();
             AddYearComboboxItems();
             RefreshMakesComboBox();
+            ManageAutoBackupSetting();
             ShowAllLocalRecords();
             ManageBackgroundSetting();
         }
@@ -177,6 +180,28 @@ namespace MAF_VE_2
             //printDoc.GetPreviewPage -= GetPreviewPage;
             //printDoc.AddPages -= AddPages;
             Window.Current.CoreWindow.KeyDown -= CoreWindow_KeyDown;
+        }
+
+        void ManageAutoBackupSetting()
+        {
+            Object autoBackupSetting = localSettings.Values[AutoBackupIsOn];
+            bool IsStored = CheckIfSettingIsStored(autoBackupSetting);
+
+            if (IsStored)
+            {
+                try
+                {
+                    bool backupIsOn = (bool)autoBackupSetting;
+                    if (backupIsOn)
+                    {
+                        autoBackupToggle.IsOn = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("ManageAutoBackupSetting error:  " + ex.Message);
+                }
+            }
         }
 
         #endregion
@@ -686,6 +711,7 @@ namespace MAF_VE_2
         {
             var mafRecords = localDatabaseConnection.Query<MAFcalculation>("SELECT * from MAFcalculation ORDER BY vehicleID DESC");
             localRecords.ItemsSource = mafRecords;
+            
             if (mafRecords.Count == 0)
             {
                 noResults.Visibility = Visibility.Visible;
@@ -712,6 +738,34 @@ namespace MAF_VE_2
 
         void BeginLocalDbBackupOption()
         {
+            // Need to check if autoback up toggle is on........
+
+            var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+            Object savedCount = localSettings.Values[localRecordCountAtLastBackup];
+
+            bool stored = CheckIfSettingIsStored(savedCount);
+            if (stored) // Backup has been stored before
+            {
+                try
+                {
+                    int countAtLastBackup = (int)savedCount;
+
+                    if (currentCount - countAtLastBackup > 2)
+                    {
+                        AutosaveLocalDbBackup();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("BeginLocalDbBackupOption error:  " + ex.Message);
+                }
+            }
+            else // Backup has not been stored before
+            {
+
+            }
+
+
             Object backupReminderSetting = localSettings.Values[ShowBackupReminder];
             bool IsStored = CheckIfSettingIsStored(backupReminderSetting);
             if (IsStored)
@@ -735,6 +789,8 @@ namespace MAF_VE_2
             }
         }
 
+
+
         void ShowBackupReminderPopup()
         {
             localSettings.Values[ShowBackupReminder] = true;
@@ -754,18 +810,79 @@ namespace MAF_VE_2
 
             if (toggleSwitch.IsOn)
             {
-                
+                Object token = localSettings.Values[DbBackupFileToken];
+                bool tokenIsStored = CheckIfSettingIsStored(token);
+
+                if (tokenIsStored)
+                {
+                    // Do nothing. We already have an access token to auto save file.
+                }
+                else
+                {
+                    SaveLocalDatabaseBackup();
+                }
+
+                localSettings.Values[AutoBackupIsOn] = true;
+            }
+            else
+            {
+                localSettings.Values[AutoBackupIsOn] = false;
+            }
+        }
+
+        async void AutosaveLocalDbBackup()
+        {
+            var localRecordsCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+
+            Object token = localSettings.Values[DbBackupFileToken];
+            bool settingIsStored = CheckIfSettingIsStored(token);
+
+            if (settingIsStored)
+            {
+                try
+                {
+                    localDatabaseConnection.Close();
+                    backingUpPopup.Visibility = Visibility.Visible;
+
+                    string fileAccessToken = (string)token;
+                    var storageFile = await StorageApplicationPermissions.FutureAccessList.GetFileAsync(fileAccessToken);
+
+                    var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
+                    if (dbFile != null)
+                    {
+                        await dbFile.CopyAndReplaceAsync(storageFile);
+                    }
+                    else
+                    {
+                        var dialog = await new MessageDialog("Local database file not found.").ShowAsync();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Log("AutosaveLocalDbBackup error:  " + ex.Message);
+                }
+                finally
+                {
+                    InitializeLocalDatabase();
+                    backingUpPopup.Visibility = Visibility.Collapsed;
+                    localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
+                }
+            }
+            else
+            {
+                SaveLocalDatabaseBackup();
             }
         }
 
         async void SaveLocalDatabaseBackup()
         {
-            localDatabaseConnection.Close();
-
+            var localRecordsCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+            
             try
             {
-                var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
+                localDatabaseConnection.Close();
 
+                var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                 if (dbFile != null)
                 {
                     var savePicker = new FileSavePicker();
@@ -790,6 +907,7 @@ namespace MAF_VE_2
             finally
             {
                 InitializeLocalDatabase();
+                localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
             }
         }
 
@@ -2036,11 +2154,6 @@ namespace MAF_VE_2
                 }
             }
         }
-
-
-
-
-
 
         #endregion
 

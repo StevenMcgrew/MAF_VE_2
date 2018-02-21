@@ -624,7 +624,11 @@
 
                         </Pivot>
 
-
+                        <Grid Name="backingUpPopup" Visibility="Collapsed" Grid.RowSpan="2" Background="#B2000000">
+                            <StackPanel Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1" Margin="0,0,0,200">
+                                <TextBlock FontSize="18" Foreground="White" Text="Auto Backup..." TextWrapping="WrapWholeWords" Margin="0,0,0,5"/>
+                            </StackPanel>
+                        </Grid>
 
                     </Grid>
 
