@@ -738,58 +738,71 @@ namespace MAF_VE_2
 
         void BeginLocalDbBackupOption()
         {
-            // Need to check if autoback up toggle is on........
-
-            var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
-            Object savedCount = localSettings.Values[localRecordCountAtLastBackup];
-
-            bool stored = CheckIfSettingIsStored(savedCount);
-            if (stored) // Backup has been stored before
+            var backupIsOn = autoBackupToggle.IsOn;
+            if (backupIsOn)
             {
-                try
-                {
-                    int countAtLastBackup = (int)savedCount;
+                var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+                Object savedCount = localSettings.Values[localRecordCountAtLastBackup];
 
-                    if (currentCount - countAtLastBackup > 2)
+                bool stored = CheckIfSettingIsStored(savedCount);
+                if (stored) // Backup should have been stored before, and savedCount is available
+                {
+                    try
                     {
-                        AutosaveLocalDbBackup();
+                        int countAtLastBackup = (int)savedCount;
+
+                        if (currentCount - countAtLastBackup > 2)
+                        {
+                            AutosaveLocalDbBackup();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("BeginLocalDbBackupOption error:  " + ex.Message);
                     }
                 }
-                catch (Exception ex)
+                else // Backup has not been stored before
                 {
-                    Log("BeginLocalDbBackupOption error:  " + ex.Message);
-                }
-            }
-            else // Backup has not been stored before
-            {
-
-            }
-
-
-            Object backupReminderSetting = localSettings.Values[ShowBackupReminder];
-            bool IsStored = CheckIfSettingIsStored(backupReminderSetting);
-            if (IsStored)
-            {
-                try
-                {
-                    bool showReminder = (bool)backupReminderSetting;
-                    if (showReminder)
-                    {
-                        ShowBackupReminderPopup();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Log("ShowBackupReminder error:  " + ex.Message);
+                    // Show message that a save location will be chosen
+                    SaveLocalDatabaseBackup();
                 }
             }
             else
             {
-                ShowBackupReminderPopup();
+                Object backupReminderSetting = localSettings.Values[ShowBackupReminder];
+                bool IsStored = CheckIfSettingIsStored(backupReminderSetting);
+                if (IsStored)
+                {
+                    try
+                    {
+                        bool showReminder = (bool)backupReminderSetting;
+                        if (showReminder)
+                        {
+                            var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+                            if (currentCount == 0)
+                            {
+                                // Do nothing. No records saved yet.
+                            }
+                            else
+                            {
+                                if (currentCount % 3 == 0) // if currentCount is divisible by three, then remainder would be zero
+                                {
+                                    ShowBackupReminderPopup();
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log("ShowBackupReminder error:  " + ex.Message);
+                    }
+                }
+                else
+                {
+                    ShowBackupReminderPopup();
+                }
             }
         }
-
-
 
         void ShowBackupReminderPopup()
         {
@@ -802,6 +815,9 @@ namespace MAF_VE_2
         private void yesBackupButton_Click(object sender, RoutedEventArgs e)
         {
             SaveLocalDatabaseBackup();
+
+            askToBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
         }
 
         private void autoBackupToggle_Toggled(object sender, RoutedEventArgs e)
@@ -810,18 +826,7 @@ namespace MAF_VE_2
 
             if (toggleSwitch.IsOn)
             {
-                Object token = localSettings.Values[DbBackupFileToken];
-                bool tokenIsStored = CheckIfSettingIsStored(token);
-
-                if (tokenIsStored)
-                {
-                    // Do nothing. We already have an access token to auto save file.
-                }
-                else
-                {
-                    SaveLocalDatabaseBackup();
-                }
-
+                BeginLocalDbBackupOption();
                 localSettings.Values[AutoBackupIsOn] = true;
             }
             else
@@ -887,7 +892,7 @@ namespace MAF_VE_2
                 {
                     var savePicker = new FileSavePicker();
                     savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-                    savePicker.FileTypeChoices.Add(".sqlite SQLite database", new List<string>() { ".sqlite" });
+                    savePicker.FileTypeChoices.Add("SQLite database", new List<string>() { ".sqlite" });
                     savePicker.SuggestedFileName = "MAF-VE-backup.sqlite";
 
                     var file = await savePicker.PickSaveFileAsync();
@@ -897,6 +902,10 @@ namespace MAF_VE_2
 
                         string token = StorageApplicationPermissions.FutureAccessList.Add(file);
                         localSettings.Values[DbBackupFileToken] = token;
+                    }
+                    else
+                    {
+                        // operation cancelled
                     }
                 }
             }
@@ -911,14 +920,90 @@ namespace MAF_VE_2
             }
         }
 
-        private void importButton_Click(object sender, RoutedEventArgs e)
+        private async void importButton_Click(object sender, RoutedEventArgs e)
         {
-            
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add(".sqlite");
+            StorageFile file = await picker.PickSingleFileAsync();
+
+            if (file != null)
+            {
+                if (file.FileType == ".sqlite")
+                {
+                    try
+                    {
+                        localDatabaseConnection.Close();
+                        var localAppFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
+                        await file.CopyAndReplaceAsync(localAppFile);
+                        ShowAllLocalRecords();
+                    }
+                    catch (Exception ex)
+                    {
+                        var dialog = await new MessageDialog("A problem occured when trying to import the file." + ex.Message).ShowAsync();
+                        InitializeLocalDatabase();
+                        ShowAllLocalRecords();
+                    }
+                }
+                else
+                {
+                    var dialog = await new MessageDialog("Wrong file type detected. Make sure to choose a SQLITE (.sqlite) file.").ShowAsync();
+                }
+            }
+            else
+            {
+                // operation cancelled
+            }
         }
 
-        private void importAndMergeButton_Click(object sender, RoutedEventArgs e)
+        private async void importAndMergeButton_Click(object sender, RoutedEventArgs e)
         {
+            FileOpenPicker picker = new FileOpenPicker();
+            picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            picker.FileTypeFilter.Add(".sqlite");
+            StorageFile file = await picker.PickSingleFileAsync();
 
+            if (file != null)
+            {
+                if (file.FileType == ".sqlite")
+                {
+                    try
+                    {
+                        localDatabaseConnection.Close();
+
+                        string firstDbPath = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
+                        string secondDbPath = file.Path;
+                        localDatabaseConnection.Execute("ATTACH DATABASE '" + firstDbPath + "' AS firstDB;");
+                        localDatabaseConnection.Execute("ATTACH DATABASE '" + secondDbPath + "' AS secondDB");
+
+                        string query = "INSERT OR REPLACE INTO firstDB.Students ("
+                                        + "Year, Make, Model, Engine, Condition, Comments, MAF_units, Temp_units, Altitude_units, Engine_speed, MAF, Engine_size, Air_temperature, Altitude, Expected_MAF, MAF_Difference, Volumetric_Efficiency) "
+                                        + "SELECT Year, Make, Model, Engine, Condition, Comments, MAF_units, Temp_units, Altitude_units, Engine_speed, MAF, Engine_size, Air_temperature, Altitude, Expected_MAF, MAF_Difference, Volumetric_Efficiency "
+                                        + "FROM secondDB.Students";
+                        localDatabaseConnection.Execute(query);
+
+
+
+
+                        InitializeLocalDatabase();
+                        ShowAllLocalRecords();
+                    }
+                    catch (Exception ex)
+                    {
+                        var dialog = await new MessageDialog("A problem occured when trying to import and merge the file." + ex.Message).ShowAsync();
+                        InitializeLocalDatabase();
+                        ShowAllLocalRecords();
+                    }
+                }
+                else
+                {
+                    var dialog = await new MessageDialog("Wrong file type detected. Make sure to choose a SQLITE (.sqlite) file.").ShowAsync();
+                }
+            }
+            else
+            {
+                // operation cancelled
+            }
         }
 
         private void noBackupButton_Click(object sender, RoutedEventArgs e)
@@ -945,6 +1030,17 @@ namespace MAF_VE_2
         {
             localDbBackupPopUp.Visibility = Visibility.Collapsed;
             popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void generalOkButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (generalText.Text == "") //Put the actual text here
+            {
+                popUpPanelBackground.Visibility = Visibility.Collapsed;
+            }
+
+            generalPopup.Visibility = Visibility.Collapsed;
+            generalText.ClearValue(TextBlock.TextProperty);
         }
 
         #endregion
@@ -2154,6 +2250,7 @@ namespace MAF_VE_2
                 }
             }
         }
+
 
         #endregion
 

@@ -789,29 +789,34 @@
                 <Button Name="doneBackgroundOptions" HorizontalAlignment="Center" Content="Done" Style="{StaticResource blueButtonStyle}" Click="doneBackgroundOptions_Click"/>
             </StackPanel>
 
+            <StackPanel Name="generalPopup" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
+                <TextBlock Name="generalText" TextWrapping="WrapWholeWords" Foreground="White" Margin="0,0,0,10"/>
+                <Button Name="generalOkButton" Content="OK" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Click="generalOkButton_Click"/>
+            </StackPanel>
+
             <StackPanel Name="askToBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
-                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White" Text="Choose where to save automatic backups in case you lose your data?" TextWrapping="WrapWholeWords"/>
+                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White" Text="Auto Backup your data?" TextWrapping="WrapWholeWords"/>
                 <Button Name="yesBackupButton" Content="Yes" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="yesBackupButton_Click"/>
                 <Button Name="noBackupButton" Content="No" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="noBackupButton_Click"/>
                 <Button Name="dontAskBackupButton" Content="No, don't ask again" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,10" Width="146" Click="dontAskBackupButton_Click"/>
             </StackPanel>
 
             <StackPanel Name="localDbBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
-                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White">
+                <TextBlock Margin="0,0,0,40" FontSize="18" Foreground="White">
                 <Span><Underline>Local database backup options</Underline></Span>
                 <Span>:</Span>
                 </TextBlock>
-                <ToggleSwitch Name="autoBackupToggle" Foreground="White" Margin="0,0,0,10" Toggled="autoBackupToggle_Toggled">
+                <ToggleSwitch Name="autoBackupToggle" Foreground="White" Margin="0,0,0,30" Toggled="autoBackupToggle_Toggled">
                     <ToggleSwitch.HeaderTemplate>
                         <DataTemplate>
                             <ContentPresenter>
-                                <TextBlock Text="Automatic Backups" Foreground="White"/>
+                                <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
                             </ContentPresenter>
                         </DataTemplate>
                     </ToggleSwitch.HeaderTemplate>
                 </ToggleSwitch>
-                <TextBlock Foreground="White" Text="If you uninstalled this app and lost your database, you can import a previously saved database backup file. **Any current local data will be overwritten by the imported database." TextWrapping="WrapWholeWords"/>
-                <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,20" Click="importButton_Click"/>
+                <TextBlock Foreground="White" Text="If you uninstalled this app and lost your data, you can import a previously saved database backup file. **Any current local data will be overwritten by the imported database." TextWrapping="WrapWholeWords"/>
+                <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
                 <TextBlock Foreground="White" Text="If you want to import a database file without overwritting the current local data, use this import and merge option." TextWrapping="WrapWholeWords"/>
                 <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importAndMergeButton_Click"/>
                 <Button Name="closeBackupPopupButton" Content="Close" HorizontalAlignment="Center" Style="{StaticResource blueButtonStyle}" Click="closeBackupPopupButton_Click"/>
