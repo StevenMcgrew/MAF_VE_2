@@ -763,8 +763,9 @@ namespace MAF_VE_2
                 }
                 else // Backup has not been stored before
                 {
-                    // Show message that a save location will be chosen
-                    SaveLocalDatabaseBackup();
+                    popUpPanelBackground.Visibility = Visibility.Visible;
+                    generalPopup.Visibility = Visibility.Visible;
+                    generalText.Text = "Backup :  You will choose a save location.";
                 }
             }
             else
@@ -804,17 +805,23 @@ namespace MAF_VE_2
             }
         }
 
-        void ShowBackupReminderPopup()
-        {
-            localSettings.Values[ShowBackupReminder] = true;
-
-            popUpPanelBackground.Visibility = Visibility.Visible;
-            askToBackupPopUp.Visibility = Visibility.Visible;
-        }
-
         private void yesBackupButton_Click(object sender, RoutedEventArgs e)
         {
             SaveLocalDatabaseBackup();
+
+            askToBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void noBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            askToBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void dontAskBackupButton_Click(object sender, RoutedEventArgs e)
+        {
+            localSettings.Values[ShowBackupReminder] = false;
 
             askToBackupPopUp.Visibility = Visibility.Collapsed;
             popUpPanelBackground.Visibility = Visibility.Collapsed;
@@ -833,6 +840,65 @@ namespace MAF_VE_2
             {
                 localSettings.Values[AutoBackupIsOn] = false;
             }
+        }
+
+        private void importButton_Click(object sender, RoutedEventArgs e)
+        {
+            localDbBackupPopUp.Visibility = Visibility.Collapsed;
+            
+            generalPopup.Visibility = Visibility.Visible;
+            generalText.Text = "Import :  You will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther file types, or other SQLITE files that were not created as a backup for this app will not work.";
+        }
+
+        private void importAndMergeButton_Click(object sender, RoutedEventArgs e)
+        {
+            localDbBackupPopUp.Visibility = Visibility.Collapsed;
+
+            generalPopup.Visibility = Visibility.Visible;
+            generalText.Text = "Merge :  You will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther file types, or other SQLITE files that were not created as a backup for this app will not work.";
+        }
+
+        private void dataBackupMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            localDbBackupPopUp.Visibility = Visibility.Visible;
+        }
+
+        private void closeBackupPopupButton_Click(object sender, RoutedEventArgs e)
+        {
+            localDbBackupPopUp.Visibility = Visibility.Collapsed;
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+        }
+
+        private void generalOkButton_Click(object sender, RoutedEventArgs e)
+        {
+            generalPopup.Visibility = Visibility.Collapsed;
+
+            if (generalText.Text.StartsWith("B")) // starts with "Backup"
+            {
+                SaveLocalDatabaseBackup();
+            }
+            else if (generalText.Text.StartsWith("I")) // starts with "Import"
+            {
+                ImportSQLiteFile();
+            }
+            else if (generalText.Text.StartsWith("M")) // starts with "Merge"
+            {
+                ImportAndMergeSQLiteFile();
+            }
+
+            popUpPanelBackground.Visibility = Visibility.Collapsed;
+            generalText.ClearValue(TextBlock.TextProperty);
+        }
+
+        // Functions for Data Backup /////////////////////////////////////////////////////////////
+
+        void ShowBackupReminderPopup()
+        {
+            localSettings.Values[ShowBackupReminder] = true;
+
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            askToBackupPopUp.Visibility = Visibility.Visible;
         }
 
         async void AutosaveLocalDbBackup()
@@ -882,7 +948,7 @@ namespace MAF_VE_2
         async void SaveLocalDatabaseBackup()
         {
             var localRecordsCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
-            
+
             try
             {
                 localDatabaseConnection.Close();
@@ -902,11 +968,17 @@ namespace MAF_VE_2
 
                         string token = StorageApplicationPermissions.FutureAccessList.Add(file);
                         localSettings.Values[DbBackupFileToken] = token;
+
+                        savedPopupStory.Begin();
                     }
                     else
                     {
                         // operation cancelled
                     }
+                }
+                else
+                {
+                    var dialog = await new MessageDialog("A problem occured when trying to get the file.").ShowAsync();
                 }
             }
             catch (Exception ex)
@@ -920,7 +992,7 @@ namespace MAF_VE_2
             }
         }
 
-        private async void importButton_Click(object sender, RoutedEventArgs e)
+        async void ImportSQLiteFile()
         {
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
@@ -936,12 +1008,15 @@ namespace MAF_VE_2
                         localDatabaseConnection.Close();
                         var localAppFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                         await file.CopyAndReplaceAsync(localAppFile);
-                        ShowAllLocalRecords();
                     }
                     catch (Exception ex)
                     {
                         var dialog = await new MessageDialog("A problem occured when trying to import the file." + ex.Message).ShowAsync();
+                    }
+                    finally
+                    {
                         InitializeLocalDatabase();
+                        RefreshMakesComboBox();
                         ShowAllLocalRecords();
                     }
                 }
@@ -950,13 +1025,13 @@ namespace MAF_VE_2
                     var dialog = await new MessageDialog("Wrong file type detected. Make sure to choose a SQLITE (.sqlite) file.").ShowAsync();
                 }
             }
-            else
+            else // FileOpenPicker canceled
             {
-                // operation cancelled
+                popUpPanelBackground.Visibility = Visibility.Collapsed;
             }
         }
 
-        private async void importAndMergeButton_Click(object sender, RoutedEventArgs e)
+        async void ImportAndMergeSQLiteFile()
         {
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
@@ -969,29 +1044,94 @@ namespace MAF_VE_2
                 {
                     try
                     {
-                        localDatabaseConnection.Close();
+                        var importedFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("ImportedFile.sqlite", CreationCollisionOption.ReplaceExisting);
+                        await file.CopyAndReplaceAsync(importedFile);
 
-                        string firstDbPath = System.IO.Path.Combine(ApplicationData.Current.LocalFolder.Path, "MAFdatabase.sqlite");
-                        string secondDbPath = file.Path;
-                        localDatabaseConnection.Execute("ATTACH DATABASE '" + firstDbPath + "' AS firstDB;");
-                        localDatabaseConnection.Execute("ATTACH DATABASE '" + secondDbPath + "' AS secondDB");
+                        string dbPath = System.IO.Path.Combine(ApplicationData.Current.TemporaryFolder.Path, "ImportedFile.sqlite");
+                        SQLite.Net.SQLiteConnection dbConn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), dbPath);
 
-                        string query = "INSERT OR REPLACE INTO firstDB.Students ("
-                                        + "Year, Make, Model, Engine, Condition, Comments, MAF_units, Temp_units, Altitude_units, Engine_speed, MAF, Engine_size, Air_temperature, Altitude, Expected_MAF, MAF_Difference, Volumetric_Efficiency) "
-                                        + "SELECT Year, Make, Model, Engine, Condition, Comments, MAF_units, Temp_units, Altitude_units, Engine_speed, MAF, Engine_size, Air_temperature, Altitude, Expected_MAF, MAF_Difference, Volumetric_Efficiency "
-                                        + "FROM secondDB.Students";
-                        localDatabaseConnection.Execute(query);
+                        var records = dbConn.Query<MAFcalculation>("SELECT * from MAFcalculation");
+                        foreach (var record in records)
+                        {
+                            List<string> queryStringList = new List<string>();
+                            string YEAR = " Year = '" + record.Year + "'";
+                            string MAKE = " Make = '" + record.Make + "'";
+                            string MODEL = " Model = '" + record.Model + "'";
+                            string ENGINE = " Engine = '" + record.Engine + "'";
+                            string CONDITION = " Condition = '" + record.Condition + "'";
+                            string MAF = " MAF = '" + Convert.ToString(record.MAF) + "'";
+                            string VE = " Volumetric_Efficiency = '" + Convert.ToString(record.Volumetric_Efficiency) + "'";
+                            queryStringList.Add(YEAR);
+                            queryStringList.Add(MAKE);
+                            queryStringList.Add(MODEL);
+                            queryStringList.Add(ENGINE);
+                            queryStringList.Add(CONDITION);
+                            queryStringList.Add(MAF);
+                            queryStringList.Add(VE);
 
+                            string queryString = string.Join(" AND", queryStringList);
+                            var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " LIMIT 1");
 
+                            if (query.Count == 0)
+                            {
+                                try
+                                {
+                                    localDatabaseConnection.Insert(new MAFcalculation()
+                                    {
+                                        Year = record.Year,
+                                        Make = record.Make,
+                                        Model = record.Model,
+                                        Engine = record.Engine,
+                                        Condition = record.Condition,
+                                        Comments = record.Comments,
+                                        Engine_speed = record.Engine_speed,
+                                        MAF = record.MAF,
+                                        Engine_size = record.Engine_size,
+                                        Air_temperature = record.Air_temperature,
+                                        Altitude = record.Altitude,
+                                        Expected_MAF = record.Expected_MAF,
+                                        MAF_Difference = record.MAF_Difference,
+                                        Volumetric_Efficiency = record.Volumetric_Efficiency,
+                                        MAF_units = record.MAF_units,
+                                        Temp_units = record.Temp_units,
+                                        Altitude_units = record.Altitude_units
+                                    });
+                                }
+                                catch
+                                {
 
+                                }
+                            }
+                        }
 
-                        InitializeLocalDatabase();
-                        ShowAllLocalRecords();
+                        try
+                        {
+                            var makes = dbConn.Query<LocalCarMake>("SELECT * from LocalCarMake");
+                            foreach (var make in makes)
+                            {
+                                var queryMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * FROM LocalCarMake WHERE Make = '" + make.Make + "' LIMIT 1");
+                                if (queryMakes.Count == 0)
+                                {
+                                    localDatabaseConnection.Insert(new LocalCarMake()
+                                    {
+                                        Make = make.Make
+                                    });
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            var dialog = await new MessageDialog("A problem occured when trying to merge Car Makes data.  " + ex.Message ).ShowAsync();
+                        }
                     }
                     catch (Exception ex)
                     {
-                        var dialog = await new MessageDialog("A problem occured when trying to import and merge the file." + ex.Message).ShowAsync();
+                        var dialog = await new MessageDialog("A problem occured when trying to import and merge the file.  " + ex.Message).ShowAsync();
+                    }
+                    finally
+                    {
                         InitializeLocalDatabase();
+                        RefreshMakesComboBox();
                         ShowAllLocalRecords();
                     }
                 }
@@ -1000,47 +1140,10 @@ namespace MAF_VE_2
                     var dialog = await new MessageDialog("Wrong file type detected. Make sure to choose a SQLITE (.sqlite) file.").ShowAsync();
                 }
             }
-            else
-            {
-                // operation cancelled
-            }
-        }
-
-        private void noBackupButton_Click(object sender, RoutedEventArgs e)
-        {
-            askToBackupPopUp.Visibility = Visibility.Collapsed;
-            popUpPanelBackground.Visibility = Visibility.Collapsed;
-        }
-
-        private void dontAskBackupButton_Click(object sender, RoutedEventArgs e)
-        {
-            localSettings.Values[ShowBackupReminder] = false;
-
-            askToBackupPopUp.Visibility = Visibility.Collapsed;
-            popUpPanelBackground.Visibility = Visibility.Collapsed;
-        }
-
-        private void dataBackupMenuItem_Click(object sender, RoutedEventArgs e)
-        {
-            popUpPanelBackground.Visibility = Visibility.Visible;
-            localDbBackupPopUp.Visibility = Visibility.Visible;
-        }
-
-        private void closeBackupPopupButton_Click(object sender, RoutedEventArgs e)
-        {
-            localDbBackupPopUp.Visibility = Visibility.Collapsed;
-            popUpPanelBackground.Visibility = Visibility.Collapsed;
-        }
-
-        private void generalOkButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (generalText.Text == "") //Put the actual text here
+            else // FileOpenPicker canceled
             {
                 popUpPanelBackground.Visibility = Visibility.Collapsed;
             }
-
-            generalPopup.Visibility = Visibility.Collapsed;
-            generalText.ClearValue(TextBlock.TextProperty);
         }
 
         #endregion
@@ -1122,7 +1225,7 @@ namespace MAF_VE_2
                     // Add new make to local database
                     localDatabaseConnection.Insert(new LocalCarMake()
                     {
-                        Make = makeToAdd,
+                        Make = makeToAdd
                     });
 
                     RefreshMakesComboBox();
@@ -2253,7 +2356,6 @@ namespace MAF_VE_2
 
 
         #endregion
-
         
     }
 }
