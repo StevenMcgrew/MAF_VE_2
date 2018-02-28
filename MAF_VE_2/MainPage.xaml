@@ -716,7 +716,7 @@
                         <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="backgroundMenuItem" Text="Background" Click="backgroundMenuItem_Click" />
-                        <MenuFlyoutItem Name="dataBackupMenuItem" Text="Backup/Import/Merge" Click="dataBackupMenuItem_Click"/>
+                        <MenuFlyoutItem Name="dataBackupMenuItem" Text="Backup / Import / Merge" Click="dataBackupMenuItem_Click"/>
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
                         <MenuFlyoutItem Name="aboutMenuItem" Text="About" Click="aboutMenuItem_Click"/>
                         <MenuFlyoutSeparator/>
@@ -795,26 +795,33 @@
             </StackPanel>
 
             <StackPanel Name="askToBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
-                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White" Text="Backup your data: Choose a save location." TextWrapping="WrapWholeWords"/>
+                <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White" Text="Setup automatic backups: Choose a save location." TextWrapping="WrapWholeWords"/>
                 <Button Name="yesBackupButton" Content="Yes" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="yesBackupButton_Click"/>
                 <Button Name="noBackupButton" Content="No" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="noBackupButton_Click"/>
                 <Button Name="dontAskBackupButton" Content="No, don't ask again" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,10" Width="146" Click="dontAskBackupButton_Click"/>
             </StackPanel>
 
             <StackPanel Name="localDbBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
-                <TextBlock Margin="0,0,0,40" FontSize="18" Foreground="White">
+                <TextBlock Margin="0,0,0,30" FontSize="18" Foreground="White">
                 <Span><Underline>Local database backup options</Underline></Span>
                 <Span>:</Span>
                 </TextBlock>
-                <ToggleSwitch Name="autoBackupToggle" Foreground="White" Margin="0,0,0,30" Toggled="autoBackupToggle_Toggled">
-                    <ToggleSwitch.HeaderTemplate>
-                        <DataTemplate>
-                            <ContentPresenter>
-                                <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
-                            </ContentPresenter>
-                        </DataTemplate>
-                    </ToggleSwitch.HeaderTemplate>
-                </ToggleSwitch>
+                <StackPanel Orientation="Horizontal" BorderBrush="white" BorderThickness="1" HorizontalAlignment="Left" Margin="0,0,0,30">
+                    <ToggleSwitch Name="autoBackupToggle" Foreground="White" Toggled="autoBackupToggle_Toggled" Margin="10,5,0,0">
+                        <ToggleSwitch.HeaderTemplate>
+                            <DataTemplate>
+                                <ContentPresenter>
+                                    <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
+                                </ContentPresenter>
+                            </DataTemplate>
+                        </ToggleSwitch.HeaderTemplate>
+                    </ToggleSwitch>
+                    <StackPanel VerticalAlignment="Top" Padding="10,5,10,7" MinWidth="200">
+                        <TextBlock Name="lastBuDateTimeText" Text="Last Backup :  " Foreground="White"/>
+                        <TextBlock Name="lastBuLocationText" Text="Location :  " Foreground="White"/>
+                        <TextBlock Name="lastBuNameText" Text="Name :  " Foreground="White"/>
+                    </StackPanel>
+                </StackPanel>
                 <TextBlock Foreground="White" Text="If you uninstalled this app and lost your data, you can import a previously saved backup file. ***Any currently saved app data will be overwritten by the imported database***" TextWrapping="WrapWholeWords"/>
                 <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
                 <TextBlock Foreground="White" Text="If you want to import a file without overwritting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>

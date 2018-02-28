@@ -741,7 +741,7 @@ namespace MAF_VE_2
             var backupIsOn = autoBackupToggle.IsOn;
             if (backupIsOn)
             {
-                var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+                var currentCount = localDatabaseConnection.Table<MAFcalculation>().Count();
                 Object savedCount = localSettings.Values[localRecordCountAtLastBackup];
 
                 bool stored = CheckIfSettingIsStored(savedCount);
@@ -808,7 +808,7 @@ namespace MAF_VE_2
         private void yesBackupButton_Click(object sender, RoutedEventArgs e)
         {
             SaveLocalDatabaseBackup();
-
+            localSettings.Values[ShowBackupReminder] = false;
             askToBackupPopUp.Visibility = Visibility.Collapsed;
             popUpPanelBackground.Visibility = Visibility.Collapsed;
         }
@@ -886,6 +886,10 @@ namespace MAF_VE_2
             {
                 ImportAndMergeSQLiteFile();
             }
+            //else if (generalText.Text.StartsWith("T")) // starts with "The import was successful"
+            //{
+                
+            //}
 
             popUpPanelBackground.Visibility = Visibility.Collapsed;
             generalText.ClearValue(TextBlock.TextProperty);
@@ -903,7 +907,7 @@ namespace MAF_VE_2
 
         async void AutosaveLocalDbBackup()
         {
-            var localRecordsCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+            var localRecordsCount = localDatabaseConnection.Table<MAFcalculation>().Count();
 
             Object token = localSettings.Values[DbBackupFileToken];
             bool settingIsStored = CheckIfSettingIsStored(token);
@@ -922,6 +926,11 @@ namespace MAF_VE_2
                     if (dbFile != null)
                     {
                         await dbFile.CopyAndReplaceAsync(storageFile);
+
+                        var props = await storageFile.GetBasicPropertiesAsync();
+                        lastBuDateTimeText.Text = "Last Backup :  " + props.DateModified.ToString();
+                        lastBuLocationText.Text = "Location :  " + storageFile.Path;
+                        lastBuNameText.Text = "Name :  " + storageFile.Name;
                     }
                     else
                     {
@@ -947,12 +956,13 @@ namespace MAF_VE_2
 
         async void SaveLocalDatabaseBackup()
         {
-            var localRecordsCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
+            var localRecordsCount = localDatabaseConnection.Table<MAFcalculation>().Count();
 
+            bool success = false;
             try
             {
                 localDatabaseConnection.Close();
-
+                
                 var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                 if (dbFile != null)
                 {
@@ -969,6 +979,13 @@ namespace MAF_VE_2
                         string token = StorageApplicationPermissions.FutureAccessList.Add(file);
                         localSettings.Values[DbBackupFileToken] = token;
 
+                        success = true;
+
+                        var props = await file.GetBasicPropertiesAsync();
+                        lastBuDateTimeText.Text = "Last Backup :  " + props.DateModified.ToString();
+                        lastBuLocationText.Text = "Location :  " + file.Path;
+                        lastBuNameText.Text = "Name :  " + file.Name;
+                        
                         savedPopupStory.Begin();
                     }
                     else
@@ -989,6 +1006,11 @@ namespace MAF_VE_2
             {
                 InitializeLocalDatabase();
                 localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
+
+                if (success)
+                {
+                    autoBackupToggle.IsOn = true;
+                }
             }
         }
 
@@ -1003,11 +1025,14 @@ namespace MAF_VE_2
             {
                 if (file.FileType == ".sqlite")
                 {
+                    bool success = false;
                     try
                     {
                         localDatabaseConnection.Close();
                         var localAppFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                         await file.CopyAndReplaceAsync(localAppFile);
+
+                        success = true;
                     }
                     catch (Exception ex)
                     {
@@ -1018,6 +1043,19 @@ namespace MAF_VE_2
                         InitializeLocalDatabase();
                         RefreshMakesComboBox();
                         ShowAllLocalRecords();
+
+                        if (success)
+                        {
+                            var count = localDatabaseConnection.Table<MAFcalculation>().Count();
+                            //("SELECT Count(*) FROM MAFcalculation")
+
+                            popUpPanelBackground.Visibility = Visibility.Visible;
+                            generalPopup.Visibility = Visibility.Visible;
+                            generalText.Text = "The import was successful." + Environment.NewLine +
+                                                Environment.NewLine +
+                                               "All previous data was removed, and" + Environment.NewLine +
+                                                count.ToString() +  " vehicle records were imported.";
+                        }
                     }
                 }
                 else
@@ -1042,6 +1080,12 @@ namespace MAF_VE_2
             {
                 if (file.FileType == ".sqlite")
                 {
+                    var countBeforeMerge = localDatabaseConnection.Table<MAFcalculation>().Count();
+                    var numberOfRecordsInImportFile = 0;
+                    int numberOfSuccefulInserts = 0;
+                    int numberOfFailedInserts = 0;
+                    int numberOfDuplicatesDetected = 0;
+                    bool success = false;
                     try
                     {
                         var importedFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("ImportedFile.sqlite", CreationCollisionOption.ReplaceExisting);
@@ -1050,6 +1094,7 @@ namespace MAF_VE_2
                         string dbPath = System.IO.Path.Combine(ApplicationData.Current.TemporaryFolder.Path, "ImportedFile.sqlite");
                         SQLite.Net.SQLiteConnection dbConn = new SQLite.Net.SQLiteConnection(new SQLite.Net.Platform.WinRT.SQLitePlatformWinRT(), dbPath);
 
+                        numberOfRecordsInImportFile = dbConn.Table<MAFcalculation>().Count();
                         var records = dbConn.Query<MAFcalculation>("SELECT * from MAFcalculation");
                         foreach (var record in records)
                         {
@@ -1096,33 +1141,34 @@ namespace MAF_VE_2
                                         Temp_units = record.Temp_units,
                                         Altitude_units = record.Altitude_units
                                     });
+
+                                    numberOfSuccefulInserts++;
                                 }
                                 catch
                                 {
-
+                                    numberOfFailedInserts++;
                                 }
                             }
-                        }
-
-                        try
-                        {
-                            var makes = dbConn.Query<LocalCarMake>("SELECT * from LocalCarMake");
-                            foreach (var make in makes)
+                            else
                             {
-                                var queryMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * FROM LocalCarMake WHERE Make = '" + make.Make + "' LIMIT 1");
-                                if (queryMakes.Count == 0)
-                                {
-                                    localDatabaseConnection.Insert(new LocalCarMake()
-                                    {
-                                        Make = make.Make
-                                    });
-                                }
+                                numberOfDuplicatesDetected++;
                             }
                         }
-                        catch (Exception ex)
+
+                        var makes = dbConn.Query<LocalCarMake>("SELECT * from LocalCarMake");
+                        foreach (var make in makes)
                         {
-                            var dialog = await new MessageDialog("A problem occured when trying to merge Car Makes data.  " + ex.Message ).ShowAsync();
+                            var queryMakes = localDatabaseConnection.Query<LocalCarMake>("SELECT * FROM LocalCarMake WHERE Make = '" + make.Make + "' LIMIT 1");
+                            if (queryMakes.Count == 0)
+                            {
+                                localDatabaseConnection.Insert(new LocalCarMake()
+                                {
+                                    Make = make.Make
+                                });
+                            }
                         }
+
+                        success = true;
                     }
                     catch (Exception ex)
                     {
@@ -1133,6 +1179,25 @@ namespace MAF_VE_2
                         InitializeLocalDatabase();
                         RefreshMakesComboBox();
                         ShowAllLocalRecords();
+
+                        if (success)
+                        {
+                            var countAfterMerge = localDatabaseConnection.Table<MAFcalculation>().Count();
+
+                            popUpPanelBackground.Visibility = Visibility.Visible;
+                            generalPopup.Visibility = Visibility.Visible;
+                            generalText.Text = "The merge operation completed." + Environment.NewLine +
+                                                Environment.NewLine +
+                                                Environment.NewLine +
+                                                countBeforeMerge.ToString() + " records BEFORE MERGE" + Environment.NewLine +
+                                                numberOfRecordsInImportFile.ToString() + " records TO BE MERGED" + Environment.NewLine +
+                                                Environment.NewLine +
+                                                numberOfDuplicatesDetected.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " DUPLICATES detected (duplicate records are not merged)" + Environment.NewLine +
+                                                numberOfSuccefulInserts.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " SUCCESSFULLY merged" + Environment.NewLine +
+                                                numberOfFailedInserts.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " FAILED to merge" + Environment.NewLine +
+                                                Environment.NewLine +
+                                                countAfterMerge.ToString() + " records AFTER MERGE";
+                        }
                     }
                 }
                 else
