@@ -41,7 +41,7 @@ namespace MAF_VE_2
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         List<MAFcalculation> LocalCollection;
-        List<MAFcalculation> GlobalCollection;
+        List<MAFcalculationGlobal> GlobalCollection;
         bool rbCheckFired = false;
         string condition = "";
         const string ImageFileName = "BingImageOfTheDay.jpg";
@@ -108,6 +108,7 @@ namespace MAF_VE_2
             RefreshMakesComboBox();
             ManageAutoBackupSetting();
             ShowAllLocalRecords();
+            ShowRecentGlobalRecords();
             ManageBackgroundSetting();
         }
 
@@ -757,6 +758,55 @@ namespace MAF_VE_2
              });
         }
 
+        Task<List<MAFcalculationGlobal>> GetRecentGlobalRecordsAsync()
+        {
+            return Task.Run(async () =>
+            {
+                var records = new List<MAFcalculationGlobal>();
+
+                // Get JSON
+                string maf_ve_api_URL = "http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/last100";
+                string JSON;
+                try
+                {
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(maf_ve_api_URL));
+                        JSON = await httpResponse.Content.ReadAsStringAsync();
+                    }
+                }
+                catch
+                {
+                    return null;
+                }
+
+                // Parse JSON
+                JsonArray jsonArray;
+                try
+                {
+                    bool IsParsed = JsonArray.TryParse(JSON, out jsonArray);
+                    if (IsParsed)
+                    {
+                        // Build List and return it
+                        foreach (var item in jsonArray)
+                        {
+                            var jsonString = item.ToString();
+                            records.Add(new MAFcalculationGlobal(jsonString));
+                        }
+                        return records;
+                    }
+                    else
+                    {
+                        return records;
+                    }
+                }
+                catch
+                {
+                    return records;
+                }
+            });
+        }
+
         async void ShowAllLocalRecords()
         {
             Log("ShowAllLocalRecords");
@@ -769,14 +819,10 @@ namespace MAF_VE_2
             if (LocalCollection.Count == 0)
             {
                 noResults.Visibility = Visibility.Visible;
-                mafChartNoResultsLabel.Visibility = Visibility.Visible;
-                veChartNoResultsLabel.Visibility = Visibility.Visible;
             }
             else
             {
                 noResults.Visibility = Visibility.Collapsed;
-                mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
-                veChartNoResultsLabel.Visibility = Visibility.Collapsed;
             }
 
             searchedForText.Text = "all records";
@@ -786,6 +832,38 @@ namespace MAF_VE_2
             ClearChartData();
 
             EndWaitForDb();
+        }
+
+        async void ShowRecentGlobalRecords()
+        {
+            progressGlobal.Visibility = Visibility.Visible;
+            GlobalCollection = await GetRecentGlobalRecordsAsync();
+            globalRecords.Items.Clear();
+            globalScrollViewer.ChangeView(0.0, 0.0, null, true);
+
+            if (GlobalCollection == null)
+            {
+                noResultsGlobal.Text = "Global database not available.\r\nCheck internet connection or try again later.";
+                noResultsGlobal.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                globalRecords.ItemsSource = GlobalCollection;
+
+                noResultsGlobal.Text = "No results found.";
+                if (GlobalCollection.Count == 0)
+                {
+                    noResultsGlobal.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    noResultsGlobal.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            searchedForTextGlobal.Text = "most recent 100 records";
+            searchedForPanelStoryGlobal.Begin();
+            progressGlobal.Visibility = Visibility.Collapsed;
         }
 
         void LoadRecords(List<MAFcalculation> records, ListView listView)
@@ -1090,7 +1168,7 @@ namespace MAF_VE_2
                         var dialog = await new MessageDialog("A problem occured when trying to auto-backup app data.").ShowAsync();
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
                     var dialog = await new MessageDialog("A problem occured when trying to auto-backup app data.").ShowAsync();
                 }
@@ -2098,8 +2176,6 @@ namespace MAF_VE_2
         async void Search()
         {
             noResults.Visibility = Visibility.Collapsed;
-            mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
-            veChartNoResultsLabel.Visibility = Visibility.Collapsed;
 
             string YEAR = "";
             string MAKE = "";
@@ -2230,8 +2306,6 @@ namespace MAF_VE_2
                     if (localRecords.Items.Count == 0)
                     {
                         noResults.Visibility = Visibility.Visible;
-                        mafChartNoResultsLabel.Visibility = Visibility.Visible;
-                        veChartNoResultsLabel.Visibility = Visibility.Visible;
                     }
                     else
                     {
@@ -2691,6 +2765,10 @@ namespace MAF_VE_2
         }
 
         #endregion
-        
+
+        private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+        }
     }
 }
