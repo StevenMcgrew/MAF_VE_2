@@ -529,22 +529,33 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                                     <Span><Underline>VE chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,10,0">
-                                                    <TextBlock Name="veRpm5" FontSize="12" Foreground="White" Text="----" Margin="0,68,0,0"/>
-                                                    <TextBlock Name="veRpm4" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
-                                                    <TextBlock Name="veRpm3" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
-                                                    <TextBlock Name="veRpm2" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="veRpm5" FontSize="12" Foreground="White" Text="---" Margin="0,68,0,0"/>
+                                                    <TextBlock Name="veRpm4" FontSize="12" Foreground="White" Text="---" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="veRpm3" FontSize="12" Foreground="White" Text="---" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="veRpm2" FontSize="12" Foreground="White" Text="---" Margin="0,60,0,0"/>
                                                 </StackPanel>
-                                                <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
-                                                <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,10,0,0">
-                                                    <TextBlock Name="vePercent2" Foreground="White" FontSize="12" Text="----" Margin="67,0,0,0"/>
-                                                    <TextBlock Name="vePercent3" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
-                                                    <TextBlock Name="vePercent4" Foreground="White" FontSize="12" Text="----" Margin="57,0,0,0"/>
-                                                    <TextBlock Name="vePercent5" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
-                                                </StackPanel>
-                                                <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
+                                                <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" Margin="0,10,0,0" Width="362">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Name="vePercent2" Grid.Column="1" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="vePercent3" Grid.Column="3" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="vePercent4" Grid.Column="5" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="vePercent5" Grid.Column="7" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                </Grid>
+                                                <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="VE (%)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>
@@ -602,22 +613,33 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                                         <Span><Underline>MAF chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
+                                                <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,10,0">
-                                                    <TextBlock Name="mafRpm5" Foreground="White" FontSize="12" Text="----" Margin="0,68,0,0"/>
-                                                    <TextBlock Name="mafRpm4" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
-                                                    <TextBlock Name="mafRpm3" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
-                                                    <TextBlock Name="mafRpm2" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="mafRpm5" Foreground="White" FontSize="12" Text="---" Margin="0,68,0,0"/>
+                                                    <TextBlock Name="mafRpm4" Foreground="White" FontSize="12" Text="---" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="mafRpm3" Foreground="White" FontSize="12" Text="---" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="mafRpm2" Foreground="White" FontSize="12" Text="---" Margin="0,60,0,0"/>
                                                 </StackPanel>
-                                                <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
-                                                <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,10,0,0">
-                                                    <TextBlock Name="mafFlow2" Foreground="White" FontSize="12" Text="----" Margin="67,0,0,0"/>
-                                                    <TextBlock Name="mafFlow3" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
-                                                    <TextBlock Name="mafFlow4" Foreground="White" FontSize="12" Text="----" Margin="57,0,0,0"/>
-                                                    <TextBlock Name="mafFlow5" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
-                                                </StackPanel>
-                                                <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
+                                                <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <Grid Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" Margin="0,10,0,0" Width="362">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Name="mafFlow2" Grid.Column="1" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="mafFlow3" Grid.Column="3" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="mafFlow4" Grid.Column="5" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                    <TextBlock Name="mafFlow5" Grid.Column="7" Foreground="White" FontSize="12" Text="---" HorizontalAlignment="Center" Width="20" TextAlignment="Center"/>
+                                                </Grid>
+                                                <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="---" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>

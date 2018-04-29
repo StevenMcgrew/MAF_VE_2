@@ -984,7 +984,10 @@ namespace MAF_VE_2
         private void backupNowButton_Click(object sender, RoutedEventArgs e)
         {
             AutosaveLocalDbBackup();
-            savedPopupStory.Begin();
+            if (lastBackupText.Text.Count() > 24)
+            {
+                savedPopupStory.Begin();
+            }
         }
 
         private void changeLocationButton_Click(object sender, RoutedEventArgs e)
