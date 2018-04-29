@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using Windows.Web.Http;
+using Windows.Web.Http.Headers;
 
 namespace MAF_VE_2
 {
@@ -838,7 +840,6 @@ namespace MAF_VE_2
         {
             progressGlobal.Visibility = Visibility.Visible;
             GlobalCollection = await GetRecentGlobalRecordsAsync();
-            globalRecords.Items.Clear();
             globalScrollViewer.ChangeView(0.0, 0.0, null, true);
 
             if (GlobalCollection == null)
@@ -2030,17 +2031,25 @@ namespace MAF_VE_2
             comments.ClearValue(TextBox.TextProperty);
 
             ShowAllLocalRecords();
+            ShowRecentGlobalRecords();
+            noResultsGlobal.Visibility = Visibility.Visible;
         }
 
         #endregion
 
         #region Save
 
-        private async void saveButton_Click(object sender, RoutedEventArgs e)
+        private void saveButton_Click(object sender, RoutedEventArgs e)
+        {
+            Save();
+        }
+
+        async void Save()
         {
             var dialog1 = new MessageDialog("Must enter Year, Make, Model, Engine, and select Good/Bad/Unsure. Only the comments section is optional.");
             bool success = false;
 
+            MAFcalculation recordToSave = new MAFcalculation();
             string _year;
             string _make;
             string _model;
@@ -2082,27 +2091,26 @@ namespace MAF_VE_2
 
             try
             {
-                localDatabaseConnection.Insert(new MAFcalculation()
-                {
-                    Year = _year,
-                    Make = _make,
-                    Model = _model,
-                    Engine = _engine,
-                    Condition = _condition,
-                    Comments = _comments,
-                    Engine_speed = Convert.ToDouble(rpm.Text),
-                    MAF = Convert.ToDouble(maf.Text),
-                    Engine_size = Convert.ToDouble(engineSize.Text),
-                    Air_temperature = Convert.ToDouble(airTemp.Text),
-                    Altitude = Convert.ToDouble(altitude.Text),
-                    Expected_MAF = Convert.ToDouble(expectedMAF.Text),
-                    MAF_Difference = Convert.ToDouble(mafDifference.Text),
-                    Volumetric_Efficiency = Convert.ToDouble(VE.Text),
-                    MAF_units = mafUnits.SelectedValue.ToString(),
-                    Temp_units = airTempUnits.SelectedValue.ToString(),
-                    Altitude_units = altitudeUnits.SelectedValue.ToString()
-                });
-                
+                recordToSave.Year = _year;
+                recordToSave.Make = _make;
+                recordToSave.Model = _model;
+                recordToSave.Engine = _engine;
+                recordToSave.Condition = _condition;
+                recordToSave.Comments = _comments;
+                recordToSave.Engine_speed = Convert.ToDouble(rpm.Text);
+                recordToSave.MAF = Convert.ToDouble(maf.Text);
+                recordToSave.Engine_size = Convert.ToDouble(engineSize.Text);
+                recordToSave.Air_temperature = Convert.ToDouble(airTemp.Text);
+                recordToSave.Altitude = Convert.ToDouble(altitude.Text);
+                recordToSave.Expected_MAF = Convert.ToDouble(expectedMAF.Text);
+                recordToSave.MAF_Difference = Convert.ToDouble(mafDifference.Text);
+                recordToSave.Volumetric_Efficiency = Convert.ToDouble(VE.Text);
+                recordToSave.MAF_units = mafUnits.SelectedValue.ToString();
+                recordToSave.Temp_units = airTempUnits.SelectedValue.ToString();
+                recordToSave.Altitude_units = altitudeUnits.SelectedValue.ToString();
+
+                localDatabaseConnection.Insert(recordToSave);
+
                 good.ClearValue(RadioButton.IsCheckedProperty);
                 bad.ClearValue(RadioButton.IsCheckedProperty);
                 unsure.ClearValue(RadioButton.IsCheckedProperty);
@@ -2124,6 +2132,68 @@ namespace MAF_VE_2
                 if (success)
                 {
                     savedPopupStory.Begin();
+                    SaveGlobalAsync(recordToSave);
+                }
+            }
+        }
+
+        async void SaveGlobalAsync(MAFcalculation recordToSave)
+        {
+            const string yearKey = "year";
+            const string makeKey = "make";
+            const string modelKey = "model";
+            const string engineKey = "engine";
+            const string conditionKey = "condition";
+            const string commentsKey = "comments";
+            const string mafunitsKey = "mafunits";
+            const string tempunitsKey = "tempunits";
+            const string altitudeunitsKey = "altitudeunits";
+            const string rpmKey = "rpm";
+            const string mafKey = "maf";
+            const string airtempKey = "airtemp";
+            const string altitudeKey = "altitude";
+            const string expectedmafKey = "expectedmaf";
+            const string mafdiffKey = "mafdiff";
+            const string veKey = "ve";
+
+            JsonObject jsonObject = new JsonObject();
+            jsonObject[yearKey] = JsonValue.CreateStringValue(recordToSave.Year);
+            jsonObject[makeKey] = JsonValue.CreateStringValue(recordToSave.Make);
+            jsonObject[modelKey] = JsonValue.CreateStringValue(recordToSave.Model);
+            jsonObject[engineKey] = JsonValue.CreateStringValue(recordToSave.Engine);
+            jsonObject[conditionKey] = JsonValue.CreateStringValue(recordToSave.Condition);
+            jsonObject[commentsKey] = JsonValue.CreateStringValue(recordToSave.Comments);
+            jsonObject[mafunitsKey] = JsonValue.CreateStringValue(recordToSave.MAF_units);
+            jsonObject[tempunitsKey] = JsonValue.CreateStringValue(recordToSave.Temp_units);
+            jsonObject[altitudeunitsKey] = JsonValue.CreateStringValue(recordToSave.Altitude_units);
+            jsonObject[rpmKey] = JsonValue.CreateNumberValue(recordToSave.Engine_speed);
+            jsonObject[mafKey] = JsonValue.CreateNumberValue(recordToSave.MAF);
+            jsonObject[airtempKey] = JsonValue.CreateNumberValue(recordToSave.Air_temperature);
+            jsonObject[altitudeKey] = JsonValue.CreateNumberValue(recordToSave.Altitude);
+            jsonObject[expectedmafKey] = JsonValue.CreateNumberValue(recordToSave.Expected_MAF);
+            jsonObject[mafdiffKey] = JsonValue.CreateNumberValue(recordToSave.MAF_Difference);
+            jsonObject[veKey] = JsonValue.CreateNumberValue(recordToSave.Volumetric_Efficiency);
+
+            var jsonString = jsonObject.Stringify();
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                Uri UriToPostTo = new Uri("http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/insert");
+                httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
+
+                try
+                {
+                    HttpStringContent content = new HttpStringContent(jsonString, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    HttpResponseMessage response = await httpClient.PostAsync(UriToPostTo, content);
+                }
+                catch
+                {
+
+                }
+                finally
+                {
+                    ShowRecentGlobalRecords();
                 }
             }
         }
