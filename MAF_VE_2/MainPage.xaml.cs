@@ -29,11 +29,19 @@ namespace MAF_VE_2
 {
     public sealed partial class MainPage : Page
     {
+        void Log(string str)
+        {
+            TextBlock t = new TextBlock();
+            t.Text = str;
+            backgroundImageLogPanel.Children.Add(t);
+        }
 
         #region General variables
 
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
+        List<MAFcalculation> LocalCollection;
+        List<MAFcalculation> GlobalCollection;
         bool rbCheckFired = false;
         string condition = "";
         const string ImageFileName = "BingImageOfTheDay.jpg";
@@ -45,6 +53,7 @@ namespace MAF_VE_2
         const string DbBackupFileToken = "DbBackupFileToken";
         const string AutoBackupIsOn = "AutoBackupIsOn";
         const string localRecordCountAtLastBackup = "localRecordCountAtLastBackup";
+        const string lastBackupTimeAndLocation = "lastBackupTimeAndLocation";
 
         #endregion
 
@@ -202,6 +211,22 @@ namespace MAF_VE_2
                     Log("ManageAutoBackupSetting error:  " + ex.Message);
                 }
             }
+
+            Object backupDateAndLocation = localSettings.Values[lastBackupTimeAndLocation];
+            bool stored = CheckIfSettingIsStored(backupDateAndLocation);
+
+            if (stored)
+            {
+                try
+                {
+                    string backupText = (string)backupDateAndLocation;
+                    lastBackupText.Text = backupText;
+                }
+                catch (Exception ex)
+                {
+                    Log("SetBackupDateAndLocationText error:  " + ex.Message);
+                }
+            }
         }
 
         #endregion
@@ -210,65 +235,65 @@ namespace MAF_VE_2
 
         async void ManageBackgroundSetting()
         {
-            Log("ManageBackgroundSetting");
+            //Log("ManageBackgroundSetting");
             Object backgroundSetting = localSettings.Values[BackgroundImageSetting];
             bool IsStored = CheckIfSettingIsStored(backgroundSetting);
             if (IsStored)
             {
-                Log("Setting is stored...");
+                //Log("Setting is stored...");
                 bool IsShowImage = await CheckIfBackgroundSettingIsShowImage(backgroundSetting);
                 if (IsShowImage)
                 {
-                    Log("Setting is Show Image...");
+                    //Log("Setting is Show Image...");
                     yesImage.IsChecked = true;
                 }
                 else
                 {
-                    Log("Setting is No Image...");
+                    //Log("Setting is No Image...");
                     noImage.IsChecked = true; 
                 }
             }
             else
             {
-                Log("No setting is stored...");
+                //Log("No setting is stored...");
                 yesImage.IsChecked = true; 
             }
         }
 
         async void ManageBackgroundImage()
         {
-            Log("ManageBackgroundImage");
-            Log("Try get image file...");
+            //Log("ManageBackgroundImage");
+            //Log("Try get image file...");
             IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
             if (imageFileItem != null) // A file was previously saved and we were able to get it
             {
-                Log("Got image file...");
+                //Log("Got image file...");
                 bool imageWasSet = await SetBackgroundImage(imageFileItem);
                 if (imageWasSet)
                 {
-                    Log("Image was set...");
-                    Log("Try get copyright file...");
+                    //Log("Image was set...");
+                    //Log("Try get copyright file...");
                     IStorageItem copyrightFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(CopyrightFileName);
                     if (copyrightFileItem != null)
                     {
-                        Log("Got copyright file...");
+                        //Log("Got copyright file...");
                         SetCopyrightText(copyrightFileItem);
                     }
                     else
                     {
-                        Log("Problem getting copyright file...");
+                        //Log("Problem getting copyright file...");
                     }
 
                     DownloadAndSetImageAndCopyrightIfNew();
                 }
                 else
                 {
-                    Log("Problem setting image...");
+                    //Log("Problem setting image...");
                 }
             }
             else // No file saved yet, or problem getting file
             {
-                Log("Did not get image file");
+                //Log("Did not get image file");
                 SetDefaultBackgroundImage();
                 DownloadAndSetImageAndCopyrightIfNew();
             }
@@ -276,7 +301,7 @@ namespace MAF_VE_2
 
         bool CheckIfSettingIsStored(object setting)
         {
-            Log("CheckIfSettingIsStored");
+            //Log("CheckIfSettingIsStored");
             if (setting != null)
             {
                 return true;
@@ -289,7 +314,7 @@ namespace MAF_VE_2
 
         async Task<bool> CheckIfBackgroundSettingIsShowImage(object setting)
         {
-            Log("CheckIfBackgroundSettingIsShowImage");
+            //Log("CheckIfBackgroundSettingIsShowImage");
 
             try
             {
@@ -312,42 +337,42 @@ namespace MAF_VE_2
 
         async void SetImageAndCopyright()
         {
-            Log("SetImageAndCopyright");
-            Log("Try get image file...");
+            //Log("SetImageAndCopyright");
+            //Log("Try get image file...");
             IStorageItem imageFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(ImageFileName);
             if (imageFileItem != null)
             {
-                Log("Got image file...");
+                //Log("Got image file...");
                 bool imageWasSet = await SetBackgroundImage(imageFileItem);
                 if (imageWasSet)
                 {
-                    Log("Image was set...");
-                    Log("Try get copyright file...");
+                    //Log("Image was set...");
+                    //Log("Try get copyright file...");
                     IStorageItem copyrightFileItem = await ApplicationData.Current.LocalFolder.TryGetItemAsync(CopyrightFileName);
                     if (copyrightFileItem != null)
                     {
-                        Log("Got copyright file...");
+                        //Log("Got copyright file...");
                         SetCopyrightText(copyrightFileItem);
                     }
                     else
                     {
-                        Log("Problem getting copyright file...");
+                        //Log("Problem getting copyright file...");
                     }
                 }
                 else
                 {
-                    Log("Problem setting image...");
+                    //Log("Problem setting image...");
                 }
             }
             else
             {
-                Log("Did not get image file...");
+                //Log("Did not get image file...");
             }
         }
 
         async Task<bool> SetBackgroundImage(IStorageItem storageItem)
         {
-            Log("SetBackgroundImage");
+            //Log("SetBackgroundImage");
             try
             {
                 StorageFile file = storageItem as StorageFile;
@@ -361,7 +386,7 @@ namespace MAF_VE_2
             }
             catch (Exception ex)
             {
-                Log("Deleting potentially corrupt image file...");
+                //Log("Deleting potentially corrupt image file...");
                 var potentiallyCorruptFile = await ApplicationData.Current.LocalFolder.GetFileAsync(ImageFileName);
                 await potentiallyCorruptFile.DeleteAsync();
 
@@ -373,7 +398,7 @@ namespace MAF_VE_2
 
         async void SetCopyrightText(IStorageItem storageItem)
         {
-            Log("SetCopyrightText");
+            //Log("SetCopyrightText");
             try
             {
                 StorageFile file = storageItem as StorageFile;
@@ -385,11 +410,11 @@ namespace MAF_VE_2
 
                 DateTimeOffset dateOfLastMod = props.DateModified;
                 string dateTime = dateOfLastMod.DateTime.ToString();
-                Log("File last modified: " + dateTime);
+                //Log("File last modified: " + dateTime);
             }
             catch (Exception ex)
             {
-                Log("Deleting potentially corrupt copyright file...");
+                //Log("Deleting potentially corrupt copyright file...");
                 var potentiallyCorruptFile = await ApplicationData.Current.LocalFolder.GetFileAsync(CopyrightFileName);
                 await potentiallyCorruptFile.DeleteAsync();
 
@@ -401,13 +426,13 @@ namespace MAF_VE_2
 
         async Task<JsonObject> CheckForNewImage()
         {
-            Log("CheckForNewImage");
+            //Log("CheckForNewImage");
             JsonObject jsonObject;
             string JSON = await GetBingImageJSON();
 
             if (JSON != null)
             {
-                Log("Got JSON...");
+                //Log("Got JSON...");
                 jsonObject = await ParseJSON(JSON);
 
                 if (jsonObject != null)
@@ -420,18 +445,18 @@ namespace MAF_VE_2
 
                         if (copyrightText == savedCopyrightText)
                         {
-                            Log("No new image available yet...");
+                            //Log("No new image available yet...");
                             return jsonObject = null; // New image not available yet
                         }
                         else
                         {
-                            Log("New image is available...");
+                            //Log("New image is available...");
                             return jsonObject; // New image is available
                         }
                     }
                     catch
                     {
-                        Log("Problem comparing copyright text, continuing on...");
+                        //Log("Problem comparing copyright text, continuing on...");
                         return jsonObject; // The problem was likely that there was no copyright file, so we want to continue on to download the image and copyright
                     }
                 }
@@ -442,14 +467,14 @@ namespace MAF_VE_2
             }
             else
             {
-                Log("Did not get JSON, check internet...");
+                //Log("Did not get JSON, check internet...");
                 return jsonObject = null; // Problem getting JSON
             }
         }
 
         async Task<string> GetBingImageJSON()
         {
-            Log("GetBingImageJSON");
+            //Log("GetBingImageJSON");
             string region = "en-US";
             int numberOfImages = 1;
             string bingImageURL = string.Format("http://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n={0}&mkt={1}", numberOfImages, region);
@@ -471,19 +496,19 @@ namespace MAF_VE_2
 
         async Task<JsonObject> ParseJSON(string JSON)
         {
-            Log("ParseJSON");
+            //Log("ParseJSON");
             JsonObject jsonObject;
             try
             {
                 bool IsParsed = JsonObject.TryParse(JSON, out jsonObject);
                 if (IsParsed)
                 {
-                    Log("JSON was parsed...");
+                    //Log("JSON was parsed...");
                     return jsonObject;
                 }
                 else
                 {
-                    Log("JSON was not parsed...");
+                    //Log("JSON was not parsed...");
                     return jsonObject = null;
                 }
             }
@@ -496,7 +521,7 @@ namespace MAF_VE_2
 
         async Task<bool> DownloadBingImageToFile(JsonObject jsonObject)
         {
-            Log("DownloadBingImageToFile");
+            //Log("DownloadBingImageToFile");
             try
             {
                 string partialUrlForImage = jsonObject["images"].GetArray()[0].GetObject()["url"].GetString();
@@ -506,36 +531,36 @@ namespace MAF_VE_2
 
                 RandomAccessStreamReference IRASRstream = RandomAccessStreamReference.CreateFromUri(bingUri);
                 StorageFile remoteFile = await StorageFile.CreateStreamedFileFromUriAsync(fileName, bingUri, IRASRstream);
-                Log("Downloading...");
+                //Log("Downloading...");
                 await remoteFile.CopyAsync(ApplicationData.Current.LocalFolder, fileName, NameCollisionOption.ReplaceExisting);
 
-                Log("Successfully downloaded to file...");
+                //Log("Successfully downloaded to file...");
                 return true;
             }
             catch (Exception ex)
             {
                 await new MessageDialog("Problem downloading image. A slow internet connection can cause this problem. \n \n" + ex.Message).ShowAsync();
 
-                Log("Failed to download to file, check internet...");
+                //Log("Failed to download to file, check internet...");
                 return false;
             }
         }
 
         async Task<bool> SaveCopyrightToFile(JsonObject jsonObject)
         {
-            Log("SaveCopyrightToFile");
+            //Log("SaveCopyrightToFile");
             try
             {
                 string copyrightText = jsonObject["images"].GetArray()[0].GetObject()["copyright"].GetString();
                 StorageFile copyrightFile = await ApplicationData.Current.LocalFolder.CreateFileAsync(CopyrightFileName, CreationCollisionOption.ReplaceExisting);
                 await FileIO.WriteTextAsync(copyrightFile, copyrightText);
 
-                Log("Successfully saved copyright text...");
+                //Log("Successfully saved copyright text...");
                 return true;
             }
             catch (Exception ex)
             {
-                Log("Failed to save copyright text...");
+                //Log("Failed to save copyright text...");
                 await new MessageDialog("Problem saving copyright text. \n \n" + ex.Message).ShowAsync();
                 return false;
             }
@@ -543,13 +568,13 @@ namespace MAF_VE_2
 
         void SetDefaultBackgroundImage()
         {
-            Log("SetDefaultBackgroundImage");
+            //Log("SetDefaultBackgroundImage");
             backgroundImage.Source = new BitmapImage(new Uri(BaseUri, "/Assets/hdBackground.png"));
         }
 
         async void DownloadAndSetImageAndCopyrightIfNew()
         {
-            Log("DownloadAndSetImageAndCopyrightIfNew");
+            //Log("DownloadAndSetImageAndCopyrightIfNew");
 
             JsonObject newImageJsonObject = await CheckForNewImage();
 
@@ -633,13 +658,13 @@ namespace MAF_VE_2
             {
                 if (choice == "yesImage")
                 {
-                    Log("  yesImage Checked");
+                    //Log("  yesImage Checked");
                     ManageBackgroundImage();
                     localSettings.Values[BackgroundImageSetting] = true;
                 }
                 else
                 {
-                    Log("  noImage Checked");
+                    //Log("  noImage Checked");
                     backgroundImage.ClearValue(Image.SourceProperty);
                     copyright.ClearValue(TextBlock.TextProperty);
                     copyrightButton.BorderThickness = new Thickness(0);
@@ -696,23 +721,52 @@ namespace MAF_VE_2
             return fileName;
         }
 
-        void Log(string str)
-        {
-            TextBlock t = new TextBlock();
-            t.Text = str;
-            backgroundImageLogPanel.Children.Add(t);
-        }
-
         #endregion
 
         #region Databases
 
-        void ShowAllLocalRecords()
+        void BeginWaitForDb()
         {
-            var mafRecords = localDatabaseConnection.Query<MAFcalculation>("SELECT * from MAFcalculation ORDER BY vehicleID DESC");
-            localRecords.ItemsSource = mafRecords;
-            
-            if (mafRecords.Count == 0)
+            resetButton.IsEnabled = false;
+            saveButton.IsEnabled = false;
+            searchButton.IsEnabled = false;
+            progressLocal.Visibility = Visibility.Visible;
+        }
+
+        void EndWaitForDb()
+        {
+            progressLocal.Visibility = Visibility.Collapsed;
+            resetButton.IsEnabled = true;
+            saveButton.IsEnabled = true;
+            searchButton.IsEnabled = true;
+        }
+
+        Task<List<MAFcalculation>> QueryLocalDatabase(string queryString)
+        {
+            return Task.Run(() =>
+            {
+                return localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC LIMIT 1000");
+            });
+        }
+
+        Task<List<MAFcalculation>> GetAllLocalRecordsAsync()
+        {
+            return Task.Run(() =>
+             {
+                 return localDatabaseConnection.Query<MAFcalculation>("SELECT * from MAFcalculation ORDER BY vehicleID DESC");
+             });
+        }
+
+        async void ShowAllLocalRecords()
+        {
+            Log("ShowAllLocalRecords");
+            BeginWaitForDb();
+
+            Log("GetAllLocalRecordsAsync");
+            LocalCollection = await GetAllLocalRecordsAsync();
+            LoadRecords(LocalCollection, localRecords);
+
+            if (LocalCollection.Count == 0)
             {
                 noResults.Visibility = Visibility.Visible;
                 mafChartNoResultsLabel.Visibility = Visibility.Visible;
@@ -730,6 +784,84 @@ namespace MAF_VE_2
             veChartDataDescription.Text = "Perform a search to see data in this chart";
             mafChartDataDescription.Text = "Perform a search to see data in this chart";
             ClearChartData();
+
+            EndWaitForDb();
+        }
+
+        void LoadRecords(List<MAFcalculation> records, ListView listView)
+        {
+            localScrollViewer.ViewChanged -= localScrollViewer_ViewChanged;
+
+            listView.Items.Clear();
+
+            localScrollViewer.ChangeView(0.0, 0.0, null, true);
+
+            var viewHeight = localScrollViewer.ViewportHeight;
+            var amountToLoad = Convert.ToInt32((viewHeight * 2) / 44);
+            if (amountToLoad < 20)
+            {
+                amountToLoad = 20;
+            }
+
+            if (records.Count > amountToLoad)
+            {
+                // Add only the amountToLoad to start with
+                Log("LoadRecords, " + amountToLoad.ToString());
+                for (int i = 0; i < amountToLoad; i++)
+                {
+                    var itemToBeAdded = records.ElementAt(i);
+                    listView.Items.Add(itemToBeAdded);
+                }
+            }
+            else
+            {
+                // Add all records since there aren't a lot
+                Log("LoadRecords, all");
+                for (int i = 0; i < records.Count; i++)
+                {
+                    var itemToBeAdded = records.ElementAt(i);
+                    listView.Items.Add(itemToBeAdded);
+                }
+            }
+
+            localScrollViewer.ViewChanged += localScrollViewer_ViewChanged;
+        }
+
+        private void localScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            var scrollviewer = sender as ScrollViewer;
+
+            if (scrollviewer.VerticalOffset >= scrollviewer.ScrollableHeight) // scrollviewer is at bottom
+            {
+                var listviewCount = localRecords.Items.Count();
+                var collectionCount = LocalCollection.Count();
+                var numberOfRecordsRemaining = collectionCount - listviewCount;
+
+                if (numberOfRecordsRemaining <= 0) // No more records to add to listview
+                {
+
+                }
+                else
+                {
+                    Log("scroll add records");
+                    var indexToStartAt = collectionCount - numberOfRecordsRemaining;
+                    var indexToEndAt = LocalCollection.Count - 1;
+                    if (numberOfRecordsRemaining > 20)
+                    {
+                        indexToEndAt = indexToStartAt + 19;
+                    }
+
+                    for (int i = indexToStartAt; i <= indexToEndAt; i++)
+                    {
+                        var itemToBeAdded = LocalCollection.ElementAt(i);
+                        localRecords.Items.Add(itemToBeAdded);
+                    }
+                }
+            }
+            else // scrollviewer not at bottom
+            {
+
+            }
         }
 
         #endregion
@@ -738,10 +870,12 @@ namespace MAF_VE_2
 
         void BeginLocalDbBackupOption()
         {
+            Log("BeginLocalDbBackupOption");
+            var currentCount = localDatabaseConnection.Table<MAFcalculation>().Count();
+
             var backupIsOn = autoBackupToggle.IsOn;
             if (backupIsOn)
             {
-                var currentCount = localDatabaseConnection.Table<MAFcalculation>().Count();
                 Object savedCount = localSettings.Values[localRecordCountAtLastBackup];
 
                 bool stored = CheckIfSettingIsStored(savedCount);
@@ -758,14 +892,14 @@ namespace MAF_VE_2
                     }
                     catch (Exception ex)
                     {
-                        Log("BeginLocalDbBackupOption error:  " + ex.Message);
+                        Log("BeginLocalDbBackupOption error1:  " + ex.Message);
                     }
                 }
-                else // Backup has not been stored before
+                else // Backup has not been stored before (This section of code is reached when auto backup toggle switch was toggled to on and no backup has been saved before)
                 {
                     popUpPanelBackground.Visibility = Visibility.Visible;
-                    generalPopup.Visibility = Visibility.Visible;
-                    generalText.Text = "Backup :  You will choose a save location.";
+                    localDbBackupPopUp.Visibility = Visibility.Visible;
+                    popUpForAutoBackupToggle.Visibility = Visibility.Visible;
                 }
             }
             else
@@ -779,26 +913,31 @@ namespace MAF_VE_2
                         bool showReminder = (bool)backupReminderSetting;
                         if (showReminder)
                         {
-                            var currentCount = localDatabaseConnection.GetTableInfo("MAFcalculation").Count;
-                            if (currentCount == 0)
-                            {
-                                // Do nothing. No records saved yet.
-                            }
-                            else
-                            {
-                                if (currentCount % 3 == 0) // if currentCount is divisible by three, then remainder would be zero
-                                {
-                                    ShowBackupReminderPopup();
-                                }
-                            }
+                            ShowBackupReminderEvery3rdRecord(currentCount);
                         }
                     }
                     catch (Exception ex)
                     {
-                        Log("ShowBackupReminder error:  " + ex.Message);
+                        Log("BeginLocalDbBackupOption error2:  " + ex.Message);
                     }
                 }
                 else
+                {
+                    ShowBackupReminderEvery3rdRecord(currentCount);
+                }
+            }
+        }
+
+        void ShowBackupReminderEvery3rdRecord(int recordCount)
+        {
+            Log("ShowBackupReminderEvery3rdRecord");
+            if (recordCount == 0)
+            {
+                // Do nothing. No records saved yet.
+            }
+            else
+            {
+                if (recordCount % 3 == 0) // if currentCount is divisible by three, then remainder would be zero, so show reminder
                 {
                     ShowBackupReminderPopup();
                 }
@@ -842,12 +981,23 @@ namespace MAF_VE_2
             }
         }
 
+        private void backupNowButton_Click(object sender, RoutedEventArgs e)
+        {
+            AutosaveLocalDbBackup();
+            savedPopupStory.Begin();
+        }
+
+        private void changeLocationButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveLocalDatabaseBackup();
+        }
+
         private void importButton_Click(object sender, RoutedEventArgs e)
         {
             localDbBackupPopUp.Visibility = Visibility.Collapsed;
             
             generalPopup.Visibility = Visibility.Visible;
-            generalText.Text = "Import :  You will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther file types, or other SQLITE files that were not created as a backup for this app will not work.";
+            generalText.Text = "Import :  In the next step, you will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther SQLITE files that were not created for this app will not work.";
         }
 
         private void importAndMergeButton_Click(object sender, RoutedEventArgs e)
@@ -855,7 +1005,7 @@ namespace MAF_VE_2
             localDbBackupPopUp.Visibility = Visibility.Collapsed;
 
             generalPopup.Visibility = Visibility.Visible;
-            generalText.Text = "Merge :  You will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther file types, or other SQLITE files that were not created as a backup for this app will not work.";
+            generalText.Text = "Merge :  In the next step, you will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther SQLITE files that were not created for this app will not work.";
         }
 
         private void dataBackupMenuItem_Click(object sender, RoutedEventArgs e)
@@ -873,12 +1023,8 @@ namespace MAF_VE_2
         private void generalOkButton_Click(object sender, RoutedEventArgs e)
         {
             generalPopup.Visibility = Visibility.Collapsed;
-
-            if (generalText.Text.StartsWith("B")) // starts with "Backup"
-            {
-                SaveLocalDatabaseBackup();
-            }
-            else if (generalText.Text.StartsWith("I")) // starts with "Import"
+            
+            if (generalText.Text.StartsWith("I")) // starts with "Import"
             {
                 ImportSQLiteFile();
             }
@@ -886,19 +1032,23 @@ namespace MAF_VE_2
             {
                 ImportAndMergeSQLiteFile();
             }
-            //else if (generalText.Text.StartsWith("T")) // starts with "The import was successful"
-            //{
-                
-            //}
 
             popUpPanelBackground.Visibility = Visibility.Collapsed;
             generalText.ClearValue(TextBlock.TextProperty);
+            gridForMergeNotes.Visibility = Visibility.Collapsed;
+        }
+
+        private void popUpForAutoBackupToggle_OKbtn_Click(object sender, RoutedEventArgs e)
+        {
+            SaveLocalDatabaseBackup();
+            popUpForAutoBackupToggle.Visibility = Visibility.Collapsed;
         }
 
         // Functions for Data Backup /////////////////////////////////////////////////////////////
 
         void ShowBackupReminderPopup()
         {
+            Log("ShowBackupReminderPopup");
             localSettings.Values[ShowBackupReminder] = true;
 
             popUpPanelBackground.Visibility = Visibility.Visible;
@@ -907,8 +1057,7 @@ namespace MAF_VE_2
 
         async void AutosaveLocalDbBackup()
         {
-            var localRecordsCount = localDatabaseConnection.Table<MAFcalculation>().Count();
-
+            Log("AutosaveLocalDbBackup");
             Object token = localSettings.Values[DbBackupFileToken];
             bool settingIsStored = CheckIfSettingIsStored(token);
 
@@ -916,8 +1065,8 @@ namespace MAF_VE_2
             {
                 try
                 {
-                    localDatabaseConnection.Close();
-                    backingUpPopup.Visibility = Visibility.Visible;
+                    dbButtonsPanel.IsHitTestVisible = false;
+                    //localDatabaseConnection.Close();
 
                     string fileAccessToken = (string)token;
                     var storageFile = await StorageApplicationPermissions.FutureAccessList.GetFileAsync(fileAccessToken);
@@ -927,25 +1076,26 @@ namespace MAF_VE_2
                     {
                         await dbFile.CopyAndReplaceAsync(storageFile);
 
-                        var props = await storageFile.GetBasicPropertiesAsync();
-                        lastBuDateTimeText.Text = "Last Backup :  " + props.DateModified.ToString();
-                        lastBuLocationText.Text = "Location :  " + storageFile.Path;
-                        lastBuNameText.Text = "Name :  " + storageFile.Name;
+                        var now = System.DateTime.Now;
+                        lastBackupText.Text = "Last Backup:   " + now + Environment.NewLine +
+                                              "Location:   " + storageFile.Path;
+
+                        localSettings.Values[lastBackupTimeAndLocation] = lastBackupText.Text;
                     }
                     else
                     {
-                        var dialog = await new MessageDialog("Local database file not found.").ShowAsync();
+                        var dialog = await new MessageDialog("A problem occured when trying to auto-backup app data.").ShowAsync();
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log("AutosaveLocalDbBackup error:  " + ex.Message);
+                    var dialog = await new MessageDialog("A problem occured when trying to auto-backup app data.").ShowAsync();
                 }
                 finally
                 {
-                    InitializeLocalDatabase();
-                    backingUpPopup.Visibility = Visibility.Collapsed;
-                    localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
+                    //InitializeLocalDatabase();
+                    localSettings.Values[localRecordCountAtLastBackup] = localDatabaseConnection.Table<MAFcalculation>().Count();
+                    dbButtonsPanel.IsHitTestVisible = true;
                 }
             }
             else
@@ -956,12 +1106,14 @@ namespace MAF_VE_2
 
         async void SaveLocalDatabaseBackup()
         {
+            Log("SaveLocalDatabaseBackup");
             var localRecordsCount = localDatabaseConnection.Table<MAFcalculation>().Count();
 
             bool success = false;
             try
             {
-                localDatabaseConnection.Close();
+                dbButtonsPanel.IsHitTestVisible = false;
+                //localDatabaseConnection.Close();
                 
                 var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                 if (dbFile != null)
@@ -981,16 +1133,20 @@ namespace MAF_VE_2
 
                         success = true;
 
-                        var props = await file.GetBasicPropertiesAsync();
-                        lastBuDateTimeText.Text = "Last Backup :  " + props.DateModified.ToString();
-                        lastBuLocationText.Text = "Location :  " + file.Path;
-                        lastBuNameText.Text = "Name :  " + file.Name;
+                        var now = System.DateTime.Now;
+                        lastBackupText.Text = "Last Backup:   " + now + Environment.NewLine +
+                                              "Location:   " + file.Path;
+
+                        localSettings.Values[lastBackupTimeAndLocation] = lastBackupText.Text;
                         
                         savedPopupStory.Begin();
                     }
-                    else
+                    else // operation cancelled
                     {
-                        // operation cancelled
+                        if (lastBackupText.Text.Count() < 25) // no backups have ever been saved
+                        {
+                            autoBackupToggle.IsOn = false;
+                        }
                     }
                 }
                 else
@@ -1004,18 +1160,21 @@ namespace MAF_VE_2
             }
             finally
             {
-                InitializeLocalDatabase();
-                localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
+                //InitializeLocalDatabase();
 
                 if (success)
                 {
+                    localSettings.Values[localRecordCountAtLastBackup] = localRecordsCount;
                     autoBackupToggle.IsOn = true;
                 }
+
+                dbButtonsPanel.IsHitTestVisible = true;
             }
         }
 
         async void ImportSQLiteFile()
         {
+            Log("ImportSQLiteFile");
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             picker.FileTypeFilter.Add(".sqlite");
@@ -1028,7 +1187,16 @@ namespace MAF_VE_2
                     bool success = false;
                     try
                     {
+                        popUpPanelBackground.Visibility = Visibility.Visible;
+                        generalOkButton.Visibility = Visibility.Collapsed;
+                        generalText.Text = " Importing file...";
+                        generalPopup.Visibility = Visibility.Visible;
+                        generalProgressRing.Visibility = Visibility.Visible;
+                        generalProgressRing.IsActive = true;
+                        dbButtonsPanel.IsHitTestVisible = false;
+
                         localDatabaseConnection.Close();
+
                         var localAppFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                         await file.CopyAndReplaceAsync(localAppFile);
 
@@ -1044,6 +1212,10 @@ namespace MAF_VE_2
                         RefreshMakesComboBox();
                         ShowAllLocalRecords();
 
+                        generalProgressRing.IsActive = false;
+                        generalProgressRing.Visibility = Visibility.Collapsed;
+                        generalOkButton.Visibility = Visibility.Visible;
+
                         if (success)
                         {
                             var count = localDatabaseConnection.Table<MAFcalculation>().Count();
@@ -1053,9 +1225,11 @@ namespace MAF_VE_2
                             generalPopup.Visibility = Visibility.Visible;
                             generalText.Text = "The import was successful." + Environment.NewLine +
                                                 Environment.NewLine +
-                                               "All previous data was removed, and" + Environment.NewLine +
-                                                count.ToString() +  " vehicle records were imported.";
+                                               "All previous data was removed, and the chosen file was imported." + Environment.NewLine +
+                                               "There were " + count.ToString() + " vehicle records in the file.";
                         }
+                        
+                        dbButtonsPanel.IsHitTestVisible = true;
                     }
                 }
                 else
@@ -1071,6 +1245,7 @@ namespace MAF_VE_2
 
         async void ImportAndMergeSQLiteFile()
         {
+            Log("ImportAndMergeSQLiteFile");
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             picker.FileTypeFilter.Add(".sqlite");
@@ -1088,6 +1263,14 @@ namespace MAF_VE_2
                     bool success = false;
                     try
                     {
+                        popUpPanelBackground.Visibility = Visibility.Visible;
+                        generalOkButton.Visibility = Visibility.Collapsed;
+                        generalText.Text = " Merging records...";
+                        generalPopup.Visibility = Visibility.Visible;
+                        generalProgressRing.Visibility = Visibility.Visible;
+                        generalProgressRing.IsActive = true;
+                        dbButtonsPanel.IsHitTestVisible = false;
+
                         var importedFile = await ApplicationData.Current.TemporaryFolder.CreateFileAsync("ImportedFile.sqlite", CreationCollisionOption.ReplaceExisting);
                         await file.CopyAndReplaceAsync(importedFile);
 
@@ -1180,24 +1363,26 @@ namespace MAF_VE_2
                         RefreshMakesComboBox();
                         ShowAllLocalRecords();
 
+                        generalProgressRing.IsActive = false;
+                        generalProgressRing.Visibility = Visibility.Collapsed;
+                        generalOkButton.Visibility = Visibility.Visible;
+
                         if (success)
                         {
                             var countAfterMerge = localDatabaseConnection.Table<MAFcalculation>().Count();
 
                             popUpPanelBackground.Visibility = Visibility.Visible;
                             generalPopup.Visibility = Visibility.Visible;
-                            generalText.Text = "The merge operation completed." + Environment.NewLine +
-                                                Environment.NewLine +
-                                                Environment.NewLine +
-                                                countBeforeMerge.ToString() + " records BEFORE MERGE" + Environment.NewLine +
-                                                numberOfRecordsInImportFile.ToString() + " records TO BE MERGED" + Environment.NewLine +
-                                                Environment.NewLine +
-                                                numberOfDuplicatesDetected.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " DUPLICATES detected (duplicate records are not merged)" + Environment.NewLine +
-                                                numberOfSuccefulInserts.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " SUCCESSFULLY merged" + Environment.NewLine +
-                                                numberOfFailedInserts.ToString() + "/" + numberOfRecordsInImportFile.ToString() + " FAILED to merge" + Environment.NewLine +
-                                                Environment.NewLine +
-                                                countAfterMerge.ToString() + " records AFTER MERGE";
+                            generalText.Text = "The merge operation completed.";
+                            gridForMergeNotes.Visibility = Visibility.Visible;
+                            beforeTblk.Text = countBeforeMerge.ToString();
+                            successTblk.Text = numberOfSuccefulInserts.ToString();
+                            totalTblk.Text = countAfterMerge.ToString();
+                            duplicatesTblk.Text = numberOfDuplicatesDetected.ToString();
+                            failedTblk.Text = numberOfFailedInserts.ToString();
                         }
+
+                        dbButtonsPanel.IsHitTestVisible = true;
                     }
                 }
                 else
@@ -1430,6 +1615,8 @@ namespace MAF_VE_2
             {
                 copyrightButton.Opacity = 1.0;
             }
+
+            AddRecordsWhenViewGrows(localScrollViewer.ViewportHeight);
         }
 
         // Functions/Methods for SizeChanged /////////////////////////////////////////////////
@@ -1453,6 +1640,45 @@ namespace MAF_VE_2
                 mainGrid.Children.Add(recordsPanel);
                 mainGrid.ColumnDefinitions[0].Width = GridLength.Auto;
                 mainGrid.ColumnDefinitions[1].Width = new GridLength(1, GridUnitType.Star);
+            }
+        }
+
+        void AddRecordsWhenViewGrows(double newViewHeight)
+        {
+            if (LocalCollection != null)
+            {
+                if (localRecords.ActualHeight < newViewHeight)
+                {
+                    var newHeightWeWant = newViewHeight * 2;
+                    var amountToLoad = Convert.ToInt32((newHeightWeWant - localRecords.ActualHeight) / 44);
+                    var listviewCount = localRecords.Items.Count();
+                    var collectionCount = LocalCollection.Count();
+                    var numberOfRecordsRemaining = collectionCount - listviewCount;
+
+                    if (numberOfRecordsRemaining <= 0) // No more records to add to listview
+                    {
+
+                    }
+                    else
+                    {
+                        int indexToStartAt = collectionCount - numberOfRecordsRemaining;
+                        int indexToEndAt;
+                        if (numberOfRecordsRemaining < amountToLoad)
+                        {
+                            indexToEndAt = LocalCollection.Count - 1; // Load all remaining records
+                        }
+                        else
+                        {
+                            indexToEndAt = indexToStartAt + (amountToLoad - 1); // Only load amountToLoad (the -1 is so we choose the correct index)
+                        }
+
+                        for (int i = indexToStartAt; i <= indexToEndAt; i++)
+                        {
+                            var itemToBeAdded = LocalCollection.ElementAt(i);
+                            localRecords.Items.Add(itemToBeAdded);
+                        }
+                    }
+                }
             }
         }
 
@@ -1482,6 +1708,7 @@ namespace MAF_VE_2
                 }
                 else
                 {
+                    recordsViewPivot.SelectedItem = Local;
                     SearchPanelColorStoryboard.Begin();
                 }
             }
@@ -1501,7 +1728,6 @@ namespace MAF_VE_2
 
         private void helpMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            //Frame.Navigate(typeof(BlankPage1));
             mainPivot.SelectedItem = helpPivotItem;
         }
 
@@ -1796,9 +2022,6 @@ namespace MAF_VE_2
                     Altitude_units = altitudeUnits.SelectedValue.ToString()
                 });
                 
-                ShowAllLocalRecords();
-                savedPopupStory.Begin();
-
                 good.ClearValue(RadioButton.IsCheckedProperty);
                 bad.ClearValue(RadioButton.IsCheckedProperty);
                 unsure.ClearValue(RadioButton.IsCheckedProperty);
@@ -1813,9 +2036,13 @@ namespace MAF_VE_2
             }
             finally
             {
+                BeginWaitForDb();
+                BeginLocalDbBackupOption();
+                ShowAllLocalRecords();
+
                 if (success)
                 {
-                    BeginLocalDbBackupOption();
+                    savedPopupStory.Begin();
                 }
             }
         }
@@ -1860,165 +2087,175 @@ namespace MAF_VE_2
 
         #region Search
 
-        private async void searchButton_Click(object sender, RoutedEventArgs e)
+        private void searchButton_Click(object sender, RoutedEventArgs e)
         {
+            Search();
+        }
+
+        async void Search()
+        {
+            noResults.Visibility = Visibility.Collapsed;
+            mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
+            veChartNoResultsLabel.Visibility = Visibility.Collapsed;
+
+            string YEAR = "";
+            string MAKE = "";
+            string MODEL = "";
+            string ENGINE = "";
+            string CONDITION = "";
+            string COMMENTS = "";
+            List<string> queryStringList = new List<string>();
+            List<string> searchedForList = new List<string>();
+            string queryString;
+
+            try
             {
-                noResults.Visibility = Visibility.Collapsed;
-                mafChartNoResultsLabel.Visibility = Visibility.Collapsed;
-                veChartNoResultsLabel.Visibility = Visibility.Collapsed;
+                BeginWaitForDb();
 
-                string YEAR = "";
-                string MAKE = "";
-                string MODEL = "";
-                string ENGINE = "";
-                string CONDITION = "";
-                string COMMENTS = "";
-                List<string> queryStringList = new List<string>();
-                List<string> searchedForList = new List<string>();
-                string queryString;
-
-                try
+                if (year.SelectedItem != null)
                 {
-                    if (year.SelectedItem != null)
-                    {
-                        YEAR = year.SelectedItem.ToString();
-                        searchedForList.Add(YEAR);
+                    YEAR = year.SelectedItem.ToString();
+                    searchedForList.Add(YEAR);
 
-                        if (YEAR != "")
-                        {
-                            YEAR = " Year = '" + YEAR + "'";
-                            queryStringList.Add(YEAR);
-                        }
+                    if (YEAR != "")
+                    {
+                        YEAR = " Year = '" + YEAR + "'";
+                        queryStringList.Add(YEAR);
                     }
+                }
 
-                    if (make.SelectedItem != null)
+                if (make.SelectedItem != null)
+                {
+                    MAKE = make.SelectedItem.ToString();
+                    searchedForList.Add(MAKE);
+
+                    if (MAKE != "")
                     {
-                        MAKE = make.SelectedItem.ToString();
-                        searchedForList.Add(MAKE);
-
-                        if (MAKE != "")
-                        {
-                            MAKE = " Make = '" + MAKE + "'";
-                            queryStringList.Add(MAKE);
-                        }
+                        MAKE = " Make = '" + MAKE + "'";
+                        queryStringList.Add(MAKE);
                     }
+                }
 
-                    if (!string.IsNullOrWhiteSpace(model.Text))
+                if (!string.IsNullOrWhiteSpace(model.Text))
+                {
+                    MODEL = model.Text.Trim();
+                    searchedForList.Add(MODEL);
+
+                    if (MODEL.Length < 3)
                     {
-                        MODEL = model.Text.Trim();
-                        searchedForList.Add(MODEL);
-
-                        if (MODEL.Length < 3)
-                        {
-                            MODEL = " Model = '" + MODEL + "'";
-                            queryStringList.Add(MODEL);
-                        }
-                        else
-                        {
-                            MODEL = MODEL.Substring(0, 3);
-                            MODEL = " Model LIKE '" + MODEL + "%'";
-                            queryStringList.Add(MODEL);
-                        }
-                    }
-
-                    if (engine.SelectedItem != null)
-                    {
-                        ENGINE = engine.SelectedItem.ToString();
-                        searchedForList.Add(ENGINE);
-
-                        if (ENGINE != "")
-                        {
-                            ENGINE = " Engine = '" + ENGINE + "'";
-                            queryStringList.Add(ENGINE);
-                        }
-                    }
-
-                    if (condition != null)
-                    {
-                        CONDITION = condition;
-                        searchedForList.Add(CONDITION);
-
-                        if (CONDITION != "")
-                        {
-                            CONDITION = " Condition = '" + CONDITION + "'";
-                            queryStringList.Add(CONDITION);
-                        }
-                    }
-
-                    if (!string.IsNullOrWhiteSpace(comments.Text))
-                    {
-                        COMMENTS = comments.Text.Trim();
-
-                        // Split comments into individual words and remove separators like commas and white space
-                        string[] separators = { ",", ".", "!", "?", ";", ":", " " };
-                        string[] words = COMMENTS.Split(separators, StringSplitOptions.RemoveEmptyEntries);
-
-                        foreach (var word in words)
-                        {
-                            // Add each word as a keyword search of the Comments in the database
-                            string KEYWORD = " Comments LIKE '%" + word + "%'";
-                            queryStringList.Add(KEYWORD);
-
-                            // Add each word to searchedForList
-                            searchedForList.Add(word);
-                        }
-                    }
-
-                    if (queryStringList.Count > 0)
-                    {
-                        ClearChartData();
-
-                        // Set queryString based on items in queryStringList
-                        if (queryStringList.Count == 1)
-                        {
-                            queryString = queryStringList.First().ToString();
-                        }
-                        else
-                        {
-                            queryString = string.Join(" AND", queryStringList);
-                        }
-
-                        // Query the database and update localRecords
-                        var query = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE" + queryString + " ORDER BY vehicleID DESC");
-                        localRecords.ItemsSource = query;
-
-                        // Set searchedForText
-                        var searchText = string.Join(" ", searchedForList);
-                        searchedForText.Text = searchText;
-                        searchedForPanelStory.Begin();
-                        mafChartDataDescription.Text = searchText;
-                        veChartDataDescription.Text = searchText;
-
-                        // Manage noResults visibility, plot data if there are results
-                        if (localRecords.Items.Count == 0)
-                        {
-                            noResults.Visibility = Visibility.Visible;
-                            mafChartNoResultsLabel.Visibility = Visibility.Visible;
-                            veChartNoResultsLabel.Visibility = Visibility.Visible;
-                        }
-                        else
-                        {
-                            List<MAFcalculation> copyOfQuery = query.Select(item => new MAFcalculation(item)).ToList();
-                            PlotDataOnCharts(copyOfQuery);
-                        }
-
-                        // Navigate to databasePivotItem if needed
-                        if (databaseGrid.Children.Contains(recordsPanel))
-                        {
-                            mainPivot.SelectedItem = databasePivotItem;
-                        }
+                        MODEL = " Model = '" + MODEL + "'";
+                        queryStringList.Add(MODEL);
                     }
                     else
                     {
-                        var dialog = await new MessageDialog("Please select at least one option before searching.").ShowAsync();
+                        MODEL = MODEL.Substring(0, 3);
+                        MODEL = " Model LIKE '" + MODEL + "%'";
+                        queryStringList.Add(MODEL);
                     }
                 }
-                catch
+
+                if (engine.SelectedItem != null)
                 {
-                    var dialog = await new MessageDialog("A problem occurred when trying to search. Showing all records now.").ShowAsync();
-                    ClearChartData();
-                    ShowAllLocalRecords();
+                    ENGINE = engine.SelectedItem.ToString();
+                    searchedForList.Add(ENGINE);
+
+                    if (ENGINE != "")
+                    {
+                        ENGINE = " Engine = '" + ENGINE + "'";
+                        queryStringList.Add(ENGINE);
+                    }
                 }
+
+                if (condition != null)
+                {
+                    CONDITION = condition;
+                    searchedForList.Add(CONDITION);
+
+                    if (CONDITION != "")
+                    {
+                        CONDITION = " Condition = '" + CONDITION + "'";
+                        queryStringList.Add(CONDITION);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(comments.Text))
+                {
+                    COMMENTS = comments.Text.Trim();
+
+                    // Split comments into individual words and remove separators like commas and white space
+                    string[] separators = { ",", ".", "!", "?", ";", ":", " " };
+                    string[] words = COMMENTS.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var word in words)
+                    {
+                        // Add each word as a keyword search of the Comments in the database
+                        string KEYWORD = " Comments LIKE '%" + word + "%'";
+                        queryStringList.Add(KEYWORD);
+
+                        // Add each word to searchedForList
+                        searchedForList.Add(word);
+                    }
+                }
+
+                if (queryStringList.Count > 0)
+                {
+                    ClearChartData();
+
+                    // Set queryString based on items in queryStringList
+                    if (queryStringList.Count == 1)
+                    {
+                        queryString = queryStringList.First().ToString();
+                    }
+                    else
+                    {
+                        queryString = string.Join(" AND", queryStringList);
+                    }
+
+                    // Query the database and update localRecords
+                    Log("QueryLocalDatabase");
+                    LocalCollection = await Task.Run(() => QueryLocalDatabase(queryString));
+                    LoadRecords(LocalCollection, localRecords);
+
+                    // Set searchedForText
+                    var searchText = string.Join(" ", searchedForList);
+                    searchedForText.Text = searchText;
+                    searchedForPanelStory.Begin();
+                    mafChartDataDescription.Text = searchText;
+                    veChartDataDescription.Text = searchText;
+
+                    // Manage noResults visibility, plot data if there are results
+                    if (localRecords.Items.Count == 0)
+                    {
+                        noResults.Visibility = Visibility.Visible;
+                        mafChartNoResultsLabel.Visibility = Visibility.Visible;
+                        veChartNoResultsLabel.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        //List<MAFcalculation> copyOfQuery = localSearchResults.Select(item => new MAFcalculation(item)).ToList();
+                        PlotDataOnCharts(LocalCollection);
+                    }
+
+                    // Navigate to databasePivotItem if needed
+                    if (databaseGrid.Children.Contains(recordsPanel))
+                    {
+                        mainPivot.SelectedItem = databasePivotItem;
+                    }
+                }
+                else
+                {
+                    var dialog = await new MessageDialog("Please select at least one option before searching.").ShowAsync();
+                }
+            }
+            catch
+            {
+                var dialog = await new MessageDialog("A problem occurred when trying to search. Showing all records now.").ShowAsync();
+                ClearChartData();
+                ShowAllLocalRecords();
+            }
+            finally
+            {
+                EndWaitForDb();
             }
         }
 
@@ -2028,13 +2265,13 @@ namespace MAF_VE_2
 
         void PlotDataOnCharts(List<MAFcalculation> records)
         {
-            if (records.Count < 1)
+            if (records.Count == 0)
             {
                 return;
             }
             else if (records.Count > 0)
             {
-                records = AddCurrentCalculationToList(records);
+                AddCurrentCalculationToList(records);
                 ConvertToGramsPerSecond(records);
                 SetRpmScaleOnCharts(records);
                 SetMafScaleOnChart(records);
@@ -2042,6 +2279,7 @@ namespace MAF_VE_2
                 SetAmountsPerPixel();
                 AddMafDataPlots(records);
                 AddVeDataPlots(records);
+                RemoveLastCalculationFromList(records);
             }
         }
 
@@ -2058,15 +2296,6 @@ namespace MAF_VE_2
             rpmPerPixel = double.NaN;
             mafPerPixel = double.NaN;
             vePerPixel = double.NaN;
-
-            highMafRpm.Text = "----";
-            highVeRpm.Text = "----";
-            lowMafRpm.Text = "----";
-            lowVeRpm.Text = "----";
-            lowMafFlow.Text = "----";
-            highMafFlow.Text = "----";
-            lowVePercent.Text = "----";
-            highVePercent.Text = "----";
 
             vePlot.Children.Clear();
             mafPlot.Children.Clear();
@@ -2118,10 +2347,25 @@ namespace MAF_VE_2
             lowRPM = Math.Round(lowRPM);
             highRPM = Math.Round(highRPM);
 
+            var rpmPerDiv = (highRPM - lowRPM) / 5;
+            var rpm2 = Math.Round(lowRPM + rpmPerDiv);
+            var rpm3 = Math.Round(rpm2 + rpmPerDiv);
+            var rpm4 = Math.Round(rpm3 + rpmPerDiv);
+            var rpm5 = Math.Round(rpm4 + rpmPerDiv);
+
             lowMafRpm.Text = lowRPM.ToString();
-            lowVeRpm.Text = lowMafRpm.Text;
             highMafRpm.Text = highRPM.ToString();
+            mafRpm2.Text = rpm2.ToString();
+            mafRpm3.Text = rpm3.ToString();
+            mafRpm4.Text = rpm4.ToString();
+            mafRpm5.Text = rpm5.ToString();
+
+            lowVeRpm.Text = lowMafRpm.Text;
             highVeRpm.Text = highMafRpm.Text;
+            veRpm2.Text = mafRpm2.Text;
+            veRpm3.Text = mafRpm3.Text;
+            veRpm4.Text = mafRpm4.Text;
+            veRpm5.Text = mafRpm5.Text;
         }
 
         void SetMafScaleOnChart(List<MAFcalculation> records)
@@ -2142,8 +2386,18 @@ namespace MAF_VE_2
             lowMAF = Math.Round(lowMAF);
             highMAF = Math.Round(highMAF);
 
+            var mafPerDiv = (highMAF - lowMAF) / 5;
+            var maf2 = Math.Round(lowMAF + mafPerDiv);
+            var maf3 = Math.Round(maf2 + mafPerDiv);
+            var maf4 = Math.Round(maf3 + mafPerDiv);
+            var maf5 = Math.Round(maf4 + mafPerDiv);
+
             lowMafFlow.Text = lowMAF.ToString();
             highMafFlow.Text = highMAF.ToString();
+            mafFlow2.Text = maf2.ToString();
+            mafFlow3.Text = maf3.ToString();
+            mafFlow4.Text = maf4.ToString();
+            mafFlow5.Text = maf5.ToString();
         }
 
         void SetVeScaleOnChart(List<MAFcalculation> records)
@@ -2164,8 +2418,18 @@ namespace MAF_VE_2
             lowVE = Math.Round(lowVE);
             highVE = Math.Round(highVE);
 
+            var vePerDiv = (highVE - lowVE) / 5;
+            var ve2 = Math.Round(lowVE + vePerDiv);
+            var ve3 = Math.Round(ve2 + vePerDiv);
+            var ve4 = Math.Round(ve3 + vePerDiv);
+            var ve5 = Math.Round(ve4 + vePerDiv);
+
             lowVePercent.Text = lowVE.ToString();
             highVePercent.Text = highVE.ToString();
+            vePercent2.Text = ve2.ToString();
+            vePercent3.Text = ve3.ToString();
+            vePercent4.Text = ve4.ToString();
+            vePercent5.Text = ve5.ToString();
         }
 
         void SetAmountsPerPixel()
@@ -2277,6 +2541,10 @@ namespace MAF_VE_2
             }
         }
 
+        void RemoveLastCalculationFromList(List<MAFcalculation> records)
+        {
+            records.RemoveAt(records.Count - 1);
+        }
 
         #endregion
 
@@ -2312,7 +2580,7 @@ namespace MAF_VE_2
 
         #endregion
 
-        #region Chart viewability
+        #region Charts view Expand/Shrink
 
         private void recordsViewPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -2418,7 +2686,6 @@ namespace MAF_VE_2
                 }
             }
         }
-
 
         #endregion
         

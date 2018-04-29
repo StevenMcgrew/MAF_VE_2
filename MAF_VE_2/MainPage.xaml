@@ -73,7 +73,6 @@
         </Storyboard>
     </Page.Resources>
 
-    <!--<Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">-->
     <Grid>
         <Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -82,11 +81,8 @@
                 <GradientStop Color="#FF0C203C" Offset="0.888"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Image Name="backgroundImage" Stretch="UniformToFill">
-            <!--<Image.Source>
-                <BitmapImage/>
-            </Image.Source>-->
-        </Image>
+        
+        <Image Name="backgroundImage" Stretch="UniformToFill"/>
 
         <Pivot Name="mainPivot" Template="{StaticResource mainPivotTemplate}">
 
@@ -290,7 +286,7 @@
                             <TextBlock Text="Comments or Keywords:" Margin="5,4,0,0" Foreground="White"/>
                             <TextBox Name="comments" TextWrapping="Wrap" Height="32" MaxLength="200" Margin="5,0,0,0" MinWidth="300" HorizontalAlignment="Left"/>
 
-                            <StackPanel Orientation="Horizontal">
+                            <StackPanel Name="dbButtonsPanel" Orientation="Horizontal">
                                 <Button Name="searchButton" Style="{StaticResource blueButtonStyle}" Margin="5,10,0,0" Click="searchButton_Click">
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE11A;" VerticalAlignment="Center"/>
@@ -328,7 +324,7 @@
                                         <TextBlock Name="searchedForText" Text="2000 Ford Explorer 4.0L" Foreground="White" Margin="135,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Top" IsTextSelectionEnabled="True" TextWrapping="WrapWholeWords" />
                                     </Grid>
 
-                                    <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
+                                    <ScrollViewer Name="localScrollViewer" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollMode="Enabled" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled" ViewChanged="localScrollViewer_ViewChanged">
                                         <StackPanel Background="White">
 
                                             <Grid Background="LightGray" Height="44" BorderBrush="Black" BorderThickness="0,0,0,1">
@@ -414,6 +410,8 @@
 
                                         </StackPanel>
                                     </ScrollViewer>
+
+                                    <ProgressBar Grid.Row="1" Name="progressLocal" IsIndeterminate="True" Height="7" VerticalAlignment="Top" Foreground="#FF3399FF" Visibility="Collapsed" Background="Transparent" Margin="0,-8,0,0" />
 
                                 </Grid>
 
@@ -531,36 +529,59 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                                     <Span><Underline>VE chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
-                                                <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="highVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
+                                                <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,10,0">
+                                                    <TextBlock Name="veRpm5" FontSize="12" Foreground="White" Text="----" Margin="0,68,0,0"/>
+                                                    <TextBlock Name="veRpm4" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="veRpm3" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="veRpm2" FontSize="12" Foreground="White" Text="----" Margin="0,60,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Name="lowVeRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
+                                                <TextBlock Name="highVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,10,0,0">
+                                                    <TextBlock Name="vePercent2" Foreground="White" FontSize="12" Text="----" Margin="67,0,0,0"/>
+                                                    <TextBlock Name="vePercent3" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
+                                                    <TextBlock Name="vePercent4" Foreground="White" FontSize="12" Text="----" Margin="57,0,0,0"/>
+                                                    <TextBlock Name="vePercent5" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Name="lowVePercent" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="VE (%)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>
                                                         <CompositeTransform Rotation="-90"/>
                                                     </TextBlock.RenderTransform>
                                                 </TextBlock>
-                                                <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1,0,0,1"/>
+                                                <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1" Background="#FF1E1E1E">
+                                                    <Grid>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="76" Y1="0" X2="76" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="152" Y1="0" X2="152" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="228" Y1="0" X2="228" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="304" Y1="0" X2="304" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="76" X2="380" Y2="76"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="152" X2="380" Y2="152"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="228" X2="380" Y2="228"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="304" X2="380" Y2="304"/>
+                                                    </Grid>
+                                                </Border>
                                                 <Grid Name="vePlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <TextBlock Name="veChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
-                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Good" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Good" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Bad" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Bad" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Unsure" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Unsure" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Current" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                 </StackPanel>
 
@@ -581,36 +602,59 @@
                                                 <TextBlock Grid.Row="0" Grid.Column="1" Foreground="DodgerBlue" HorizontalAlignment="Center" FontWeight="Bold" FontSize="18" VerticalAlignment="Center">
                                                         <Span><Underline>MAF chart</Underline></Span>
                                                 </TextBlock>
-                                                <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-10,10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-8"/>
-                                                <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
-                                                <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
+                                                <TextBlock Name="highMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,-8,10,0" VerticalAlignment="Top"/>
+                                                <StackPanel Grid.Row="1" Grid.Column="0" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="0,0,10,0">
+                                                    <TextBlock Name="mafRpm5" Foreground="White" FontSize="12" Text="----" Margin="0,68,0,0"/>
+                                                    <TextBlock Name="mafRpm4" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="mafRpm3" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
+                                                    <TextBlock Name="mafRpm2" Foreground="White" FontSize="12" Text="----" Margin="0,60,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Name="lowMafRpm" Grid.Row="1" Grid.Column="0" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,-5"/>
+                                                <TextBlock Name="highMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Right" Margin="0,10,-10,0" VerticalAlignment="Top"/>
+                                                <StackPanel Orientation="Horizontal" Grid.Row="2" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,10,0,0">
+                                                    <TextBlock Name="mafFlow2" Foreground="White" FontSize="12" Text="----" Margin="67,0,0,0"/>
+                                                    <TextBlock Name="mafFlow3" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
+                                                    <TextBlock Name="mafFlow4" Foreground="White" FontSize="12" Text="----" Margin="57,0,0,0"/>
+                                                    <TextBlock Name="mafFlow5" Foreground="White" FontSize="12" Text="----" Margin="56,0,0,0"/>
+                                                </StackPanel>
+                                                <TextBlock Name="lowMafFlow" Grid.Row="2" Grid.Column="1" FontSize="12" Text="----" Foreground="White" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-10,10,0,0"/>
                                                 <TextBlock Grid.Row="2" Grid.Column="1" Text="MAF (g/s)" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,10"/>
                                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="RPM" Foreground="White" VerticalAlignment="Center" Margin="0" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Left">
                                                     <TextBlock.RenderTransform>
                                                         <CompositeTransform Rotation="-90"/>
                                                     </TextBlock.RenderTransform>
                                                 </TextBlock>
-                                                <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1,0,0,1"/>
+                                                <Border Grid.Row="1" Grid.Column="1" BorderBrush="White" BorderThickness="1" Background="#FF1E1E1E">
+                                                    <Grid>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="76" Y1="0" X2="76" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="152" Y1="0" X2="152" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="228" Y1="0" X2="228" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="304" Y1="0" X2="304" Y2="380"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="76" X2="380" Y2="76"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="152" X2="380" Y2="152"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="228" X2="380" Y2="228"/>
+                                                        <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="304" X2="380" Y2="304"/>
+                                                    </Grid>
+                                                </Border>
                                                 <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <TextBlock Name="mafChartNoResultsLabel" Grid.Row="1" Grid.Column="1" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="Red" Text="NO RESULTS FOUND" Margin="0,25,0,0" Visibility="Collapsed"/>
-                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="-10,0,0,30">
+                                                <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Good" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Good" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1" />
-                                                        <TextBlock Text="Bad" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Red" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Bad" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Unsure" Foreground="White"/>
+                                                        <Ellipse Width="10" Height="10" Fill="Yellow" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Unsure" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,0,4,0" Stroke="Black" StrokeThickness="1"/>
-                                                        <TextBlock Text="Current" Foreground="White" Margin="0,0,0,2"/>
+                                                        <Ellipse Width="10" Height="10" Fill="White" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
+                                                        <TextBlock Text="Current" Foreground="White" FontSize="12"/>
                                                     </StackPanel>
                                                 </StackPanel>
 
@@ -623,12 +667,6 @@
                             </PivotItem>
 
                         </Pivot>
-
-                        <Grid Name="backingUpPopup" Visibility="Collapsed" Grid.RowSpan="2" Background="#B2000000">
-                            <StackPanel Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1" Margin="0,0,0,200">
-                                <TextBlock FontSize="18" Foreground="White" Text="Auto Backup..." TextWrapping="WrapWholeWords" Margin="0,0,0,5"/>
-                            </StackPanel>
-                        </Grid>
 
                     </Grid>
 
@@ -716,7 +754,7 @@
                         <MenuFlyoutItem Name="saveMenuItem" Text="Save" Click="databaseMenuItem_Click" />
                         <MenuFlyoutSeparator/>
                         <MenuFlyoutItem Name="backgroundMenuItem" Text="Background" Click="backgroundMenuItem_Click" />
-                        <MenuFlyoutItem Name="dataBackupMenuItem" Text="Backup / Import / Merge" Click="dataBackupMenuItem_Click"/>
+                        <MenuFlyoutItem Name="dataBackupMenuItem" Text="Backup and Restore" Click="dataBackupMenuItem_Click"/>
                         <MenuFlyoutItem Name="helpMenuItem" Text="Help" Click="helpMenuItem_Click" />
                         <MenuFlyoutItem Name="aboutMenuItem" Text="About" Click="aboutMenuItem_Click"/>
                         <MenuFlyoutSeparator/>
@@ -791,43 +829,90 @@
 
             <StackPanel Name="generalPopup" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
                 <TextBlock Name="generalText" TextWrapping="WrapWholeWords" Foreground="White" Margin="0,0,0,10"/>
+                <Grid Name="gridForMergeNotes" Visibility="Collapsed" Margin="0,10,0,20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Rectangle Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Fill="White" Height="2" VerticalAlignment="Bottom" Margin="4,0,0,-1"/>
+                    <SymbolIcon Grid.Row="1" Grid.Column="0" Foreground="White" Symbol="Add" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,5,0" >
+                        <SymbolIcon.RenderTransform>
+                            <CompositeTransform ScaleX="0.5" ScaleY="0.5"/>
+                        </SymbolIcon.RenderTransform>
+                    </SymbolIcon>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Foreground="White" HorizontalAlignment="Right" Text="---" Name="beforeTblk"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Foreground="White" HorizontalAlignment="Right" Text="---" Name="successTblk"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Foreground="White" HorizontalAlignment="Right" Text="---" Name="totalTblk"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Foreground="White" HorizontalAlignment="Right" Text="---" Name="duplicatesTblk"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" Foreground="White" HorizontalAlignment="Right" Text="---" Name="failedTblk"/>
+                    <TextBlock Grid.Row="4" Grid.Column="2" Foreground="White" Margin="10,0,0,0" Text="DUPLICATE records detected (duplicates are not merged)"/>
+                    <TextBlock Grid.Row="5" Grid.Column="2" Foreground="White" Margin="10,0,0,0" Text="records FAILED to merge"/>
+                    <TextBlock Grid.Row="0" Grid.Column="2" Foreground="White" Margin="10,0,0,0" Text="records BEFORE merge"/>
+                    <TextBlock Grid.Row="1" Grid.Column="2" Foreground="White" Margin="10,0,0,0" Text="records MERGED successfully"/>
+                    <TextBlock Grid.Row="2" Grid.Column="2" Foreground="White" Margin="10,0,0,0" Text="records TOTAL after merge"/>
+                </Grid>
                 <Button Name="generalOkButton" Content="OK" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Click="generalOkButton_Click"/>
+                <ProgressRing Name="generalProgressRing" Visibility="Collapsed" Foreground="#FF3399FF" Width="30" Height="30"/>
             </StackPanel>
 
             <StackPanel Name="askToBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
                 <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White" Text="Setup automatic backups: Choose a save location." TextWrapping="WrapWholeWords"/>
-                <Button Name="yesBackupButton" Content="Yes" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="yesBackupButton_Click"/>
-                <Button Name="noBackupButton" Content="No" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="noBackupButton_Click"/>
-                <Button Name="dontAskBackupButton" Content="No, don't ask again" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,10" Width="146" Click="dontAskBackupButton_Click"/>
+                <Button Name="yesBackupButton" Content="OK" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="yesBackupButton_Click"/>
+                <Button Name="noBackupButton" Content="Remind me later" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,20" Width="146" Click="noBackupButton_Click"/>
+                <Button Name="dontAskBackupButton" Content="Don't ask again" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,10" Width="146" Click="dontAskBackupButton_Click"/>
             </StackPanel>
 
             <StackPanel Name="localDbBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
                 <TextBlock Margin="0,0,0,30" FontSize="18" Foreground="White">
-                <Span><Underline>Local database backup options</Underline></Span>
-                <Span>:</Span>
+                    <Span><Underline>Local database backup options</Underline></Span>
+                    <Span>:</Span>
                 </TextBlock>
-                <StackPanel Orientation="Horizontal" BorderBrush="white" BorderThickness="1" HorizontalAlignment="Left" Margin="0,0,0,30">
-                    <ToggleSwitch Name="autoBackupToggle" Foreground="White" Toggled="autoBackupToggle_Toggled" Margin="10,5,0,0">
-                        <ToggleSwitch.HeaderTemplate>
-                            <DataTemplate>
-                                <ContentPresenter>
-                                    <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
-                                </ContentPresenter>
-                            </DataTemplate>
-                        </ToggleSwitch.HeaderTemplate>
-                    </ToggleSwitch>
-                    <StackPanel VerticalAlignment="Top" Padding="10,5,10,7" MinWidth="200">
-                        <TextBlock Name="lastBuDateTimeText" Text="Last Backup :  " Foreground="White"/>
-                        <TextBlock Name="lastBuLocationText" Text="Location :  " Foreground="White"/>
-                        <TextBlock Name="lastBuNameText" Text="Name :  " Foreground="White"/>
+                <ScrollViewer Margin="0,0,0,30" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <StackPanel BorderBrush="white" BorderThickness="1" HorizontalAlignment="Left" >
+                        <ToggleSwitch Name="autoBackupToggle" Foreground="White" Toggled="autoBackupToggle_Toggled" Margin="10,5,0,0">
+                            <ToggleSwitch.HeaderTemplate>
+                                <DataTemplate>
+                                    <ContentPresenter>
+                                        <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
+                                    </ContentPresenter>
+                                </DataTemplate>
+                            </ToggleSwitch.HeaderTemplate>
+                        </ToggleSwitch>
+                        <TextBlock Name="lastBackupText" Foreground="White" Margin="10,0" IsTextSelectionEnabled="True">
+                            <Span>Last Backup:</Span><LineBreak/>
+                            <Span>Location:</Span>
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Name="backupNowButton" Content="Backup Now" Style="{StaticResource blueButtonStyle}" Margin="10" Click="backupNowButton_Click" />
+                            <Button Name="changeLocationButton" Content="Change Location" Style="{StaticResource blueButtonStyle}" Margin="0,10,10,10" Click="changeLocationButton_Click"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-                <TextBlock Foreground="White" Text="If you uninstalled this app and lost your data, you can import a previously saved backup file. ***Any currently saved app data will be overwritten by the imported database***" TextWrapping="WrapWholeWords"/>
+                </ScrollViewer>
+                <TextBlock Foreground="White" TextWrapping="WrapWholeWords">
+                    <Span>If you uninstalled and reinstalled this app, you will need to import a previously saved backup file to restore your database.</Span><LineBreak/>
+                    <Span>*Any currently saved app data will be overwritten by the imported database.</Span>
+                </TextBlock>
                 <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
-                <TextBlock Foreground="White" Text="If you want to import a file without overwritting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>
+                <TextBlock Foreground="White" Text="If you want to import a file without overwriting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>
                 <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importAndMergeButton_Click"/>
                 <Button Name="closeBackupPopupButton" Content="Close" HorizontalAlignment="Center" Style="{StaticResource blueButtonStyle}" Click="closeBackupPopupButton_Click"/>
             </StackPanel>
+
+            <Grid Name="popUpForAutoBackupToggle" Visibility="Collapsed" Background="#B2000000" Padding="20">
+                <StackPanel Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
+                    <TextBlock Text="Backup :  In the next step, you will choose a save location." Foreground="White"/>
+                    <Button Name="popUpForAutoBackupToggle_OKbtn" Content="OK" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,20,0,0" Click="popUpForAutoBackupToggle_OKbtn_Click"/>
+                </StackPanel>
+            </Grid>
 
             <StackPanel Name="aboutPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
                 <TextBlock Text="MAF VE Calculator" FontWeight="Bold" Margin="0,0,0,10" Foreground="White" FontSize="18"/>
@@ -856,7 +941,7 @@
         </StackPanel>
 
         <StackPanel Name="backgroundImageLogPanel" Visibility="Collapsed" VerticalAlignment="Bottom" HorizontalAlignment="Right" Padding="10" Background="White" BorderBrush="Black" BorderThickness="2">
-            <TextBlock Text="Background Image Log:"/>
+            <TextBlock Text="Log:"/>
         </StackPanel>
 
     </Grid>
