@@ -1,6 +1,7 @@
 ﻿using MAF_VE_2.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -44,6 +45,7 @@ namespace MAF_VE_2
         List<string> allCarMakes;
         List<MAFcalculation> LocalCollection;
         List<MAFcalculationGlobal> GlobalCollection;
+        List<MAFcalculationGlobal> EmptyList;
         bool rbCheckFired = false;
         string condition = "";
         const string ImageFileName = "BingImageOfTheDay.jpg";
@@ -89,6 +91,9 @@ namespace MAF_VE_2
             InitializeLocalDatabase();
 
             allCarMakes = new List<string>();
+            LocalCollection = new List<MAFcalculation>();
+            GlobalCollection = new List<MAFcalculationGlobal>();
+            EmptyList = new List<MAFcalculationGlobal>();
 
             // Initialize Settings storage
             localSettings = ApplicationData.Current.LocalSettings;
@@ -789,7 +794,7 @@ namespace MAF_VE_2
                     bool IsParsed = JsonArray.TryParse(JSON, out jsonArray);
                     if (IsParsed)
                     {
-                        // Build List and return it
+                        // Build collection and return it
                         foreach (var item in jsonArray)
                         {
                             var jsonString = item.ToString();
@@ -804,7 +809,7 @@ namespace MAF_VE_2
                 }
                 catch
                 {
-                    return records;
+                    return null;
                 }
             });
         }
@@ -839,6 +844,11 @@ namespace MAF_VE_2
         async void ShowRecentGlobalRecords()
         {
             progressGlobal.Visibility = Visibility.Visible;
+            if (GlobalCollection != null)
+            {
+                GlobalCollection.Clear();
+            }
+            globalRecords.ItemsSource = EmptyList;
             GlobalCollection = await GetRecentGlobalRecordsAsync();
             globalScrollViewer.ChangeView(0.0, 0.0, null, true);
 
@@ -849,8 +859,6 @@ namespace MAF_VE_2
             }
             else
             {
-                globalRecords.ItemsSource = GlobalCollection;
-
                 noResultsGlobal.Text = "No results found.";
                 if (GlobalCollection.Count == 0)
                 {
@@ -858,6 +866,7 @@ namespace MAF_VE_2
                 }
                 else
                 {
+                    globalRecords.ItemsSource = GlobalCollection;
                     noResultsGlobal.Visibility = Visibility.Collapsed;
                 }
             }
@@ -2032,7 +2041,6 @@ namespace MAF_VE_2
 
             ShowAllLocalRecords();
             ShowRecentGlobalRecords();
-            noResultsGlobal.Visibility = Visibility.Visible;
         }
 
         #endregion
@@ -2139,42 +2147,25 @@ namespace MAF_VE_2
 
         async void SaveGlobalAsync(MAFcalculation recordToSave)
         {
-            const string yearKey = "year";
-            const string makeKey = "make";
-            const string modelKey = "model";
-            const string engineKey = "engine";
-            const string conditionKey = "condition";
-            const string commentsKey = "comments";
-            const string mafunitsKey = "mafunits";
-            const string tempunitsKey = "tempunits";
-            const string altitudeunitsKey = "altitudeunits";
-            const string rpmKey = "rpm";
-            const string mafKey = "maf";
-            const string airtempKey = "airtemp";
-            const string altitudeKey = "altitude";
-            const string expectedmafKey = "expectedmaf";
-            const string mafdiffKey = "mafdiff";
-            const string veKey = "ve";
-
             JsonObject jsonObject = new JsonObject();
-            jsonObject[yearKey] = JsonValue.CreateStringValue(recordToSave.Year);
-            jsonObject[makeKey] = JsonValue.CreateStringValue(recordToSave.Make);
-            jsonObject[modelKey] = JsonValue.CreateStringValue(recordToSave.Model);
-            jsonObject[engineKey] = JsonValue.CreateStringValue(recordToSave.Engine);
-            jsonObject[conditionKey] = JsonValue.CreateStringValue(recordToSave.Condition);
-            jsonObject[commentsKey] = JsonValue.CreateStringValue(recordToSave.Comments);
-            jsonObject[mafunitsKey] = JsonValue.CreateStringValue(recordToSave.MAF_units);
-            jsonObject[tempunitsKey] = JsonValue.CreateStringValue(recordToSave.Temp_units);
-            jsonObject[altitudeunitsKey] = JsonValue.CreateStringValue(recordToSave.Altitude_units);
-            jsonObject[rpmKey] = JsonValue.CreateNumberValue(recordToSave.Engine_speed);
-            jsonObject[mafKey] = JsonValue.CreateNumberValue(recordToSave.MAF);
-            jsonObject[airtempKey] = JsonValue.CreateNumberValue(recordToSave.Air_temperature);
-            jsonObject[altitudeKey] = JsonValue.CreateNumberValue(recordToSave.Altitude);
-            jsonObject[expectedmafKey] = JsonValue.CreateNumberValue(recordToSave.Expected_MAF);
-            jsonObject[mafdiffKey] = JsonValue.CreateNumberValue(recordToSave.MAF_Difference);
-            jsonObject[veKey] = JsonValue.CreateNumberValue(recordToSave.Volumetric_Efficiency);
+            jsonObject["year"] = JsonValue.CreateStringValue(recordToSave.Year);
+            jsonObject["make"] = JsonValue.CreateStringValue(recordToSave.Make);
+            jsonObject["model"] = JsonValue.CreateStringValue(recordToSave.Model);
+            jsonObject["engine"] = JsonValue.CreateStringValue(recordToSave.Engine);
+            jsonObject["condition"] = JsonValue.CreateStringValue(recordToSave.Condition);
+            jsonObject["comments"] = JsonValue.CreateStringValue(recordToSave.Comments);
+            jsonObject["mafunits"] = JsonValue.CreateStringValue(recordToSave.MAF_units);
+            jsonObject["tempunits"] = JsonValue.CreateStringValue(recordToSave.Temp_units);
+            jsonObject["altitudeunits"] = JsonValue.CreateStringValue(recordToSave.Altitude_units);
+            jsonObject["rpm"] = JsonValue.CreateNumberValue(recordToSave.Engine_speed);
+            jsonObject["maf"] = JsonValue.CreateNumberValue(recordToSave.MAF);
+            jsonObject["airtemp"] = JsonValue.CreateNumberValue(recordToSave.Air_temperature);
+            jsonObject["altitude"] = JsonValue.CreateNumberValue(recordToSave.Altitude);
+            jsonObject["expectedmaf"] = JsonValue.CreateNumberValue(recordToSave.Expected_MAF);
+            jsonObject["mafdiff"] = JsonValue.CreateNumberValue(recordToSave.MAF_Difference);
+            jsonObject["ve"] = JsonValue.CreateNumberValue(recordToSave.Volumetric_Efficiency);
 
-            var jsonString = jsonObject.Stringify();
+            string jsonString = jsonObject.Stringify();
 
             using (HttpClient httpClient = new HttpClient())
             {
@@ -2272,6 +2263,7 @@ namespace MAF_VE_2
         async void Search()
         {
             noResults.Visibility = Visibility.Collapsed;
+            noResultsGlobal.Visibility = Visibility.Collapsed;
 
             string YEAR = "";
             string MAKE = "";
@@ -2281,6 +2273,7 @@ namespace MAF_VE_2
             string COMMENTS = "";
             List<string> queryStringList = new List<string>();
             List<string> searchedForList = new List<string>();
+            JsonObject jsonObjectForGlobalSearch = new JsonObject();
             string queryString;
 
             try
@@ -2294,6 +2287,7 @@ namespace MAF_VE_2
 
                     if (YEAR != "")
                     {
+                        jsonObjectForGlobalSearch["year"] = JsonValue.CreateStringValue(YEAR);
                         YEAR = " Year = '" + YEAR + "'";
                         queryStringList.Add(YEAR);
                     }
@@ -2306,6 +2300,7 @@ namespace MAF_VE_2
 
                     if (MAKE != "")
                     {
+                        jsonObjectForGlobalSearch["make"] = JsonValue.CreateStringValue(MAKE);
                         MAKE = " Make = '" + MAKE + "'";
                         queryStringList.Add(MAKE);
                     }
@@ -2315,6 +2310,7 @@ namespace MAF_VE_2
                 {
                     MODEL = model.Text.Trim();
                     searchedForList.Add(MODEL);
+                    jsonObjectForGlobalSearch["model"] = JsonValue.CreateStringValue(MODEL);
 
                     if (MODEL.Length < 3)
                     {
@@ -2336,6 +2332,7 @@ namespace MAF_VE_2
 
                     if (ENGINE != "")
                     {
+                        jsonObjectForGlobalSearch["engine"] = JsonValue.CreateStringValue(ENGINE);
                         ENGINE = " Engine = '" + ENGINE + "'";
                         queryStringList.Add(ENGINE);
                     }
@@ -2348,6 +2345,7 @@ namespace MAF_VE_2
 
                     if (CONDITION != "")
                     {
+                        jsonObjectForGlobalSearch["condition"] = JsonValue.CreateStringValue(CONDITION);
                         CONDITION = " Condition = '" + CONDITION + "'";
                         queryStringList.Add(CONDITION);
                     }
@@ -2358,22 +2356,48 @@ namespace MAF_VE_2
                     COMMENTS = comments.Text.Trim();
 
                     // Split comments into individual words and remove separators like commas and white space
-                    string[] separators = { ",", ".", "!", "?", ";", ":", " " };
+                    string[] separators = { ",", ".", "!", "?", ";", ":", " ", "|", "-", "\"", "\\", "/", "%", "*", "(", ")", "+" };
                     string[] words = COMMENTS.Split(separators, StringSplitOptions.RemoveEmptyEntries);
 
+                    // Add up to 3 keywords to global search object first
+                    var wordCount = words.Count();
+                    if (wordCount > 0)
+                    {
+                        jsonObjectForGlobalSearch["keyword1"] = JsonValue.CreateStringValue(words[0]);
+
+                        if (wordCount > 1)
+                        {
+                            jsonObjectForGlobalSearch["keyword2"] = JsonValue.CreateStringValue(words[1]);
+
+                            if (wordCount > 2)
+                            {
+                                jsonObjectForGlobalSearch["keyword3"] = JsonValue.CreateStringValue(words[2]);
+                            }
+                        }
+                    }
+
+                    // Add all keywords to local search
                     foreach (var word in words)
                     {
-                        // Add each word as a keyword search of the Comments in the database
                         string KEYWORD = " Comments LIKE '%" + word + "%'";
                         queryStringList.Add(KEYWORD);
-
-                        // Add each word to searchedForList
+                        
                         searchedForList.Add(word);
                     }
                 }
 
                 if (queryStringList.Count > 0)
                 {
+                    // Set searchedForText
+                    var searchText = string.Join(" ", searchedForList);
+                    searchedForText.Text = searchText;
+                    searchedForPanelStory.Begin();
+                    mafChartDataDescription.Text = searchText;
+                    veChartDataDescription.Text = searchText;
+                    searchedForTextGlobal.Text = searchText;
+
+                    progressGlobal.Visibility = Visibility.Visible;
+                    SearchGlobalDatabaseAsync(jsonObjectForGlobalSearch);
                     ClearChartData();
 
                     // Set queryString based on items in queryStringList
@@ -2390,13 +2414,6 @@ namespace MAF_VE_2
                     Log("QueryLocalDatabase");
                     LocalCollection = await Task.Run(() => QueryLocalDatabase(queryString));
                     LoadRecords(LocalCollection, localRecords);
-
-                    // Set searchedForText
-                    var searchText = string.Join(" ", searchedForList);
-                    searchedForText.Text = searchText;
-                    searchedForPanelStory.Begin();
-                    mafChartDataDescription.Text = searchText;
-                    veChartDataDescription.Text = searchText;
 
                     // Manage noResults visibility, plot data if there are results
                     if (localRecords.Items.Count == 0)
@@ -2429,6 +2446,92 @@ namespace MAF_VE_2
             finally
             {
                 EndWaitForDb();
+            }
+        }
+
+        async void SearchGlobalDatabaseAsync(JsonObject jsonObject)
+        {
+            string jsonString = jsonObject.Stringify();
+
+            using (HttpClient httpClient = new HttpClient())
+            {
+                Uri UriToPostTo = new Uri("http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/query");
+                httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
+                httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
+                string JSON = "";
+                bool success = false;
+
+                try
+                {
+                    HttpStringContent content = new HttpStringContent(jsonString, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    HttpResponseMessage response = await httpClient.PostAsync(UriToPostTo, content);
+
+                    JSON = await response.Content.ReadAsStringAsync();
+
+                    if (JSON.Contains("notice"))
+                    {
+                        GlobalCollection.Clear();
+                        globalRecords.ItemsSource = EmptyList;
+                        noResultsGlobal.Text = JSON;
+                        noResultsGlobal.Visibility = Visibility.Visible;
+                        progressGlobal.Visibility = Visibility.Collapsed;
+                        return;
+                    }
+
+                    // Parse JSON
+                    JsonArray jsonArray;
+                    bool IsParsed = JsonArray.TryParse(JSON, out jsonArray);
+                    if (IsParsed)
+                    {
+                        // Build collection
+                        GlobalCollection.Clear();
+                        foreach (var item in jsonArray)
+                        {
+                            var jString = item.ToString();
+                            GlobalCollection.Add(new MAFcalculationGlobal(jString));
+                        }
+
+                        success = true;
+                    }
+                    else
+                    {
+                        success = false;
+                    }
+                }
+                catch
+                {
+                    GlobalCollection.Clear();
+                    globalRecords.ItemsSource = EmptyList;
+                    noResultsGlobal.Text = "Trouble searching global database.\r\nCheck internet connection or try again later.";
+                    noResultsGlobal.Visibility = Visibility.Visible;
+                }
+
+                globalScrollViewer.ChangeView(0.0, 0.0, null, true);
+
+                if (success)
+                {
+                    noResultsGlobal.Text = "No results found.";
+                    if (GlobalCollection.Count == 0)
+                    {
+                        noResultsGlobal.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        globalRecords.ItemsSource = EmptyList;
+                        globalRecords.ItemsSource = GlobalCollection;
+                        noResultsGlobal.Visibility = Visibility.Collapsed;
+                    }
+                }
+                else
+                {
+                    GlobalCollection.Clear();
+                    globalRecords.ItemsSource = EmptyList;
+                    noResultsGlobal.Text = "Trouble searching global database.\r\nCheck internet connection or try again later.";
+                    noResultsGlobal.Visibility = Visibility.Visible;
+                }
+
+                searchedForPanelStoryGlobal.Begin();
+                progressGlobal.Visibility = Visibility.Collapsed;
             }
         }
 

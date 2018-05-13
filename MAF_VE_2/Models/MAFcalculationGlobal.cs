@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using Windows.Data.Json;
 
 namespace MAF_VE_2.Models
@@ -26,13 +27,12 @@ namespace MAF_VE_2.Models
 
         public MAFcalculationGlobal()
         {
-
+            
         }
 
         public MAFcalculationGlobal(string jsonString)
         {
             JsonObject jsonObject = JsonObject.Parse(jsonString);
-
             _year = jsonObject.GetNamedString("_year");
             _make = jsonObject.GetNamedString("_make");
             _model = jsonObject.GetNamedString("_model");
