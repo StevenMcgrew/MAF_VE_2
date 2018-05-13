@@ -2228,6 +2228,32 @@ namespace MAF_VE_2
             recordPopUp.Visibility = Visibility.Visible;
         }
 
+        private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            var item = e.ClickedItem as MAFcalculationGlobal;
+
+            YMME.Text = item._year + " " +
+                        item._make + " " +
+                        item._model + " " +
+                        item._engine;
+
+            RPM.Text = item._rpm.ToString();
+            MAF.Text = item._maf.ToString();
+            MAF_UNITS.Text = item._mafunits;
+            AIR.Text = item._airtemp;
+            AIR_UNITS.Text = item._tempunits;
+            ELEVATION.Text = item._altitude;
+            ELEVATION_UNITS.Text = item._altitudeunits;
+            EXPECTED.Text = item._expectedmaf;
+            DIFF.Text = item._mafdiff;
+            VOLUMETRIC.Text = item._ve;
+            CONDITION.Text = item._condition;
+            COMMENTS.Text = item._comments;
+
+            popUpPanelBackground.Visibility = Visibility.Visible;
+            recordPopUp.Visibility = Visibility.Visible;
+        }
+
         private void closeRecordPopUpButton_Click(object sender, RoutedEventArgs e)
         {
             popUpPanelBackground.Visibility = Visibility.Collapsed;
@@ -2836,9 +2862,6 @@ namespace MAF_VE_2
 
         #endregion
 
-        private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
-        {
-
-        }
+        
     }
 }
