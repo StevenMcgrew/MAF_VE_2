@@ -44,8 +44,7 @@ namespace MAF_VE_2
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         List<MAFcalculation> LocalCollection;
-        List<MAFcalculationGlobal> GlobalCollection;
-        List<MAFcalculationGlobal> EmptyList;
+        List<MAFcalculation> GlobalCollection;
         bool rbCheckFired = false;
         string condition = "";
         const string ImageFileName = "BingImageOfTheDay.jpg";
@@ -58,6 +57,25 @@ namespace MAF_VE_2
         const string AutoBackupIsOn = "AutoBackupIsOn";
         const string localRecordCountAtLastBackup = "localRecordCountAtLastBackup";
         const string lastBackupTimeAndLocation = "lastBackupTimeAndLocation";
+
+        #endregion
+
+        #region Property for beginning data plotting
+
+        private int _numberOfSearchesFinished;
+        private int numberOfSearchesCompleted;
+        public int NumberOfSearchesCompleted
+        {
+            get { return numberOfSearchesCompleted; }
+            set
+            {
+                numberOfSearchesCompleted = value;
+                if (numberOfSearchesCompleted == 2)
+                {
+                    PlotDataOnCharts(LocalCollection, GlobalCollection);
+                }
+            }
+        }
 
         #endregion
 
@@ -92,8 +110,7 @@ namespace MAF_VE_2
 
             allCarMakes = new List<string>();
             LocalCollection = new List<MAFcalculation>();
-            GlobalCollection = new List<MAFcalculationGlobal>();
-            EmptyList = new List<MAFcalculationGlobal>();
+            GlobalCollection = new List<MAFcalculation>();
 
             // Initialize Settings storage
             localSettings = ApplicationData.Current.LocalSettings;
@@ -258,13 +275,13 @@ namespace MAF_VE_2
                 else
                 {
                     //Log("Setting is No Image...");
-                    noImage.IsChecked = true; 
+                    noImage.IsChecked = true;
                 }
             }
             else
             {
                 //Log("No setting is stored...");
-                yesImage.IsChecked = true; 
+                yesImage.IsChecked = true;
             }
         }
 
@@ -765,11 +782,11 @@ namespace MAF_VE_2
              });
         }
 
-        Task<List<MAFcalculationGlobal>> GetRecentGlobalRecordsAsync()
+        Task<List<MAFcalculation>> GetRecentGlobalRecordsAsync()
         {
             return Task.Run(async () =>
             {
-                var records = new List<MAFcalculationGlobal>();
+                var records = new List<MAFcalculation>();
 
                 // Get JSON
                 string maf_ve_api_URL = "http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/last100";
@@ -798,7 +815,7 @@ namespace MAF_VE_2
                         foreach (var item in jsonArray)
                         {
                             var jsonString = item.ToString();
-                            records.Add(new MAFcalculationGlobal(jsonString));
+                            records.Add(new MAFcalculation(jsonString));
                         }
                         return records;
                     }
@@ -816,12 +833,12 @@ namespace MAF_VE_2
 
         async void ShowAllLocalRecords()
         {
-            Log("ShowAllLocalRecords");
+            //Log("ShowAllLocalRecords");
             BeginWaitForDb();
 
-            Log("GetAllLocalRecordsAsync");
+            //Log("GetAllLocalRecordsAsync");
             LocalCollection = await GetAllLocalRecordsAsync();
-            LoadRecords(LocalCollection, localRecords);
+            LoadLocalRecords(LocalCollection, localRecords);
 
             if (LocalCollection.Count == 0)
             {
@@ -848,9 +865,7 @@ namespace MAF_VE_2
             {
                 GlobalCollection.Clear();
             }
-            globalRecords.ItemsSource = EmptyList;
             GlobalCollection = await GetRecentGlobalRecordsAsync();
-            globalScrollViewer.ChangeView(0.0, 0.0, null, true);
 
             if (GlobalCollection == null)
             {
@@ -860,15 +875,18 @@ namespace MAF_VE_2
             else
             {
                 noResultsGlobal.Text = "No results found.";
+
                 if (GlobalCollection.Count == 0)
                 {
                     noResultsGlobal.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    globalRecords.ItemsSource = GlobalCollection;
+
                     noResultsGlobal.Visibility = Visibility.Collapsed;
                 }
+
+                LoadGlobalRecords(GlobalCollection, globalRecords);
             }
 
             searchedForTextGlobal.Text = "most recent 100 records";
@@ -876,13 +894,12 @@ namespace MAF_VE_2
             progressGlobal.Visibility = Visibility.Collapsed;
         }
 
-        void LoadRecords(List<MAFcalculation> records, ListView listView)
+        void LoadLocalRecords(List<MAFcalculation> records, ListView listView)
         {
             localScrollViewer.ViewChanged -= localScrollViewer_ViewChanged;
+            localScrollViewer.ChangeView(0.0, 0.0, null, true);
 
             listView.Items.Clear();
-
-            localScrollViewer.ChangeView(0.0, 0.0, null, true);
 
             var viewHeight = localScrollViewer.ViewportHeight;
             var amountToLoad = Convert.ToInt32((viewHeight * 2) / 44);
@@ -913,6 +930,18 @@ namespace MAF_VE_2
             }
 
             localScrollViewer.ViewChanged += localScrollViewer_ViewChanged;
+        }
+
+        void LoadGlobalRecords(List<MAFcalculation> records, ListView listView)
+        {
+            globalScrollViewer.ChangeView(0.0, 0.0, null, true);
+            listView.Items.Clear();
+
+            for (int i = 0; i < records.Count; i++)
+            {
+                var itemToBeAdded = records.ElementAt(i);
+                listView.Items.Add(itemToBeAdded);
+            }
         }
 
         private void localScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -1086,7 +1115,7 @@ namespace MAF_VE_2
         private void importButton_Click(object sender, RoutedEventArgs e)
         {
             localDbBackupPopUp.Visibility = Visibility.Collapsed;
-            
+
             generalPopup.Visibility = Visibility.Visible;
             generalText.Text = "Import :  In the next step, you will need to chose a SQLITE (.sqlite) file that was previously created as a backup of this app.\r\nOther SQLITE files that were not created for this app will not work.";
         }
@@ -1114,7 +1143,7 @@ namespace MAF_VE_2
         private void generalOkButton_Click(object sender, RoutedEventArgs e)
         {
             generalPopup.Visibility = Visibility.Collapsed;
-            
+
             if (generalText.Text.StartsWith("I")) // starts with "Import"
             {
                 ImportSQLiteFile();
@@ -1205,7 +1234,7 @@ namespace MAF_VE_2
             {
                 dbButtonsPanel.IsHitTestVisible = false;
                 //localDatabaseConnection.Close();
-                
+
                 var dbFile = await ApplicationData.Current.LocalFolder.GetFileAsync("MAFdatabase.sqlite");
                 if (dbFile != null)
                 {
@@ -1229,7 +1258,7 @@ namespace MAF_VE_2
                                               "Location:   " + file.Path;
 
                         localSettings.Values[lastBackupTimeAndLocation] = lastBackupText.Text;
-                        
+
                         savedPopupStory.Begin();
                     }
                     else // operation cancelled
@@ -1319,7 +1348,7 @@ namespace MAF_VE_2
                                                "All previous data was removed, and the chosen file was imported." + Environment.NewLine +
                                                "There were " + count.ToString() + " vehicle records in the file.";
                         }
-                        
+
                         dbButtonsPanel.IsHitTestVisible = true;
                     }
                 }
@@ -2193,7 +2222,7 @@ namespace MAF_VE_2
 
         #region Record click
 
-        private void localRecords_ItemClick(object sender, ItemClickEventArgs e)
+        private void records_ItemClick(object sender, ItemClickEventArgs e)
         {
             var item = e.ClickedItem as MAFcalculation;
 
@@ -2219,31 +2248,31 @@ namespace MAF_VE_2
             recordPopUp.Visibility = Visibility.Visible;
         }
 
-        private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
-        {
-            var item = e.ClickedItem as MAFcalculationGlobal;
+        //private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
+        //{
+        //    var item = e.ClickedItem as MAFcalculation;
 
-            YMME.Text = item._year + " " +
-                        item._make + " " +
-                        item._model + " " +
-                        item._engine;
+        //    YMME.Text = item._year + " " +
+        //                item._make + " " +
+        //                item._model + " " +
+        //                item._engine;
 
-            RPM.Text = item._rpm.ToString();
-            MAF.Text = item._maf.ToString();
-            MAF_UNITS.Text = item._mafunits;
-            AIR.Text = item._airtemp;
-            AIR_UNITS.Text = item._tempunits;
-            ELEVATION.Text = item._altitude;
-            ELEVATION_UNITS.Text = item._altitudeunits;
-            EXPECTED.Text = item._expectedmaf;
-            DIFF.Text = item._mafdiff;
-            VOLUMETRIC.Text = item._ve;
-            CONDITION.Text = item._condition;
-            COMMENTS.Text = item._comments;
+        //    RPM.Text = item._rpm.ToString();
+        //    MAF.Text = item._maf.ToString();
+        //    MAF_UNITS.Text = item._mafunits;
+        //    AIR.Text = item._airtemp;
+        //    AIR_UNITS.Text = item._tempunits;
+        //    ELEVATION.Text = item._altitude;
+        //    ELEVATION_UNITS.Text = item._altitudeunits;
+        //    EXPECTED.Text = item._expectedmaf;
+        //    DIFF.Text = item._mafdiff;
+        //    VOLUMETRIC.Text = item._ve;
+        //    CONDITION.Text = item._condition;
+        //    COMMENTS.Text = item._comments;
 
-            popUpPanelBackground.Visibility = Visibility.Visible;
-            recordPopUp.Visibility = Visibility.Visible;
-        }
+        //    popUpPanelBackground.Visibility = Visibility.Visible;
+        //    recordPopUp.Visibility = Visibility.Visible;
+        //}
 
         private void closeRecordPopUpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -2257,11 +2286,16 @@ namespace MAF_VE_2
 
         private void searchButton_Click(object sender, RoutedEventArgs e)
         {
+            _numberOfSearchesFinished = 0;
+            progressGlobal.Visibility = Visibility.Visible;
+            BeginWaitForDb();
+
             Search();
         }
 
         async void Search()
         {
+            LocalCollection.Clear();
             noResults.Visibility = Visibility.Collapsed;
             noResultsGlobal.Visibility = Visibility.Collapsed;
 
@@ -2278,8 +2312,6 @@ namespace MAF_VE_2
 
             try
             {
-                BeginWaitForDb();
-
                 if (year.SelectedItem != null)
                 {
                     YEAR = year.SelectedItem.ToString();
@@ -2381,7 +2413,7 @@ namespace MAF_VE_2
                     {
                         string KEYWORD = " Comments LIKE '%" + word + "%'";
                         queryStringList.Add(KEYWORD);
-                        
+
                         searchedForList.Add(word);
                     }
                 }
@@ -2396,8 +2428,6 @@ namespace MAF_VE_2
                     veChartDataDescription.Text = searchText;
                     searchedForTextGlobal.Text = searchText;
 
-                    progressGlobal.Visibility = Visibility.Visible;
-                    SearchGlobalDatabaseAsync(jsonObjectForGlobalSearch);
                     ClearChartData();
 
                     // Set queryString based on items in queryStringList
@@ -2413,17 +2443,12 @@ namespace MAF_VE_2
                     // Query the database and update localRecords
                     Log("QueryLocalDatabase");
                     LocalCollection = await Task.Run(() => QueryLocalDatabase(queryString));
-                    LoadRecords(LocalCollection, localRecords);
+                    LoadLocalRecords(LocalCollection, localRecords);
 
-                    // Manage noResults visibility, plot data if there are results
+                    // Manage noResults visibility
                     if (localRecords.Items.Count == 0)
                     {
                         noResults.Visibility = Visibility.Visible;
-                    }
-                    else
-                    {
-                        //List<MAFcalculation> copyOfQuery = localSearchResults.Select(item => new MAFcalculation(item)).ToList();
-                        PlotDataOnCharts(LocalCollection);
                     }
 
                     // Navigate to databasePivotItem if needed
@@ -2445,12 +2470,17 @@ namespace MAF_VE_2
             }
             finally
             {
+                _numberOfSearchesFinished++;
+                NumberOfSearchesCompleted = _numberOfSearchesFinished;
+                SearchGlobalDatabaseAsync(jsonObjectForGlobalSearch);
                 EndWaitForDb();
             }
         }
 
         async void SearchGlobalDatabaseAsync(JsonObject jsonObject)
         {
+            GlobalCollection.Clear();
+
             string jsonString = jsonObject.Stringify();
 
             using (HttpClient httpClient = new HttpClient())
@@ -2470,11 +2500,12 @@ namespace MAF_VE_2
 
                     if (JSON.Contains("notice"))
                     {
-                        GlobalCollection.Clear();
-                        globalRecords.ItemsSource = EmptyList;
+                        globalRecords.Items.Clear();
                         noResultsGlobal.Text = JSON;
                         noResultsGlobal.Visibility = Visibility.Visible;
                         progressGlobal.Visibility = Visibility.Collapsed;
+                        _numberOfSearchesFinished++;
+                        NumberOfSearchesCompleted = _numberOfSearchesFinished;
                         return;
                     }
 
@@ -2484,11 +2515,10 @@ namespace MAF_VE_2
                     if (IsParsed)
                     {
                         // Build collection
-                        GlobalCollection.Clear();
                         foreach (var item in jsonArray)
                         {
                             var jString = item.ToString();
-                            GlobalCollection.Add(new MAFcalculationGlobal(jString));
+                            GlobalCollection.Add(new MAFcalculation(jString));
                         }
 
                         success = true;
@@ -2500,9 +2530,8 @@ namespace MAF_VE_2
                 }
                 catch
                 {
-                    GlobalCollection.Clear();
-                    globalRecords.ItemsSource = EmptyList;
-                    noResultsGlobal.Text = "Trouble searching global database.\r\nCheck internet connection or try again later.";
+                    globalRecords.Items.Clear();
+                    noResultsGlobal.Text = "Problem searching global database.\r\nCheck internet connection or try again later.";
                     noResultsGlobal.Visibility = Visibility.Visible;
                 }
 
@@ -2517,21 +2546,21 @@ namespace MAF_VE_2
                     }
                     else
                     {
-                        globalRecords.ItemsSource = EmptyList;
-                        globalRecords.ItemsSource = GlobalCollection;
+                        LoadGlobalRecords(GlobalCollection, globalRecords);
                         noResultsGlobal.Visibility = Visibility.Collapsed;
                     }
                 }
                 else
                 {
-                    GlobalCollection.Clear();
-                    globalRecords.ItemsSource = EmptyList;
+                    globalRecords.Items.Clear();
                     noResultsGlobal.Text = "Trouble searching global database.\r\nCheck internet connection or try again later.";
                     noResultsGlobal.Visibility = Visibility.Visible;
                 }
 
                 searchedForPanelStoryGlobal.Begin();
                 progressGlobal.Visibility = Visibility.Collapsed;
+                _numberOfSearchesFinished++;
+                NumberOfSearchesCompleted = _numberOfSearchesFinished;
             }
         }
 
@@ -2539,23 +2568,84 @@ namespace MAF_VE_2
 
         #region Plot data
 
-        void PlotDataOnCharts(List<MAFcalculation> records)
+        void PlotDataOnCharts(List<MAFcalculation> _localRecords, List<MAFcalculation> _globalRecords)
         {
-            if (records.Count == 0)
+            if (_globalRecords == null)
             {
-                return;
+                if (_localRecords.Count > 0)
+                {
+                    //plot local only
+                    AddCurrentCalculationToLocalList(_localRecords);
+                    ConvertToGramsPerSecond(_localRecords);
+                    var rpmMinMax = GetMinMaxRpm(_localRecords);
+                    var mafMinMax = GetMinMaxMaf(_localRecords);
+                    var veMinMax = GetMinMaxVe(_localRecords);
+                    SetRpmScaleOnCharts(rpmMinMax);
+                    SetMafScaleOnChart(mafMinMax);
+                    SetVeScaleOnChart(veMinMax);
+                    SetAmountsPerPixel();
+                    AddMafDataPlots(_localRecords, localMafPlot);
+                    AddVeDataPlots(_localRecords, localVePlot);
+                    RemoveLastCalculationFromList(_localRecords);
+                }
             }
-            else if (records.Count > 0)
+            else
             {
-                AddCurrentCalculationToList(records);
-                ConvertToGramsPerSecond(records);
-                SetRpmScaleOnCharts(records);
-                SetMafScaleOnChart(records);
-                SetVeScaleOnChart(records);
-                SetAmountsPerPixel();
-                AddMafDataPlots(records);
-                AddVeDataPlots(records);
-                RemoveLastCalculationFromList(records);
+                if (_globalRecords.Count > 0)
+                {
+                    if (_localRecords.Count > 0)
+                    {
+                        //plot both local and global
+                        AddCurrentCalculationToLocalList(_localRecords);
+                        ConvertToGramsPerSecond(_localRecords);
+                        ConvertToGramsPerSecond(_globalRecords);
+                        var rpmMinMax = GetMinMaxRpm(_localRecords, _globalRecords);
+                        var mafMinMax = GetMinMaxMaf(_localRecords, _globalRecords);
+                        var veMinMax = GetMinMaxVe(_localRecords, _globalRecords);
+                        SetRpmScaleOnCharts(rpmMinMax);
+                        SetMafScaleOnChart(mafMinMax);
+                        SetVeScaleOnChart(veMinMax);
+                        SetAmountsPerPixel();
+                        AddMafDataPlots(_localRecords, localMafPlot);
+                        AddVeDataPlots(_localRecords, localVePlot);
+                        AddMafDataPlots(_globalRecords, globalMafPlot);
+                        AddVeDataPlots(_globalRecords, globalVePlot);
+                        RemoveLastCalculationFromList(_localRecords);
+                    }
+                    else
+                    {
+                        //plot global only
+                        ConvertToGramsPerSecond(_globalRecords);
+                        var rpmMinMax = GetMinMaxRpm(_globalRecords);
+                        var mafMinMax = GetMinMaxMaf(_globalRecords);
+                        var veMinMax = GetMinMaxVe(_globalRecords);
+                        SetRpmScaleOnCharts(rpmMinMax);
+                        SetMafScaleOnChart(mafMinMax);
+                        SetVeScaleOnChart(veMinMax);
+                        SetAmountsPerPixel();
+                        AddMafDataPlots(_globalRecords, globalMafPlot);
+                        AddVeDataPlots(_globalRecords, globalVePlot);
+                    }
+                }
+                else
+                {
+                    if (_localRecords.Count > 0)
+                    {
+                        //plot local only
+                        AddCurrentCalculationToLocalList(_localRecords);
+                        ConvertToGramsPerSecond(_localRecords);
+                        var rpmMinMax = GetMinMaxRpm(_localRecords);
+                        var mafMinMax = GetMinMaxMaf(_localRecords);
+                        var veMinMax = GetMinMaxVe(_localRecords);
+                        SetRpmScaleOnCharts(rpmMinMax);
+                        SetMafScaleOnChart(mafMinMax);
+                        SetVeScaleOnChart(veMinMax);
+                        SetAmountsPerPixel();
+                        AddMafDataPlots(_localRecords, localMafPlot);
+                        AddVeDataPlots(_localRecords, localVePlot);
+                        RemoveLastCalculationFromList(_localRecords);
+                    }
+                }
             }
         }
 
@@ -2573,8 +2663,10 @@ namespace MAF_VE_2
             mafPerPixel = double.NaN;
             vePerPixel = double.NaN;
 
-            vePlot.Children.Clear();
-            mafPlot.Children.Clear();
+            localVePlot.Children.Clear();
+            localMafPlot.Children.Clear();
+            globalVePlot.Children.Clear();
+            globalMafPlot.Children.Clear();
         }
 
         List<MAFcalculation> ConvertToGramsPerSecond(List<MAFcalculation> records)
@@ -2605,10 +2697,85 @@ namespace MAF_VE_2
             return records;
         }
 
-        void SetRpmScaleOnCharts(List<MAFcalculation> records)
+        double[] GetMinMaxRpm(List<MAFcalculation> _localRecords, List<MAFcalculation> _globalRecords)
         {
-            double minRecordRpm = records.Min(p => p.Engine_speed);
-            double maxRecordRpm = records.Max(p => p.Engine_speed);
+            double minLocalRpm = _localRecords.Min(p => p.Engine_speed);
+            double maxLocalRpm = _localRecords.Max(p => p.Engine_speed);
+            double minGlobalRpm = _globalRecords.Min(p => p.Engine_speed);
+            double maxGlobalRpm = _globalRecords.Max(p => p.Engine_speed);
+
+            var min = Math.Min(minLocalRpm, minGlobalRpm);
+            var max = Math.Max(maxLocalRpm, maxGlobalRpm);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        double[] GetMinMaxRpm(List<MAFcalculation> records)
+        {
+            double min = records.Min(p => p.Engine_speed);
+            double max = records.Max(p => p.Engine_speed);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        double[] GetMinMaxMaf(List<MAFcalculation> _localRecords, List<MAFcalculation> _globalRecords)
+        {
+            double minLocalMaf = _localRecords.Min(p => p.MAF);
+            double maxLocalMaf = _localRecords.Max(p => p.MAF);
+            double minGlobalMaf = _globalRecords.Min(p => p.MAF);
+            double maxGlobalMaf = _globalRecords.Max(p => p.MAF);
+
+            var min = Math.Min(minLocalMaf, minGlobalMaf);
+            var max = Math.Max(maxLocalMaf, maxGlobalMaf);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        double[] GetMinMaxMaf(List<MAFcalculation> records)
+        {
+            double min = records.Min(p => p.MAF);
+            double max = records.Max(p => p.MAF);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        double[] GetMinMaxVe(List<MAFcalculation> _localRecords, List<MAFcalculation> _globalRecords)
+        {
+            double minLocalVe = _localRecords.Min(p => p.Volumetric_Efficiency);
+            double maxLocalVe = _localRecords.Max(p => p.Volumetric_Efficiency);
+            double minGlobalVe = _globalRecords.Min(p => p.Volumetric_Efficiency);
+            double maxGlobalVe = _globalRecords.Max(p => p.Volumetric_Efficiency);
+
+            var min = Math.Min(minLocalVe, minGlobalVe);
+            var max = Math.Max(maxLocalVe, maxGlobalVe);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        double[] GetMinMaxVe(List<MAFcalculation> records)
+        {
+            double min = records.Min(p => p.Volumetric_Efficiency);
+            double max = records.Max(p => p.Volumetric_Efficiency);
+
+            double[] _min_max = { min, max };
+
+            return _min_max;
+        }
+
+        void SetRpmScaleOnCharts(double[] MinMax)
+        {
+            double minRecordRpm = MinMax[0];
+            double maxRecordRpm = MinMax[1];
 
             if (minRecordRpm < 500)
             {
@@ -2644,10 +2811,10 @@ namespace MAF_VE_2
             veRpm5.Text = mafRpm5.Text;
         }
 
-        void SetMafScaleOnChart(List<MAFcalculation> records)
+        void SetMafScaleOnChart(double[] MinMax)
         {
-            double minRecordMaf = records.Min(p => p.MAF);
-            double maxRecordMaf = records.Max(p => p.MAF);
+            double minRecordMaf = MinMax[0];
+            double maxRecordMaf = MinMax[1];
 
             if (minRecordMaf < 25)
             {
@@ -2676,10 +2843,10 @@ namespace MAF_VE_2
             mafFlow5.Text = maf5.ToString();
         }
 
-        void SetVeScaleOnChart(List<MAFcalculation> records)
+        void SetVeScaleOnChart(double[] MinMax)
         {
-            double minRecordVe = records.Min(p => p.Volumetric_Efficiency);
-            double maxRecordVe = records.Max(p => p.Volumetric_Efficiency);
+            double minRecordVe = MinMax[0];
+            double maxRecordVe = MinMax[1];
 
             if (minRecordVe < 10)
             {
@@ -2715,13 +2882,13 @@ namespace MAF_VE_2
             vePerPixel = 380 / (highVE - lowVE);
         }
 
-        void AddMafDataPlots(List<MAFcalculation> records)
+        void AddMafDataPlots(List<MAFcalculation> records, Grid chart)
         {
             foreach (var record in records)
             {
                 var leftMafMargin = (record.MAF - lowMAF) * mafPerPixel;
                 var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
-                var plotColor = GetPlotColorBasedOnCondition(record);
+                var plotColor = GetPlotColorBasedOnCondition(record, chart);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftMafMargin, bottomRpmMargin);
 
@@ -2731,17 +2898,17 @@ namespace MAF_VE_2
                 toolTip.Content = recordMAF + " " + record.MAF_units + "\r" + recordRPM + "rpm";
                 ToolTipService.SetToolTip(ellipse, toolTip);
 
-                mafPlot.Children.Add(ellipse);
+                chart.Children.Add(ellipse);
             }
         }
 
-        void AddVeDataPlots(List<MAFcalculation> records)
+        void AddVeDataPlots(List<MAFcalculation> records, Grid chart)
         {
             foreach (var record in records)
             {
                 var leftVeMargin = (record.Volumetric_Efficiency - lowVE) * vePerPixel;
                 var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
-                var plotColor = GetPlotColorBasedOnCondition(record);
+                var plotColor = GetPlotColorBasedOnCondition(record, chart);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftVeMargin, bottomRpmMargin);
 
@@ -2751,24 +2918,24 @@ namespace MAF_VE_2
                 toolTip.Content = recordVE + " %" + "\r" + recordRPM + " rpm";
                 ToolTipService.SetToolTip(ellipse, toolTip);
 
-                vePlot.Children.Add(ellipse);
+                chart.Children.Add(ellipse);
             }
         }
 
-        SolidColorBrush GetPlotColorBasedOnCondition(MAFcalculation record)
+        SolidColorBrush GetPlotColorBasedOnCondition(MAFcalculation record, Grid chart)
         {
             SolidColorBrush plotColor;
 
             switch (record.Condition)
             {
                 case ("Good"):
-                    plotColor = new SolidColorBrush(Colors.Lime);
+                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Lime) : new SolidColorBrush(Colors.Green);
                     break;
                 case ("Bad"):
-                    plotColor = new SolidColorBrush(Colors.Red);
+                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.DarkRed);
                     break;
                 case ("Unsure"):
-                    plotColor = new SolidColorBrush(Colors.Yellow);
+                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Yellow) : new SolidColorBrush(Colors.Orange);
                     break;
                 case ("CurrentCalculation"):
                     plotColor = new SolidColorBrush(Colors.White);
@@ -2796,7 +2963,7 @@ namespace MAF_VE_2
             return el;
         }
 
-        List<MAFcalculation> AddCurrentCalculationToList(List<MAFcalculation> records)
+        List<MAFcalculation> AddCurrentCalculationToLocalList(List<MAFcalculation> records)
         {
             if (string.IsNullOrWhiteSpace(maf.Text) || string.IsNullOrWhiteSpace(VE.Text) || string.IsNullOrWhiteSpace(rpm.Text))
             {

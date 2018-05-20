@@ -375,7 +375,7 @@
 
                                             <TextBlock Name="noResults" Text="No local results found" Margin="10,5,5,5" Visibility="Collapsed"/>
 
-                                            <ListView Name="localRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="localRecords_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                            <ListView Name="localRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ItemClick="records_ItemClick" ScrollViewer.VerticalScrollBarVisibility="Disabled">
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate>
                                                         <Grid Name="gridForData">
@@ -486,7 +486,7 @@
 
                                             <TextBlock Name="noResultsGlobal" Text="No global results found" Margin="10,5,5,5" Visibility="Collapsed"/>
 
-                                            <ListView Name="globalRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemClick="globalRecords_ItemClick">
+                                            <ListView Name="globalRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemClick="records_ItemClick">
                                                 <ListView.ItemTemplate>
                                                     <DataTemplate>
                                                         <Grid Name="gridForData">
@@ -511,15 +511,15 @@
                                                                 <!--Comments-->
                                                             </Grid.ColumnDefinitions>
 
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=_year}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=_make}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=_model}"  />
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=_engine}" HorizontalAlignment="Center"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=_condition}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=_ve}" HorizontalAlignment="Right"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=_maf}" HorizontalAlignment="Right"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=_mafunits}"/>
-                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=_comments}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="0"  Text="{Binding Path=Year}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="1"  Text="{Binding Path=Make}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,0,0" Grid.Column="2"  Text="{Binding Path=Model}"  />
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="3"  Text="{Binding Path=Engine}" HorizontalAlignment="Center"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="10,0,5,0" Grid.Column="4" Text="{Binding Path=Condition}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0,10,0" Grid.Column="5" Text="{Binding Path=Volumetric_Efficiency}" HorizontalAlignment="Right"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="6"  Text="{Binding Path=MAF}" HorizontalAlignment="Right"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Grid.Column="7" Text="{Binding Path=MAF_units}"/>
+                                                            <TextBlock TextTrimming="CharacterEllipsis" Margin="5,0" Grid.Column="13" Text="{Binding Path=Comments}"/>
 
                                                         </Grid>
                                                     </DataTemplate>
@@ -600,7 +600,8 @@
                                                         <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="304" X2="380" Y2="304"/>
                                                     </Grid>
                                                 </Border>
-                                                <Grid Name="vePlot" Grid.Row="1" Grid.Column="1"/>
+                                                <Grid Name="globalVePlot" Grid.Row="1" Grid.Column="1"/>
+                                                <Grid Name="localVePlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
@@ -683,7 +684,8 @@
                                                         <Line StrokeThickness="1" Stroke="#FF3C3C3C" StrokeDashArray="2,10" X1="0" Y1="304" X2="380" Y2="304"/>
                                                     </Grid>
                                                 </Border>
-                                                <Grid Name="mafPlot" Grid.Row="1" Grid.Column="1"/>
+                                                <Grid Name="globalMafPlot" Grid.Row="1" Grid.Column="1"/>
+                                                <Grid Name="localMafPlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
