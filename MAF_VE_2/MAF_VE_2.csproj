@@ -107,7 +107,7 @@
     <Compile Include="Models\CarMakes.cs" />
     <Compile Include="Models\LocalCarMake.cs" />
     <Compile Include="Models\MAFcalculation.cs" />
-    <Compile Include="Models\MAFcalculationGlobal.cs" />
+    <Compile Include="Models\WebAddresses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

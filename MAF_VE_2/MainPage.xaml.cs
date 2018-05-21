@@ -1,9 +1,7 @@
 ﻿using MAF_VE_2.Models;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +39,7 @@ namespace MAF_VE_2
 
         #region General variables
 
+        WebAddresses webAddresses;
         SQLite.Net.SQLiteConnection localDatabaseConnection;
         List<string> allCarMakes;
         List<MAFcalculation> LocalCollection;
@@ -111,6 +110,7 @@ namespace MAF_VE_2
             allCarMakes = new List<string>();
             LocalCollection = new List<MAFcalculation>();
             GlobalCollection = new List<MAFcalculation>();
+            webAddresses = new WebAddresses();
 
             // Initialize Settings storage
             localSettings = ApplicationData.Current.LocalSettings;
@@ -789,44 +789,29 @@ namespace MAF_VE_2
                 var records = new List<MAFcalculation>();
 
                 // Get JSON
-                string maf_ve_api_URL = "http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/last100";
                 string JSON;
-                try
+                using (HttpClient httpClient = new HttpClient())
                 {
-                    using (HttpClient httpClient = new HttpClient())
-                    {
-                        HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(maf_ve_api_URL));
-                        JSON = await httpResponse.Content.ReadAsStringAsync();
-                    }
-                }
-                catch
-                {
-                    return null;
+                    HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(webAddresses.Last100Url));
+                    JSON = await httpResponse.Content.ReadAsStringAsync();
                 }
 
                 // Parse JSON
                 JsonArray jsonArray;
-                try
+                bool IsParsed = JsonArray.TryParse(JSON, out jsonArray);
+                if (IsParsed)
                 {
-                    bool IsParsed = JsonArray.TryParse(JSON, out jsonArray);
-                    if (IsParsed)
+                    // Build collection and return it
+                    foreach (var item in jsonArray)
                     {
-                        // Build collection and return it
-                        foreach (var item in jsonArray)
-                        {
-                            var jsonString = item.ToString();
-                            records.Add(new MAFcalculation(jsonString));
-                        }
-                        return records;
+                        var jsonString = item.ToString();
+                        records.Add(new MAFcalculation(jsonString));
                     }
-                    else
-                    {
-                        return records;
-                    }
+                    return records;
                 }
-                catch
+                else
                 {
-                    return null;
+                    return records;
                 }
             });
         }
@@ -861,13 +846,21 @@ namespace MAF_VE_2
         async void ShowRecentGlobalRecords()
         {
             progressGlobal.Visibility = Visibility.Visible;
-            if (GlobalCollection != null)
-            {
-                GlobalCollection.Clear();
-            }
-            GlobalCollection = await GetRecentGlobalRecordsAsync();
+            GlobalCollection.Clear();
 
-            if (GlobalCollection == null)
+            var success = false;
+            try
+            {
+                GlobalCollection = await GetRecentGlobalRecordsAsync();
+                success = true;
+            }
+            catch
+            {
+                success = false;
+            }
+            
+
+            if (success == false)
             {
                 noResultsGlobal.Text = "Global database not available.\r\nCheck internet connection or try again later.";
                 noResultsGlobal.Visibility = Visibility.Visible;
@@ -2198,7 +2191,7 @@ namespace MAF_VE_2
 
             using (HttpClient httpClient = new HttpClient())
             {
-                Uri UriToPostTo = new Uri("http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/insert");
+                Uri UriToPostTo = new Uri(webAddresses.InsertUrl);
                 httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
 
@@ -2247,32 +2240,6 @@ namespace MAF_VE_2
             popUpPanelBackground.Visibility = Visibility.Visible;
             recordPopUp.Visibility = Visibility.Visible;
         }
-
-        //private void globalRecords_ItemClick(object sender, ItemClickEventArgs e)
-        //{
-        //    var item = e.ClickedItem as MAFcalculation;
-
-        //    YMME.Text = item._year + " " +
-        //                item._make + " " +
-        //                item._model + " " +
-        //                item._engine;
-
-        //    RPM.Text = item._rpm.ToString();
-        //    MAF.Text = item._maf.ToString();
-        //    MAF_UNITS.Text = item._mafunits;
-        //    AIR.Text = item._airtemp;
-        //    AIR_UNITS.Text = item._tempunits;
-        //    ELEVATION.Text = item._altitude;
-        //    ELEVATION_UNITS.Text = item._altitudeunits;
-        //    EXPECTED.Text = item._expectedmaf;
-        //    DIFF.Text = item._mafdiff;
-        //    VOLUMETRIC.Text = item._ve;
-        //    CONDITION.Text = item._condition;
-        //    COMMENTS.Text = item._comments;
-
-        //    popUpPanelBackground.Visibility = Visibility.Visible;
-        //    recordPopUp.Visibility = Visibility.Visible;
-        //}
 
         private void closeRecordPopUpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -2485,7 +2452,7 @@ namespace MAF_VE_2
 
             using (HttpClient httpClient = new HttpClient())
             {
-                Uri UriToPostTo = new Uri("http://maf-ve-env.us-west-2.elasticbeanstalk.com/api/query");
+                Uri UriToPostTo = new Uri(webAddresses.QueryUrl);
                 httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
                 string JSON = "";
@@ -3131,7 +3098,6 @@ namespace MAF_VE_2
         }
 
         #endregion
-
         
     }
 }
