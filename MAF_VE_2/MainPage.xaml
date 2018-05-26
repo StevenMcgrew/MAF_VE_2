@@ -425,7 +425,7 @@
 
                             </PivotItem>
 
-                            <PivotItem Header="Global" Style="{StaticResource stylePivotItem}" >
+                            <PivotItem Name="Global" Header="Global (*)" Style="{StaticResource stylePivotItem}" >
 
                                 <Grid Padding="10">
                                     <Grid.RowDefinitions>
@@ -485,7 +485,7 @@
 
                                             </Grid>
 
-                                            <TextBlock Name="noResultsGlobal" Text="No global results found" Margin="10,5,5,5" Visibility="Collapsed"/>
+                                            <TextBlock Name="noResultsGlobal" Text="*Perform a search to see data here" Margin="10,5,5,5"/>
 
                                             <ListView Name="globalRecords" Background="White" IsItemClickEnabled="True" SelectionMode="Single" ScrollViewer.VerticalScrollBarVisibility="Disabled" ItemClick="records_ItemClick">
                                                 <ListView.ItemTemplate>
@@ -963,8 +963,8 @@
                     </StackPanel>
                 </ScrollViewer>
                 <TextBlock Foreground="White" TextWrapping="WrapWholeWords">
-                    <Span>If you uninstalled and reinstalled this app, you will need to import a previously saved backup file to restore your database.</Span><LineBreak/>
-                    <Span>*Any currently saved app data will be overwritten by the imported database.</Span>
+                    <Span>If you uninstalled/reinstalled this app, and want to restore your data, you will need to import a previously saved backup file.</Span><LineBreak/>
+                    <Span>*Any currently saved app data will be overwritten by the imported data.</Span>
                 </TextBlock>
                 <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
                 <TextBlock Foreground="White" Text="If you want to import a file without overwriting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>

@@ -132,7 +132,6 @@ namespace MAF_VE_2
             RefreshMakesComboBox();
             ManageAutoBackupSetting();
             ShowAllLocalRecords();
-            ShowRecentGlobalRecords();
             ManageBackgroundSetting();
         }
 
@@ -826,7 +825,9 @@ namespace MAF_VE_2
             LocalCollection = await GetAllLocalRecordsAsync();
             LoadLocalRecords(LocalCollection, localRecords);
 
-            if (LocalCollection.Count == 0)
+            var localCount = LocalCollection.Count;
+
+            if (localCount == 0)
             {
                 noResults.Visibility = Visibility.Visible;
             }
@@ -835,6 +836,7 @@ namespace MAF_VE_2
                 noResults.Visibility = Visibility.Collapsed;
             }
 
+            Local.Header = "Local (" + localCount.ToString() + ")";
             searchedForText.Text = "all records";
             searchedForPanelStory.Begin();
             veChartDataDescription.Text = "Perform a search to see data in this chart";
@@ -905,7 +907,6 @@ namespace MAF_VE_2
             if (records.Count > amountToLoad)
             {
                 // Add only the amountToLoad to start with
-                Log("LoadRecords, " + amountToLoad.ToString());
                 for (int i = 0; i < amountToLoad; i++)
                 {
                     var itemToBeAdded = records.ElementAt(i);
@@ -915,7 +916,6 @@ namespace MAF_VE_2
             else
             {
                 // Add all records since there aren't a lot
-                Log("LoadRecords, all");
                 for (int i = 0; i < records.Count; i++)
                 {
                     var itemToBeAdded = records.ElementAt(i);
@@ -923,6 +923,7 @@ namespace MAF_VE_2
                 }
             }
 
+            Local.Header = "Local (" + records.Count + ")";
             localScrollViewer.ViewChanged += localScrollViewer_ViewChanged;
         }
 
@@ -936,6 +937,8 @@ namespace MAF_VE_2
                 var itemToBeAdded = records.ElementAt(i);
                 listView.Items.Add(itemToBeAdded);
             }
+
+            Global.Header = "Global (" + records.Count + ")";
         }
 
         private void localScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -954,7 +957,6 @@ namespace MAF_VE_2
                 }
                 else
                 {
-                    Log("scroll add records");
                     var indexToStartAt = collectionCount - numberOfRecordsRemaining;
                     var indexToEndAt = LocalCollection.Count - 1;
                     if (numberOfRecordsRemaining > 20)
@@ -2067,8 +2069,13 @@ namespace MAF_VE_2
             condition = "";
             comments.ClearValue(TextBox.TextProperty);
 
+            globalRecords.Items.Clear();
+            Global.Header = "Global (*)";
+            searchedForTextGlobal.Text = "";
+            noResultsGlobal.Text = "*Perform a search to see data here";
+            noResultsGlobal.Visibility = Visibility.Visible;
+
             ShowAllLocalRecords();
-            ShowRecentGlobalRecords();
         }
 
         #endregion
@@ -2175,6 +2182,10 @@ namespace MAF_VE_2
 
         async void SaveGlobalAsync(MAFcalculation recordToSave)
         {
+            globalRecords.Items.Clear();
+            Global.Header = "Global (*)";
+            noResultsGlobal.Visibility = Visibility.Visible;
+
             JsonObject jsonObject = new JsonObject();
             jsonObject["year"] = JsonValue.CreateStringValue(recordToSave.Year);
             jsonObject["make"] = JsonValue.CreateStringValue(recordToSave.Make);
@@ -2200,19 +2211,37 @@ namespace MAF_VE_2
                 Uri UriToPostTo = new Uri(webAddresses.InsertUrl);
                 httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
                 httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
-
+                
                 try
                 {
                     HttpStringContent content = new HttpStringContent(jsonString, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
                     HttpResponseMessage response = await httpClient.PostAsync(UriToPostTo, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        try
+                        {
+                            string JSON = await response.Content.ReadAsStringAsync();
+
+                            if (JSON.Contains("notice"))
+                            {
+                                JsonObject jObject;
+                                bool IsParsed = JsonObject.TryParse(JSON, out jObject);
+                                if (IsParsed)
+                                {
+                                    noResultsGlobal.Text = jObject.GetNamedString("notice") + ":  " + jObject.GetNamedString("rows affected") + "\r\n*Perform a search to view data here";
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            noResultsGlobal.Text = "Successfully sent to global database" + "\r\n*Perform a search to view data here";
+                        }
+                    }
                 }
                 catch
                 {
-
-                }
-                finally
-                {
-                    ShowRecentGlobalRecords();
+                    noResultsGlobal.Text = "*Problem saving to global database.\r\nCheck internet connection or try again later.";
                 }
             }
         }
@@ -2453,6 +2482,8 @@ namespace MAF_VE_2
         async void SearchGlobalDatabaseAsync(JsonObject jsonObject)
         {
             GlobalCollection.Clear();
+            Global.Header = "Global (*)";
+            noResultsGlobal.Visibility = Visibility.Collapsed;
 
             string jsonString = jsonObject.Stringify();
 
@@ -2471,10 +2502,17 @@ namespace MAF_VE_2
 
                     JSON = await response.Content.ReadAsStringAsync();
 
-                    if (JSON.Contains("notice"))
+                    if (JSON.Substring(2, 6) == "notice")
                     {
                         globalRecords.Items.Clear();
-                        noResultsGlobal.Text = JSON;
+
+                        JsonObject jObject;
+                        bool parseOK = JsonObject.TryParse(JSON, out jObject);
+                        if (parseOK)
+                        {
+                            noResultsGlobal.Text = "*" + jObject.GetNamedString("notice");
+                        }
+
                         noResultsGlobal.Visibility = Visibility.Visible;
                         progressGlobal.Visibility = Visibility.Collapsed;
                         _numberOfSearchesFinished++;
@@ -2504,7 +2542,7 @@ namespace MAF_VE_2
                 catch
                 {
                     globalRecords.Items.Clear();
-                    noResultsGlobal.Text = "Problem searching global database.\r\nCheck internet connection or try again later.";
+                    noResultsGlobal.Text = "*Problem searching global database.\r\nCheck internet connection or try again later.";
                     noResultsGlobal.Visibility = Visibility.Visible;
                 }
 
@@ -2512,9 +2550,9 @@ namespace MAF_VE_2
 
                 if (success)
                 {
-                    noResultsGlobal.Text = "No results found.";
                     if (GlobalCollection.Count == 0)
                     {
+                        noResultsGlobal.Text = "*No records match your search parameters";
                         noResultsGlobal.Visibility = Visibility.Visible;
                     }
                     else
@@ -2526,7 +2564,7 @@ namespace MAF_VE_2
                 else
                 {
                     globalRecords.Items.Clear();
-                    noResultsGlobal.Text = "Trouble searching global database.\r\nCheck internet connection or try again later.";
+                    noResultsGlobal.Text = "*Trouble searching global database.\r\nCheck internet connection or try again later.";
                     noResultsGlobal.Visibility = Visibility.Visible;
                 }
 
