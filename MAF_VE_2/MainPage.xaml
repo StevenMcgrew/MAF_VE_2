@@ -78,6 +78,7 @@
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
+        
     </Page.Resources>
 
     <Grid>
@@ -88,7 +89,7 @@
                 <GradientStop Color="#FF0C203C" Offset="0.888"/>
             </LinearGradientBrush>
         </Grid.Background>
-        
+
         <Image Name="backgroundImage" Stretch="UniformToFill"/>
 
         <Pivot Name="mainPivot" Template="{StaticResource mainPivotTemplate}">
@@ -603,6 +604,14 @@
                                                 <Grid Name="globalVePlot" Grid.Row="1" Grid.Column="1"/>
                                                 <Grid Name="localVePlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="veChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                <Grid Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,58">
+                                                    <TextBlock Text="Local" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                                    <CheckBox Name="veLocalCheckBox" Grid.Row="1" Grid.Column="1" Width="58" Height="50" IsChecked="True" Style="{StaticResource chartCheckBoxStyle}" Checked="veLocalCheckBox_Checked" Unchecked="veLocalCheckBox_Unchecked"/>
+                                                </Grid>
+                                                <Grid Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,58,0,0">
+                                                    <TextBlock Text="Global" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                                    <CheckBox Name="veGlobalCheckBox" Grid.Row="1" Grid.Column="1" Width="58" Height="50" IsChecked="True" Style="{StaticResource chartCheckBoxStyle}" Checked="veGlobalCheckBox_Checked" Unchecked="veGlobalCheckBox_Unchecked"/>
+                                                </Grid>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>
@@ -687,6 +696,14 @@
                                                 <Grid Name="globalMafPlot" Grid.Row="1" Grid.Column="1"/>
                                                 <Grid Name="localMafPlot" Grid.Row="1" Grid.Column="1"/>
                                                 <TextBlock Name="mafChartDataDescription" Grid.Row="0" Grid.Column="1" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="White" Width="376" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                                                <Grid Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,0,0,58">
+                                                    <TextBlock Text="Local" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                                    <CheckBox Name="mafLocalCheckBox" Grid.Row="1" Grid.Column="1" Width="58" Height="50" IsChecked="True" Style="{StaticResource chartCheckBoxStyle}" Checked="mafLocalCheckBox_Checked" Unchecked="mafLocalCheckBox_Unchecked"/>
+                                                </Grid>
+                                                <Grid Grid.Row="1" Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="0,58,0,0">
+                                                    <TextBlock Text="Global" Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top" />
+                                                    <CheckBox Name="mafGlobalCheckBox" Grid.Row="1" Grid.Column="1" Width="58" Height="50" IsChecked="True" Style="{StaticResource chartCheckBoxStyle}" Checked="mafGlobalCheckBox_Checked" Unchecked="mafGlobalCheckBox_Unchecked"/>
+                                                </Grid>
                                                 <StackPanel Grid.Row="1" Grid.Column="2" VerticalAlignment="Bottom" Margin="1,1,1,10">
                                                     <StackPanel Orientation="Horizontal">
                                                         <Ellipse Width="10" Height="10" Fill="Lime" HorizontalAlignment="Left" Margin="0,1,4,0" Stroke="Black" StrokeThickness="1"/>

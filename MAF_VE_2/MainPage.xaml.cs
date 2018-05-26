@@ -792,6 +792,7 @@ namespace MAF_VE_2
                 string JSON;
                 using (HttpClient httpClient = new HttpClient())
                 {
+                    httpClient.DefaultRequestHeaders.IfModifiedSince = DateTime.Now; // This property must be set to get most current data. Otherwise, cached data will be returned.
                     HttpResponseMessage httpResponse = await httpClient.GetAsync(new Uri(webAddresses.Last100Url));
                     JSON = await httpResponse.Content.ReadAsStringAsync();
                 }
@@ -2051,6 +2052,11 @@ namespace MAF_VE_2
 
         private void resetButton_Click(object sender, RoutedEventArgs e)
         {
+            Reset();
+        }
+
+        void Reset()
+        {
             year.SelectedIndex = -1;
             make.SelectedIndex = -1;
             model.Text = "";
@@ -2542,7 +2548,7 @@ namespace MAF_VE_2
                 if (_localRecords.Count > 0)
                 {
                     //plot local only
-                    AddCurrentCalculationToLocalList(_localRecords);
+                    AddCurrentCalculationToList(_localRecords);
                     ConvertToGramsPerSecond(_localRecords);
                     var rpmMinMax = GetMinMaxRpm(_localRecords);
                     var mafMinMax = GetMinMaxMaf(_localRecords);
@@ -2563,7 +2569,8 @@ namespace MAF_VE_2
                     if (_localRecords.Count > 0)
                     {
                         //plot both local and global
-                        AddCurrentCalculationToLocalList(_localRecords);
+                        AddCurrentCalculationToList(_localRecords);
+                        AddCurrentCalculationToList(_globalRecords);
                         ConvertToGramsPerSecond(_localRecords);
                         ConvertToGramsPerSecond(_globalRecords);
                         var rpmMinMax = GetMinMaxRpm(_localRecords, _globalRecords);
@@ -2578,10 +2585,12 @@ namespace MAF_VE_2
                         AddMafDataPlots(_globalRecords, globalMafPlot);
                         AddVeDataPlots(_globalRecords, globalVePlot);
                         RemoveLastCalculationFromList(_localRecords);
+                        RemoveLastCalculationFromList(_globalRecords);
                     }
                     else
                     {
                         //plot global only
+                        AddCurrentCalculationToList(_globalRecords);
                         ConvertToGramsPerSecond(_globalRecords);
                         var rpmMinMax = GetMinMaxRpm(_globalRecords);
                         var mafMinMax = GetMinMaxMaf(_globalRecords);
@@ -2592,6 +2601,7 @@ namespace MAF_VE_2
                         SetAmountsPerPixel();
                         AddMafDataPlots(_globalRecords, globalMafPlot);
                         AddVeDataPlots(_globalRecords, globalVePlot);
+                        RemoveLastCalculationFromList(_globalRecords);
                     }
                 }
                 else
@@ -2599,7 +2609,7 @@ namespace MAF_VE_2
                     if (_localRecords.Count > 0)
                     {
                         //plot local only
-                        AddCurrentCalculationToLocalList(_localRecords);
+                        AddCurrentCalculationToList(_localRecords);
                         ConvertToGramsPerSecond(_localRecords);
                         var rpmMinMax = GetMinMaxRpm(_localRecords);
                         var mafMinMax = GetMinMaxMaf(_localRecords);
@@ -2629,6 +2639,10 @@ namespace MAF_VE_2
             rpmPerPixel = double.NaN;
             mafPerPixel = double.NaN;
             vePerPixel = double.NaN;
+            mafLocalCheckBox.IsChecked = true;
+            mafGlobalCheckBox.IsChecked = true;
+            veLocalCheckBox.IsChecked = true;
+            veGlobalCheckBox.IsChecked = true;
 
             localVePlot.Children.Clear();
             localMafPlot.Children.Clear();
@@ -2855,7 +2869,7 @@ namespace MAF_VE_2
             {
                 var leftMafMargin = (record.MAF - lowMAF) * mafPerPixel;
                 var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
-                var plotColor = GetPlotColorBasedOnCondition(record, chart);
+                var plotColor = GetPlotColorBasedOnCondition(record);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftMafMargin, bottomRpmMargin);
 
@@ -2875,7 +2889,7 @@ namespace MAF_VE_2
             {
                 var leftVeMargin = (record.Volumetric_Efficiency - lowVE) * vePerPixel;
                 var bottomRpmMargin = (record.Engine_speed - lowRPM) * rpmPerPixel;
-                var plotColor = GetPlotColorBasedOnCondition(record, chart);
+                var plotColor = GetPlotColorBasedOnCondition(record);
 
                 Ellipse ellipse = CreateEllipseForPlotChart(plotColor, leftVeMargin, bottomRpmMargin);
 
@@ -2889,20 +2903,20 @@ namespace MAF_VE_2
             }
         }
 
-        SolidColorBrush GetPlotColorBasedOnCondition(MAFcalculation record, Grid chart)
+        SolidColorBrush GetPlotColorBasedOnCondition(MAFcalculation record)
         {
             SolidColorBrush plotColor;
 
             switch (record.Condition)
             {
                 case ("Good"):
-                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Lime) : new SolidColorBrush(Colors.Green);
+                    plotColor = new SolidColorBrush(Colors.Lime);
                     break;
                 case ("Bad"):
-                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Red) : new SolidColorBrush(Colors.DarkRed);
+                    plotColor = new SolidColorBrush(Colors.Red);
                     break;
                 case ("Unsure"):
-                    plotColor = chart.Name.StartsWith("l") ? new SolidColorBrush(Colors.Yellow) : new SolidColorBrush(Colors.Orange);
+                    plotColor = new SolidColorBrush(Colors.Yellow);
                     break;
                 case ("CurrentCalculation"):
                     plotColor = new SolidColorBrush(Colors.White);
@@ -2930,11 +2944,11 @@ namespace MAF_VE_2
             return el;
         }
 
-        List<MAFcalculation> AddCurrentCalculationToLocalList(List<MAFcalculation> records)
+        void AddCurrentCalculationToList(List<MAFcalculation> records)
         {
             if (string.IsNullOrWhiteSpace(maf.Text) || string.IsNullOrWhiteSpace(VE.Text) || string.IsNullOrWhiteSpace(rpm.Text))
             {
-                return records;
+                return;
             }
             else
             {
@@ -2946,8 +2960,6 @@ namespace MAF_VE_2
                 c.Volumetric_Efficiency = Convert.ToDouble(VE.Text);
 
                 records.Add(c);
-
-                return records;
             }
         }
 
@@ -3098,6 +3110,49 @@ namespace MAF_VE_2
         }
 
         #endregion
-        
+
+        #region Chart Checkboxes
+
+        private void veLocalCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            localVePlot.Visibility = Visibility.Visible;
+        }
+
+        private void veLocalCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            localVePlot.Visibility = Visibility.Collapsed;
+        }
+
+        private void veGlobalCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            globalVePlot.Visibility = Visibility.Visible;
+        }
+
+        private void veGlobalCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            globalVePlot.Visibility = Visibility.Collapsed;
+        }
+
+        private void mafLocalCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            localMafPlot.Visibility = Visibility.Visible;
+        }
+
+        private void mafLocalCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            localMafPlot.Visibility = Visibility.Collapsed;
+        }
+
+        private void mafGlobalCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            globalMafPlot.Visibility = Visibility.Visible;
+        }
+
+        private void mafGlobalCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            globalMafPlot.Visibility = Visibility.Collapsed;
+        }
+        #endregion
+
     }
 }
