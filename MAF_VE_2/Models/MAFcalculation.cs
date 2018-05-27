@@ -29,6 +29,8 @@ namespace MAF_VE_2.Models
         public double MAF_Difference { get; set; }
         public double Volumetric_Efficiency { get; set; }
 
+        public int SentToServer { get; set; }
+
         public MAFcalculation()
         {
             

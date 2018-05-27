@@ -133,6 +133,7 @@ namespace MAF_VE_2
             ManageAutoBackupSetting();
             ShowAllLocalRecords();
             ManageBackgroundSetting();
+            SendLocalRecordsToSaveFunction();
         }
 
         void AddEngineComboboxItems()
@@ -230,9 +231,9 @@ namespace MAF_VE_2
                         autoBackupToggle.IsOn = true;
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Log("ManageAutoBackupSetting error:  " + ex.Message);
+
                 }
             }
 
@@ -246,9 +247,9 @@ namespace MAF_VE_2
                     string backupText = (string)backupDateAndLocation;
                     lastBackupText.Text = backupText;
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Log("SetBackupDateAndLocationText error:  " + ex.Message);
+
                 }
             }
         }
@@ -977,13 +978,140 @@ namespace MAF_VE_2
             }
         }
 
+        async void SendLocalRecordsToSaveFunction()
+        {
+            Log("SendLocalRecordsToSaveFunction");
+
+            List<MAFcalculation> recordsToSend = localDatabaseConnection.Query<MAFcalculation>("SELECT * FROM MAFcalculation WHERE SentToServer = 0 OR SentToServer IS NULL");
+
+            if (recordsToSend != null)
+            {
+                if (recordsToSend.Count != 0)
+                {
+                    string recordCount = recordsToSend.Count.ToString();
+
+                    Log("Found " + recordCount + " records to send");
+
+                    List<MAFcalculation> successfullySavedRecords = new List<MAFcalculation>();
+
+                    using (HttpClient httpClient = new HttpClient())
+                    {
+                        httpClient.DefaultRequestHeaders.Accept.Add(new HttpMediaTypeWithQualityHeaderValue("application/json"));
+                        httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new HttpContentCodingWithQualityHeaderValue("utf-8"));
+
+                        foreach (var record in recordsToSend)
+                        {
+                            bool saved = await SaveToGlobalDatabaseAsync(httpClient, record);
+
+                            if (saved)
+                            {
+                                successfullySavedRecords.Add(record);
+                            }
+                        }
+                    }
+
+                    var successCount = successfullySavedRecords.Count.ToString();
+                    Log(successCount + " out of " + recordCount + " saved to Global");
+
+                    foreach (var item in successfullySavedRecords)
+                    {
+                        item.SentToServer = 1;
+                    }
+
+                    var amountUpdated = localDatabaseConnection.UpdateAll(successfullySavedRecords);
+
+                    Log(amountUpdated.ToString() + " out of " + successCount + " updated in Local");
+                }
+                else
+                {
+                    Log("Query of Local returned 0 records");
+                }
+            }
+            else
+            {
+                Log("Query of Local returned null");
+            }
+        }
+
+        Task<bool> SaveToGlobalDatabaseAsync(HttpClient httpClient, MAFcalculation record)
+        {
+            return Task.Run(async () =>
+            {
+                try
+                {
+                    JsonObject jsonObject = new JsonObject();
+                    jsonObject["year"] = JsonValue.CreateStringValue(record.Year);
+                    jsonObject["make"] = JsonValue.CreateStringValue(record.Make);
+                    jsonObject["model"] = JsonValue.CreateStringValue(record.Model);
+                    jsonObject["engine"] = JsonValue.CreateStringValue(record.Engine);
+                    jsonObject["condition"] = JsonValue.CreateStringValue(record.Condition);
+                    jsonObject["comments"] = JsonValue.CreateStringValue(record.Comments);
+                    jsonObject["mafunits"] = JsonValue.CreateStringValue(record.MAF_units);
+                    jsonObject["tempunits"] = JsonValue.CreateStringValue(record.Temp_units);
+                    jsonObject["altitudeunits"] = JsonValue.CreateStringValue(record.Altitude_units);
+                    jsonObject["rpm"] = JsonValue.CreateNumberValue(record.Engine_speed);
+                    jsonObject["maf"] = JsonValue.CreateNumberValue(record.MAF);
+                    jsonObject["airtemp"] = JsonValue.CreateNumberValue(record.Air_temperature);
+                    jsonObject["altitude"] = JsonValue.CreateNumberValue(record.Altitude);
+                    jsonObject["expectedmaf"] = JsonValue.CreateNumberValue(record.Expected_MAF);
+                    jsonObject["mafdiff"] = JsonValue.CreateNumberValue(record.MAF_Difference);
+                    jsonObject["ve"] = JsonValue.CreateNumberValue(record.Volumetric_Efficiency);
+
+                    string jsonString = jsonObject.Stringify();
+
+                    Uri UriToPostTo = new Uri(webAddresses.InsertUrl);
+                    HttpStringContent content = new HttpStringContent(jsonString, Windows.Storage.Streams.UnicodeEncoding.Utf8, "application/json");
+                    HttpResponseMessage response = await httpClient.PostAsync(UriToPostTo, content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string JSON = await response.Content.ReadAsStringAsync();
+
+                        if (JSON.Contains("rows affected"))
+                        {
+                            JsonObject jObject;
+                            bool IsParsed = JsonObject.TryParse(JSON, out jObject);
+                            if (IsParsed)
+                            {
+                                var rowsAffected = Convert.ToInt32(jObject.GetNamedNumber("rows affected"));
+
+                                if (rowsAffected == 1)
+                                {
+                                    return true;
+                                }
+                                else
+                                {
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                catch
+                {
+                    return false;
+                }
+            });
+        }
+
         #endregion
 
         #region Backup options
 
         void BeginLocalDbBackupOption()
         {
-            Log("BeginLocalDbBackupOption");
             var currentCount = localDatabaseConnection.Table<MAFcalculation>().Count();
 
             var backupIsOn = autoBackupToggle.IsOn;
@@ -1003,9 +1131,9 @@ namespace MAF_VE_2
                             AutosaveLocalDbBackup();
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Log("BeginLocalDbBackupOption error1:  " + ex.Message);
+
                     }
                 }
                 else // Backup has not been stored before (This section of code is reached when auto backup toggle switch was toggled to on and no backup has been saved before)
@@ -1029,9 +1157,9 @@ namespace MAF_VE_2
                             ShowBackupReminderEvery3rdRecord(currentCount);
                         }
                     }
-                    catch (Exception ex)
+                    catch
                     {
-                        Log("BeginLocalDbBackupOption error2:  " + ex.Message);
+
                     }
                 }
                 else
@@ -1043,7 +1171,6 @@ namespace MAF_VE_2
 
         void ShowBackupReminderEvery3rdRecord(int recordCount)
         {
-            Log("ShowBackupReminderEvery3rdRecord");
             if (recordCount == 0)
             {
                 // Do nothing. No records saved yet.
@@ -1164,7 +1291,6 @@ namespace MAF_VE_2
 
         void ShowBackupReminderPopup()
         {
-            Log("ShowBackupReminderPopup");
             localSettings.Values[ShowBackupReminder] = true;
 
             popUpPanelBackground.Visibility = Visibility.Visible;
@@ -1173,7 +1299,6 @@ namespace MAF_VE_2
 
         async void AutosaveLocalDbBackup()
         {
-            Log("AutosaveLocalDbBackup");
             Object token = localSettings.Values[DbBackupFileToken];
             bool settingIsStored = CheckIfSettingIsStored(token);
 
@@ -1222,7 +1347,6 @@ namespace MAF_VE_2
 
         async void SaveLocalDatabaseBackup()
         {
-            Log("SaveLocalDatabaseBackup");
             var localRecordsCount = localDatabaseConnection.Table<MAFcalculation>().Count();
 
             bool success = false;
@@ -1290,7 +1414,6 @@ namespace MAF_VE_2
 
         async void ImportSQLiteFile()
         {
-            Log("ImportSQLiteFile");
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             picker.FileTypeFilter.Add(".sqlite");
@@ -1361,7 +1484,6 @@ namespace MAF_VE_2
 
         async void ImportAndMergeSQLiteFile()
         {
-            Log("ImportAndMergeSQLiteFile");
             FileOpenPicker picker = new FileOpenPicker();
             picker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
             picker.FileTypeFilter.Add(".sqlite");
@@ -2223,13 +2345,21 @@ namespace MAF_VE_2
                         {
                             string JSON = await response.Content.ReadAsStringAsync();
 
-                            if (JSON.Contains("notice"))
+                            if (JSON.Contains("rows affected"))
                             {
                                 JsonObject jObject;
                                 bool IsParsed = JsonObject.TryParse(JSON, out jObject);
                                 if (IsParsed)
                                 {
                                     noResultsGlobal.Text = jObject.GetNamedString("notice") + ":  " + jObject.GetNamedString("rows affected") + "\r\n*Perform a search to view data here";
+
+                                    var rowsAffected = Convert.ToInt32(jObject.GetNamedNumber("rows affected"));
+
+                                    if (rowsAffected == 1)
+                                    {
+                                        recordToSave.SentToServer = 1;
+                                        localDatabaseConnection.Update(recordToSave);
+                                    }
                                 }
                             }
                         }
@@ -2443,7 +2573,6 @@ namespace MAF_VE_2
                     }
 
                     // Query the database and update localRecords
-                    Log("QueryLocalDatabase");
                     LocalCollection = await Task.Run(() => QueryLocalDatabase(queryString));
                     LoadLocalRecords(LocalCollection, localRecords);
 
