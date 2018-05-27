@@ -314,7 +314,7 @@
 
                         <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
-                            <PivotItem Name="Local" Header="Local" Style="{StaticResource stylePivotItem}" >
+                            <PivotItem Name="Local" Header="Local (0)" Style="{StaticResource stylePivotItem}" >
 
                                 <Grid Padding="10">
                                     <Grid.RowDefinitions>

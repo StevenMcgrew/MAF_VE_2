@@ -1987,6 +1987,7 @@
                         <Setter Property="Foreground" Value="LightGray" />
                         <Setter Property="Padding" Value="12,0,12,0" />
                         <Setter Property="Height" Value="30" /> <!--This is height of tabs, which is also set elsewhere lower down-->
+                        <Setter Property="Width" Value="113" /> <!--I added this property because the drawing of the headers was getting messed up when changing the text at runtime -->
                         <Setter Property="VerticalContentAlignment" Value="Center" />
                         <Setter Property="IsTabStop" Value="False" />
                         <Setter Property="Template">
@@ -2034,6 +2035,11 @@
                                                         </ObjectAnimationUsingKeyFrames>
 
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Grid"
+                                                                                        Storyboard.TargetProperty="Background" >
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#66000000" />
+                                                        </ObjectAnimationUsingKeyFrames>
+
+                                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Grid"
                                                                                         Storyboard.TargetProperty="BorderBrush" >
                                                             <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource pivotAccentColor}" />
                                                         </ObjectAnimationUsingKeyFrames>
@@ -2060,7 +2066,7 @@
                                                         </ObjectAnimationUsingKeyFrames>
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Grid"
                                                                                         Storyboard.TargetProperty="Background" >
-                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="{ThemeResource SystemControlHighlightTransparentBrush}" />
+                                                            <DiscreteObjectKeyFrame KeyTime="0" Value="#66000000" />
                                                         </ObjectAnimationUsingKeyFrames>
 
                                                         <ObjectAnimationUsingKeyFrames Storyboard.TargetName="Grid"
