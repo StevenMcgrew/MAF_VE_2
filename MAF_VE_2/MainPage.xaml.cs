@@ -2306,6 +2306,7 @@ namespace MAF_VE_2
         {
             globalRecords.Items.Clear();
             Global.Header = "Global (*)";
+            searchedForTextGlobal.Text = "";
             noResultsGlobal.Visibility = Visibility.Visible;
 
             JsonObject jsonObject = new JsonObject();
@@ -2351,9 +2352,10 @@ namespace MAF_VE_2
                                 bool IsParsed = JsonObject.TryParse(JSON, out jObject);
                                 if (IsParsed)
                                 {
-                                    noResultsGlobal.Text = jObject.GetNamedString("notice") + ":  " + jObject.GetNamedString("rows affected") + "\r\n*Perform a search to view data here";
+                                    var affectedRows = jObject.GetNamedNumber("rows affected");
+                                    noResultsGlobal.Text = affectedRows.ToString() + " record successfully saved to global database." + "\r\n*Perform a search to view data here";
 
-                                    var rowsAffected = Convert.ToInt32(jObject.GetNamedNumber("rows affected"));
+                                    var rowsAffected = Convert.ToInt32(affectedRows);
 
                                     if (rowsAffected == 1)
                                     {
