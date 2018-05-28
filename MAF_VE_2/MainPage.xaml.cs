@@ -1688,6 +1688,20 @@ namespace MAF_VE_2
             }
         }
 
+        private void engine_DropDownOpened(object sender, object e)
+        {
+            try
+            {
+                string[] enginesArray = engine.Items.Cast<Object>().Select(item => item.ToString()).ToArray();
+                string matchingString = Array.Find(enginesArray, p => p.StartsWith(engineSize.Text));
+                engine.SelectedItem = matchingString;
+            }
+            catch
+            {
+                engine.SelectedIndex = 0;
+            }
+        }
+
         #endregion
 
         #region Add or Delete a make
@@ -2063,27 +2077,10 @@ namespace MAF_VE_2
                 {
                     VE.Background = new SolidColorBrush(Colors.Red);
                 }
-
-                //
-                TrySelectComboboxItemFromString(engine, engineSize.Text);
             }
             catch
             {
                 await new MessageDialog("Cannot perform calculation. Input requirements: Numbers only; Only one decimal (or no decimals) per input box; No blank input boxes.").ShowAsync();
-            }
-        }
-
-        void TrySelectComboboxItemFromString(ComboBox _comboBox, string _string)
-        {
-            try
-            {
-                string[] enginesArray = _comboBox.Items.Cast<Object>().Select(item => item.ToString()).ToArray();
-                string matchingString = Array.Find(enginesArray, p => p.StartsWith(_string));
-                _comboBox.SelectedItem = matchingString;
-            }
-            catch
-            {
-                _comboBox.SelectedIndex = 0;
             }
         }
 
@@ -2276,6 +2273,8 @@ namespace MAF_VE_2
 
                 localDatabaseConnection.Insert(recordToSave);
 
+                year.SelectedIndex = -1;
+                model.ClearValue(TextBox.TextProperty);
                 good.ClearValue(RadioButton.IsCheckedProperty);
                 bad.ClearValue(RadioButton.IsCheckedProperty);
                 unsure.ClearValue(RadioButton.IsCheckedProperty);
@@ -2373,7 +2372,11 @@ namespace MAF_VE_2
                 }
                 catch
                 {
-                    noResultsGlobal.Text = "*Problem saving to global database.\r\nCheck internet connection or try again later.";
+                    noResultsGlobal.Text = "*Did not save to global database.\r\n" +
+                                            "\r\nThe app will automatically send all\r\n" +
+                                            "unsaved records to the global database\r\n" +
+                                            "the next time the app is started up with\r\n" +
+                                            "an internet connection.\r\n\r\nNo need to save this same record again.";
                 }
             }
         }
@@ -3322,6 +3325,5 @@ namespace MAF_VE_2
             globalMafPlot.Visibility = Visibility.Collapsed;
         }
         #endregion
-
     }
 }

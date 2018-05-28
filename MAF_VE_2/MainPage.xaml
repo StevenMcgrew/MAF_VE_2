@@ -280,7 +280,7 @@
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="Engine" VerticalAlignment="Center" Margin="5,0,0,0" Width="45" Foreground="White"/>
-                                        <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" DropDownClosed="YearMakeOrEngine_DropDownClosed" Background="White" BorderBrush="#FF7A7A7A">
+                                        <ComboBox Name="engine" Margin="5,2,2,2" PlaceholderText="Select" Width="108" DropDownClosed="YearMakeOrEngine_DropDownClosed" Background="White" BorderBrush="#FF7A7A7A" DropDownOpened="engine_DropDownOpened">
                                         </ComboBox>
                                     </StackPanel>
                                 </StackPanel>
