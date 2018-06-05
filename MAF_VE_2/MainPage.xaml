@@ -831,56 +831,59 @@
 
         <Grid Name="popUpPanelBackground" Background="#B2000000" Visibility="Collapsed">
 
-            <StackPanel Name="recordPopUp" Visibility="Collapsed" Background="White" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" MinWidth="360" BorderBrush="Black" BorderThickness="1">
+            <ScrollViewer Name="recordPopUp" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="Black" BorderThickness="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                <StackPanel Background="White" Padding="20" MinWidth="360" HorizontalAlignment="Left" VerticalAlignment="Top">
 
-                <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center" IsTextSelectionEnabled="True"/>
+                    <TextBlock Name="YMME" FontWeight="Bold" Margin="0,0,0,10" HorizontalAlignment="Center" IsTextSelectionEnabled="True"/>
 
-                <Grid HorizontalAlignment="Center" Padding="10" Background="LightGray" >
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid HorizontalAlignment="Center" Padding="10" Background="LightGray" >
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,20,0">
-                        <TextBlock HorizontalAlignment="Left" Text="Engine Speed"/>
-                        <TextBlock HorizontalAlignment="Left" Text="MAF"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Intake Air Temp"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Elevation" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Expected MAF"/>
-                        <TextBlock HorizontalAlignment="Left" Text="MAF Difference"/>
-                        <TextBlock HorizontalAlignment="Left" Text="VE" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Left" Text="Condition"/>
-                    </StackPanel>
+                        <StackPanel Grid.Column="0" HorizontalAlignment="Left" Margin="0,0,20,0">
+                            <TextBlock HorizontalAlignment="Left" Text="Engine Speed"/>
+                            <TextBlock HorizontalAlignment="Left" Text="MAF"/>
+                            <TextBlock HorizontalAlignment="Left" Text="Intake Air Temp"/>
+                            <TextBlock HorizontalAlignment="Left" Text="Elevation" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Left" Text="Expected MAF"/>
+                            <TextBlock HorizontalAlignment="Left" Text="MAF Difference"/>
+                            <TextBlock HorizontalAlignment="Left" Text="VE" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Left" Text="Condition"/>
+                        </StackPanel>
 
-                    <StackPanel Grid.Column="1" HorizontalAlignment="Left" >
-                        <TextBlock HorizontalAlignment="Right" Name="RPM"/>
-                        <TextBlock HorizontalAlignment="Right" Name="MAF"/>
-                        <TextBlock HorizontalAlignment="Right" Name="AIR"/>
-                        <TextBlock HorizontalAlignment="Right" Name="ELEVATION" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Right" Name="EXPECTED"/>
-                        <TextBlock HorizontalAlignment="Right" Name="DIFF"/>
-                        <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
-                    </StackPanel>
+                        <StackPanel Grid.Column="1" HorizontalAlignment="Left" >
+                            <TextBlock HorizontalAlignment="Right" Name="RPM"/>
+                            <TextBlock HorizontalAlignment="Right" Name="MAF"/>
+                            <TextBlock HorizontalAlignment="Right" Name="AIR"/>
+                            <TextBlock HorizontalAlignment="Right" Name="ELEVATION" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Right" Name="EXPECTED"/>
+                            <TextBlock HorizontalAlignment="Right" Name="DIFF"/>
+                            <TextBlock HorizontalAlignment="Right" Name="VOLUMETRIC" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Right" Name="CONDITION"/>
+                        </StackPanel>
 
-                    <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0">
-                        <TextBlock HorizontalAlignment="Left" Text="RPM"/>
-                        <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
-                        <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
-                        <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Left" Text="g/s"/>
-                        <TextBlock HorizontalAlignment="Left" Text="%"/>
-                        <TextBlock HorizontalAlignment="Left" Text="%" Margin="0,0,0,20"/>
-                        <TextBlock HorizontalAlignment="Left"/>
-                    </StackPanel>
+                        <StackPanel Grid.Column="2" HorizontalAlignment="Left" Margin="5,0,0,0">
+                            <TextBlock HorizontalAlignment="Left" Text="RPM"/>
+                            <TextBlock HorizontalAlignment="Left" Name="MAF_UNITS"/>
+                            <TextBlock HorizontalAlignment="Left" Name="AIR_UNITS"/>
+                            <TextBlock HorizontalAlignment="Left" Name="ELEVATION_UNITS" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Left" Text="g/s"/>
+                            <TextBlock HorizontalAlignment="Left" Text="%"/>
+                            <TextBlock HorizontalAlignment="Left" Text="%" Margin="0,0,0,20"/>
+                            <TextBlock HorizontalAlignment="Left"/>
+                        </StackPanel>
 
-                </Grid>
+                    </Grid>
 
-                <TextBox Name="COMMENTS" Header="Comments/Keywords:" IsReadOnly="True" HorizontalAlignment="Center" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextWrapping="Wrap" MaxWidth="345" Margin="0,20,0,0"/>
-                <Button Name="closeRecordPopUpButton" Content="Close" Margin="0,20,0,0" Click="closeRecordPopUpButton_Click" HorizontalAlignment="Center"/>
+                    <TextBox Name="COMMENTS" Header="Comments/Keywords:" IsReadOnly="True" HorizontalAlignment="Center" IsSpellCheckEnabled="False" IsTextPredictionEnabled="False" TextWrapping="Wrap" MaxWidth="345" Margin="0,20,0,0"/>
+                    <Button Name="closeRecordPopUpButton" Content="Close" Margin="0,20,0,0" Click="closeRecordPopUpButton_Click" HorizontalAlignment="Center"/>
 
-            </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+
 
             <StackPanel Name="backgroundOptionsPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
                 <TextBlock Margin="0,0,0,20" FontSize="18" Foreground="White">
@@ -936,41 +939,43 @@
                 <Button Name="dontAskBackupButton" Content="Don't ask again" Style="{StaticResource blueButtonStyle}" HorizontalAlignment="Center" Margin="0,0,0,10" Width="146" Click="dontAskBackupButton_Click"/>
             </StackPanel>
 
-            <StackPanel Name="localDbBackupPopUp" Visibility="Collapsed" Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
-                <TextBlock Margin="0,0,0,30" FontSize="18" Foreground="White">
+            <ScrollViewer Name="localDbBackupPopUp" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" BorderBrush="White" BorderThickness="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel Background="#FF232323" Padding="20" HorizontalAlignment="Left" VerticalAlignment="Top">
+                    <TextBlock Margin="0,0,0,30" FontSize="18" Foreground="White">
                     <Span><Underline>Local database backup options</Underline></Span>
                     <Span>:</Span>
-                </TextBlock>
-                <ScrollViewer Margin="0,0,0,30" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-                    <StackPanel BorderBrush="white" BorderThickness="1" HorizontalAlignment="Left" >
-                        <ToggleSwitch Name="autoBackupToggle" Foreground="White" Toggled="autoBackupToggle_Toggled" Margin="10,5,0,0">
-                            <ToggleSwitch.HeaderTemplate>
-                                <DataTemplate>
-                                    <ContentPresenter>
-                                        <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
-                                    </ContentPresenter>
-                                </DataTemplate>
-                            </ToggleSwitch.HeaderTemplate>
-                        </ToggleSwitch>
-                        <TextBlock Name="lastBackupText" Foreground="White" Margin="10,0" IsTextSelectionEnabled="True">
+                    </TextBlock>
+                    <ScrollViewer Margin="0,0,0,30" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                        <StackPanel BorderBrush="white" BorderThickness="1" HorizontalAlignment="Left" >
+                            <ToggleSwitch Name="autoBackupToggle" Foreground="White" Toggled="autoBackupToggle_Toggled" Margin="10,5,0,0">
+                                <ToggleSwitch.HeaderTemplate>
+                                    <DataTemplate>
+                                        <ContentPresenter>
+                                            <TextBlock Text="Automatic Backups" Foreground="White" TextWrapping="WrapWholeWords"/>
+                                        </ContentPresenter>
+                                    </DataTemplate>
+                                </ToggleSwitch.HeaderTemplate>
+                            </ToggleSwitch>
+                            <TextBlock Name="lastBackupText" Foreground="White" Margin="10,0" IsTextSelectionEnabled="True">
                             <Span>Last Backup:</Span><LineBreak/>
                             <Span>Location:</Span>
-                        </TextBlock>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Name="backupNowButton" Content="Backup Now" Style="{StaticResource blueButtonStyle}" Margin="10" Click="backupNowButton_Click" />
-                            <Button Name="changeLocationButton" Content="Change Location" Style="{StaticResource blueButtonStyle}" Margin="0,10,10,10" Click="changeLocationButton_Click"/>
+                            </TextBlock>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Name="backupNowButton" Content="Backup Now" Style="{StaticResource blueButtonStyle}" Margin="10" Click="backupNowButton_Click" />
+                                <Button Name="changeLocationButton" Content="Change Location" Style="{StaticResource blueButtonStyle}" Margin="0,10,10,10" Click="changeLocationButton_Click"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-                <TextBlock Foreground="White" TextWrapping="WrapWholeWords">
+                    </ScrollViewer>
+                    <TextBlock Foreground="White" TextWrapping="WrapWholeWords">
                     <Span>If you uninstalled/reinstalled this app, and want to restore your data, you will need to import a previously saved backup file.</Span><LineBreak/>
                     <Span>*Any currently saved app data will be overwritten by the imported data.</Span>
-                </TextBlock>
-                <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
-                <TextBlock Foreground="White" Text="If you want to import a file without overwriting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>
-                <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importAndMergeButton_Click"/>
-                <Button Name="closeBackupPopupButton" Content="Close" HorizontalAlignment="Center" Style="{StaticResource blueButtonStyle}" Click="closeBackupPopupButton_Click"/>
-            </StackPanel>
+                    </TextBlock>
+                    <Button Name="importButton" Content="Import" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importButton_Click"/>
+                    <TextBlock Foreground="White" Text="If you want to import a file without overwriting your current app data, use this import and merge option." TextWrapping="WrapWholeWords"/>
+                    <Button Name="importAndMergeButton" Content="Import and Merge" Style="{StaticResource blueButtonStyle}" Margin="0,5,0,40" Click="importAndMergeButton_Click"/>
+                    <Button Name="closeBackupPopupButton" Content="Close" HorizontalAlignment="Center" Style="{StaticResource blueButtonStyle}" Click="closeBackupPopupButton_Click"/>
+                </StackPanel>
+            </ScrollViewer>
 
             <Grid Name="popUpForAutoBackupToggle" Visibility="Collapsed" Background="#B2000000" Padding="20">
                 <StackPanel Background="#FF232323" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="20" BorderBrush="White" BorderThickness="1">
