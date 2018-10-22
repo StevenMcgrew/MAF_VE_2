@@ -19,8 +19,24 @@
         <Storyboard x:Name="SearchPanelColorStoryboard">
             <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" Storyboard.TargetName="searchPanel">
                 <EasingColorKeyFrame KeyTime="0:0:0.2" Value="#BFFFFFFF"/>
-                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#00000000"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#BF000000"/>
                 <EasingColorKeyFrame KeyTime="0:0:0.6" Value="#BFFFFFFF"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.8" Value="#BF000000"/>
+            </ColorAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="localCountColorStoryboard">
+            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" Storyboard.TargetName="localHeaderTextPanel">
+                <EasingColorKeyFrame KeyTime="0:0:0.2" Value="#FF00A400"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#00000000"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.6" Value="#FF00A400"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.8" Value="#00000000"/>
+            </ColorAnimationUsingKeyFrames>
+        </Storyboard>
+        <Storyboard x:Name="globalCountColorStoryboard">
+            <ColorAnimationUsingKeyFrames Storyboard.TargetProperty="(Panel.Background).(SolidColorBrush.Color)" Storyboard.TargetName="globalHeaderTextPanel">
+                <EasingColorKeyFrame KeyTime="0:0:0.2" Value="#FF00A400"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.4" Value="#00000000"/>
+                <EasingColorKeyFrame KeyTime="0:0:0.6" Value="#FF00A400"/>
                 <EasingColorKeyFrame KeyTime="0:0:0.8" Value="#00000000"/>
             </ColorAnimationUsingKeyFrames>
         </Storyboard>
@@ -312,12 +328,12 @@
                             </StackPanel>
                         </StackPanel>
 
-                        <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
+                        <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged">
 
                             <PivotItem Name="Local" Style="{StaticResource stylePivotItem}" >
 
                                 <PivotItem.Header>
-                                    <StackPanel Name="localHeaderPanel" Orientation="Horizontal">
+                                    <StackPanel Name="localHeaderTextPanel" Orientation="Horizontal" Background="#00000000">
                                         <TextBlock Text="Local"/>
                                         <TextBlock Name="localHeaderCount" Text="(0)" Margin="2,0,0,0"/>
                                     </StackPanel>
@@ -435,7 +451,7 @@
                             <PivotItem Name="Global" Style="{StaticResource stylePivotItem}" >
 
                                 <PivotItem.Header>
-                                    <StackPanel Name="globalHeaderPanel" Orientation="Horizontal">
+                                    <StackPanel Name="globalHeaderTextPanel" Orientation="Horizontal" Background="#00000000">
                                         <TextBlock Text="Global"/>
                                         <TextBlock Name="globalHeaderCount" Text="(*)" Margin="2,0,0,0"/>
                                     </StackPanel>

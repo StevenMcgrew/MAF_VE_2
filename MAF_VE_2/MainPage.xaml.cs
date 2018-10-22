@@ -924,6 +924,10 @@ namespace MAF_VE_2
             }
 
             localHeaderCount.Text = "(" + records.Count + ")";
+            if (recordsViewPivot.SelectedItem != Local)
+            {
+                localCountColorStoryboard.Begin();
+            }
             localScrollViewer.ViewChanged += localScrollViewer_ViewChanged;
         }
 
@@ -939,6 +943,10 @@ namespace MAF_VE_2
             }
 
             globalHeaderCount.Text = "(" + records.Count + ")";
+            if (recordsViewPivot.SelectedItem != Global)
+            {
+                globalCountColorStoryboard.Begin();
+            }
         }
 
         private void localScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
