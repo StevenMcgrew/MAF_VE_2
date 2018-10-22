@@ -836,8 +836,7 @@ namespace MAF_VE_2
             {
                 noResults.Visibility = Visibility.Collapsed;
             }
-
-            Local.Header = "Local (" + localCount.ToString() + ")";
+            
             searchedForText.Text = "all records";
             searchedForPanelStory.Begin();
             veChartDataDescription.Text = "Perform a search to see data in this chart";
@@ -924,7 +923,7 @@ namespace MAF_VE_2
                 }
             }
 
-            Local.Header = "Local (" + records.Count + ")";
+            localHeaderCount.Text = "(" + records.Count + ")";
             localScrollViewer.ViewChanged += localScrollViewer_ViewChanged;
         }
 
@@ -939,7 +938,7 @@ namespace MAF_VE_2
                 listView.Items.Add(itemToBeAdded);
             }
 
-            Global.Header = "Global (" + records.Count + ")";
+            globalHeaderCount.Text = "(" + records.Count + ")";
         }
 
         private void localScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
@@ -2189,7 +2188,7 @@ namespace MAF_VE_2
             comments.ClearValue(TextBox.TextProperty);
 
             globalRecords.Items.Clear();
-            Global.Header = "Global (*)";
+            globalHeaderCount.Text = "(*)";
             searchedForTextGlobal.Text = "";
             noResultsGlobal.Text = "*Perform a search to see data here";
             noResultsGlobal.Visibility = Visibility.Visible;
@@ -2304,7 +2303,7 @@ namespace MAF_VE_2
         async void SaveGlobalAsync(MAFcalculation recordToSave)
         {
             globalRecords.Items.Clear();
-            Global.Header = "Global (*)";
+            globalHeaderCount.Text = "(*)";
             searchedForTextGlobal.Text = "";
             noResultsGlobal.Visibility = Visibility.Visible;
 
@@ -2616,7 +2615,7 @@ namespace MAF_VE_2
         async void SearchGlobalDatabaseAsync(JsonObject jsonObject)
         {
             GlobalCollection.Clear();
-            Global.Header = "Global (*)";
+            globalHeaderCount.Text = "(*)";
             noResultsGlobal.Visibility = Visibility.Collapsed;
 
             string jsonString = jsonObject.Stringify();

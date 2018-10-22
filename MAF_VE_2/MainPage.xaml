@@ -314,8 +314,15 @@
 
                         <Pivot Name="recordsViewPivot" Grid.Row="1" Template="{StaticResource myPivotTemplate}" SelectionChanged="recordsViewPivot_SelectionChanged" >
 
-                            <PivotItem Name="Local" Header="Local (0)" Style="{StaticResource stylePivotItem}" >
+                            <PivotItem Name="Local" Style="{StaticResource stylePivotItem}" >
 
+                                <PivotItem.Header>
+                                    <StackPanel Name="localHeaderPanel" Orientation="Horizontal">
+                                        <TextBlock Text="Local"/>
+                                        <TextBlock Name="localHeaderCount" Text="(0)" Margin="2,0,0,0"/>
+                                    </StackPanel>
+                                </PivotItem.Header>
+                                
                                 <Grid Padding="10">
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="Auto"/>
@@ -425,7 +432,14 @@
 
                             </PivotItem>
 
-                            <PivotItem Name="Global" Header="Global (*)" Style="{StaticResource stylePivotItem}" >
+                            <PivotItem Name="Global" Style="{StaticResource stylePivotItem}" >
+
+                                <PivotItem.Header>
+                                    <StackPanel Name="globalHeaderPanel" Orientation="Horizontal">
+                                        <TextBlock Text="Global"/>
+                                        <TextBlock Name="globalHeaderCount" Text="(*)" Margin="2,0,0,0"/>
+                                    </StackPanel>
+                                </PivotItem.Header>
 
                                 <Grid Padding="10">
                                     <Grid.RowDefinitions>
