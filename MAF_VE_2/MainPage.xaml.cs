@@ -131,7 +131,7 @@ namespace MAF_VE_2
             AddYearComboboxItems();
             RefreshMakesComboBox();
             ManageAutoBackupSetting();
-            ShowAllLocalRecords();
+            ShowAllLocalRecords(false);
             ManageBackgroundSetting();
             SendLocalRecordsToSaveFunction();
         }
@@ -817,14 +817,14 @@ namespace MAF_VE_2
             });
         }
 
-        async void ShowAllLocalRecords()
+        async void ShowAllLocalRecords(bool playHeaderAnimation)
         {
             //Log("ShowAllLocalRecords");
             BeginWaitForDb();
 
             //Log("GetAllLocalRecordsAsync");
             LocalCollection = await GetAllLocalRecordsAsync();
-            LoadLocalRecords(LocalCollection, localRecords);
+            LoadLocalRecords(LocalCollection, localRecords, playHeaderAnimation);
 
             var localCount = LocalCollection.Count;
 
@@ -890,7 +890,7 @@ namespace MAF_VE_2
             progressGlobal.Visibility = Visibility.Collapsed;
         }
 
-        void LoadLocalRecords(List<MAFcalculation> records, ListView listView)
+        void LoadLocalRecords(List<MAFcalculation> records, ListView listView, bool playHeaderAnimation)
         {
             localScrollViewer.ViewChanged -= localScrollViewer_ViewChanged;
             localScrollViewer.ChangeView(0.0, 0.0, null, true);
@@ -924,7 +924,7 @@ namespace MAF_VE_2
             }
 
             localHeaderCount.Text = "(" + records.Count + ")";
-            if (recordsViewPivot.SelectedItem != Local)
+            if (recordsViewPivot.SelectedItem != Local && records.Count > 0 && playHeaderAnimation == true)
             {
                 localCountColorStoryboard.Begin();
             }
@@ -943,7 +943,7 @@ namespace MAF_VE_2
             }
 
             globalHeaderCount.Text = "(" + records.Count + ")";
-            if (recordsViewPivot.SelectedItem != Global)
+            if (recordsViewPivot.SelectedItem != Global && records.Count > 0)
             {
                 globalCountColorStoryboard.Begin();
             }
@@ -1456,7 +1456,7 @@ namespace MAF_VE_2
                     {
                         InitializeLocalDatabase();
                         RefreshMakesComboBox();
-                        ShowAllLocalRecords();
+                        ShowAllLocalRecords(false);
 
                         generalProgressRing.IsActive = false;
                         generalProgressRing.Visibility = Visibility.Collapsed;
@@ -1606,7 +1606,7 @@ namespace MAF_VE_2
                     {
                         InitializeLocalDatabase();
                         RefreshMakesComboBox();
-                        ShowAllLocalRecords();
+                        ShowAllLocalRecords(false);
 
                         generalProgressRing.IsActive = false;
                         generalProgressRing.Visibility = Visibility.Collapsed;
@@ -2201,7 +2201,7 @@ namespace MAF_VE_2
             noResultsGlobal.Text = "*Perform a search to see data here";
             noResultsGlobal.Visibility = Visibility.Visible;
 
-            ShowAllLocalRecords();
+            ShowAllLocalRecords(false);
         }
 
         #endregion
@@ -2298,7 +2298,7 @@ namespace MAF_VE_2
             {
                 BeginWaitForDb();
                 BeginLocalDbBackupOption();
-                ShowAllLocalRecords();
+                ShowAllLocalRecords(false);
 
                 if (success)
                 {
@@ -2586,7 +2586,7 @@ namespace MAF_VE_2
 
                     // Query the database and update localRecords
                     LocalCollection = await Task.Run(() => QueryLocalDatabase(queryString));
-                    LoadLocalRecords(LocalCollection, localRecords);
+                    LoadLocalRecords(LocalCollection, localRecords, true);
 
                     // Manage noResults visibility
                     if (localRecords.Items.Count == 0)
@@ -2609,7 +2609,7 @@ namespace MAF_VE_2
             {
                 var dialog = await new MessageDialog("A problem occurred when trying to search. Showing all records now.").ShowAsync();
                 ClearChartData();
-                ShowAllLocalRecords();
+                ShowAllLocalRecords(true);
             }
             finally
             {
